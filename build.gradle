@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.3.1"
+    id "edu.wpi.first.GradleRIO" version "2025.3.2"
 }
 
 java {
@@ -9,6 +9,12 @@ java {
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
+
+repositories {
+    mavenCentral()
+    // YAGSL "online" dependency repository (formerly provided via vendordep).
+    maven { url = uri("https://broncbotz3481.github.io/YAGSL-Lib/yagsl/repos") }
+}
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -72,6 +78,9 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Use ONLY the "online" YAGSL dependency (not the vendordep copy).
+    implementation 'swervelib:YAGSL-java:2025.8.0'
 }
 
 test {
