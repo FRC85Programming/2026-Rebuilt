@@ -30,14 +30,28 @@ public class ShooterSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        if (Robot.isSimulation()) {
-            shooterSim.update(flywheelMotor.get() * 12.0, 0.02);
+        final boolean isSim = Robot.isSimulation();
+        final double flywheelRpmMeasured = isSim ? shooterSim.getFlywheelRPM() : getFlywheelRPM();
+
+        // Simple feedforward in "percent output per RPM" (roughly 1 / freeSpeedRPM).
+        final double flywheelFF = ShooterConstants.FLYWHEEL_FF * goalRpm;
+        final double flywheelPIDOut = flywheelPID.calculate(flywheelRpmMeasured, goalRpm);
+        double flywheelOut = flywheelFF + flywheelPIDOut;
+        flywheelOut = Math.max(-1.0, Math.min(1.0, flywheelOut));
+
+        flywheelMotor.set(flywheelOut);
+
+        if (isSim) {
+            shooterSim.update(flywheelOut * 12.0, 0.02);
         }
+
+        SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
+        SmartDashboard.putNumber("Flywheel Measured RPM", flywheelRpmMeasured);
         SmartDashboard.putNumber("Sim Flywheel Speed", shooterSim.getFlywheelRPM());
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
-
-        flywheelMotor.set(flywheelPID.calculate(getFlywheelRPM(), goalRpm));
-        SmartDashboard.putNumber("Flywheel PID", flywheelPID.calculate(getFlywheelRPM(), goalRpm));
+        SmartDashboard.putNumber("Flywheel FF Out", flywheelFF);
+        SmartDashboard.putNumber("Flywheel PID Out", flywheelPIDOut);
+        SmartDashboard.putNumber("Flywheel Out", flywheelOut);
     }
 
     private double convertFlywheelVelocity(double velocity) {

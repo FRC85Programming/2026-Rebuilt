@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -10,22 +9,15 @@ import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSim {
 
-    DCMotor flywheelMotor = DCMotor.getNeoVortex(1);
-    double gearRatio = ShooterConstants.FLYWHEEL_GEAR_RATIO;
-    double flywheelMOI = 0.003; 
-    double flywheelKv = 0.1;    
-    double flywheelKa = 0.001;  
+    private final DCMotor flywheelMotor = DCMotor.getNeoVortex(1);
+    private final double gearRatio = ShooterConstants.FLYWHEEL_GEAR_RATIO;
 
-    double hoodAngle =  30.0; 
+    private final double flywheelMOI = 0.003;
 
-    LinearSystem<N1,N1,N1> flywheelPlant = LinearSystemId
-    .identifyVelocitySystem(flywheelKv, flywheelKa);
+    private final LinearSystem<N1, N1, N1> flywheelPlant =
+        LinearSystemId.createFlywheelSystem(flywheelMotor, flywheelMOI, gearRatio);
 
-    FlywheelSim flywheelSim = new FlywheelSim(
-        flywheelPlant,
-        flywheelMotor,
-        gearRatio
-    );
+    private final FlywheelSim flywheelSim = new FlywheelSim(flywheelPlant, flywheelMotor, gearRatio);
   
     private double hoodAngleDeg = 30.0;
   
