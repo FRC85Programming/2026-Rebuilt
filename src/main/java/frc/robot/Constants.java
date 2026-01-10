@@ -48,4 +48,26 @@ public final class Constants
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
   }
+
+  public static class ShooterConstants
+  {
+    public static final int SHOOTER_MOTOR_ID = 30;
+    public static final int HOOD_MOTOR_ID = 31;
+
+    public static final double FLYWHEEL_GEAR_RATIO = 1.0;
+    public static final double HOOD_GEAR_RATIO = 100.0;
+
+    // Hood limits - degrees
+    public static final double HOOD_MIN_ANGLE = 15.0;
+    public static final double HOOD_MAX_ANGLE = 55.0;
+
+    public static final double FLYWHEEL_P = 0.0002;
+    public static final double FLYWHEEL_I = 0.0;
+    public static final double FLYWHEEL_D = 0.0;
+    public static final double FLYWHEEL_FF = 0.00018;
+
+    public static final double HOOD_P = 0.3;
+    public static final double HOOD_I = 0.0;
+    public static final double HOOD_D = 0.0;
+  }
 }
