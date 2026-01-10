@@ -5,14 +5,20 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.ShooterConstants;
 
-public class ShooterSubsystem {
+public class ShooterSubsystem extends SubsystemBase{
      private final SparkFlex flywheelMotor =
       new SparkFlex(ShooterConstants.FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
 
     private final SparkFlex hoodMotor =
         new SparkFlex(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless);
+
+    private final ShooterSim shooterSim = new ShooterSim();
 
     private final RelativeEncoder flywheelEncoder = flywheelMotor.getEncoder();
     private final RelativeEncoder hoodEncoder = hoodMotor.getEncoder();
@@ -20,12 +26,26 @@ public class ShooterSubsystem {
     private final PIDController flywheelPID = new PIDController(ShooterConstants.FLYWHEEL_P, ShooterConstants.FLYWHEEL_I, ShooterConstants.FLYWHEEL_D);
     private final PIDController hoodPID = new PIDController(ShooterConstants.HOOD_P, ShooterConstants.HOOD_I, ShooterConstants.HOOD_D);
 
+    double goalRpm = 0.0;
+
+    @Override
+    public void periodic() {
+        if (Robot.isSimulation()) {
+            shooterSim.update(flywheelMotor.get() * 12.0, 0.02);
+        }
+        SmartDashboard.putNumber("Sim Flywheel Speed", shooterSim.getFlywheelRPM());
+        SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
+
+        flywheelMotor.set(flywheelPID.calculate(getFlywheelRPM(), goalRpm));
+        SmartDashboard.putNumber("Flywheel PID", flywheelPID.calculate(getFlywheelRPM(), goalRpm));
+    }
+
     private double convertFlywheelVelocity(double velocity) {
         return velocity / ShooterConstants.FLYWHEEL_GEAR_RATIO;
     }
 
     public void setFlywheelRPM(double rpm) {
-        flywheelMotor.set(flywheelPID.calculate(getFlywheelRPM(), rpm));
+        goalRpm = rpm;
     }
 
     public void stopFlywheel() {
@@ -40,7 +60,15 @@ public class ShooterSubsystem {
         return hoodEncoder.getPosition();
     }
 
+    // In degrees
     public void setHoodAngle(double angle) {
+        angle = Math.max(
+            ShooterConstants.HOOD_MIN_ANGLE,
+            Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
+           
+        if (Robot.isSimulation()) {    
+            shooterSim.setHoodAngle(angle);
+        }
         hoodMotor.set(hoodPID.calculate(getHoodAngle(), angle));
     }
 
