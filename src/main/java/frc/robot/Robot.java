@@ -5,9 +5,11 @@
 package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -47,13 +49,7 @@ public class Robot extends LoggedRobot
   @Override
   public void robotInit()
   {
-    Logger.addDataReceiver(new NT4Publisher());
-    if (isReal())
-    {
-      Logger.addDataReceiver(new WPILOGWriter());
-    }
-    Logger.start();
-
+    configureAdvantageKit();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -83,6 +79,8 @@ public class Robot extends LoggedRobot
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    super.robotPeriodic();
   }
 
   /**
@@ -187,10 +185,32 @@ public class Robot extends LoggedRobot
 
       Pose3d[] notesPoses = SimulatedArena.getInstance()
                 .getGamePiecesArrayByType("Note");
-      if (notesPoses == null)
-      {
-        notesPoses = new Pose3d[0];
-      }
       Logger.recordOutput("FieldSimulation/NotesPositions", notesPoses);
+  }
+
+  private void configureAdvantageKit()
+  {
+    Logger.recordMetadata("ProjectName", "2026-Rebuilt");
+
+    if (isReal())
+    {
+      // Log to file on the roboRIO and publish live data to NT for AdvantageScope.
+      Logger.addDataReceiver(new WPILOGWriter());
+      Logger.addDataReceiver(new NT4Publisher());
+    } else if (isSimulation())
+    {
+      // Log locally and publish to NT for AdvantageScope while simulating.
+      Logger.addDataReceiver(new WPILOGWriter());
+      Logger.addDataReceiver(new NT4Publisher());
+    } else
+    {
+      // Replay a log file (desktop only).
+      setUseTiming(false);
+      String logPath = LogFileUtil.findReplayLog();
+      Logger.setReplaySource(new WPILOGReader(logPath));
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+    }
+
+    Logger.start();
   }
 }

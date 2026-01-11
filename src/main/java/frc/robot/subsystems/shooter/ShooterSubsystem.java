@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -70,8 +71,16 @@ public class ShooterSubsystem extends SubsystemBase{
         return convertFlywheelVelocity(flywheelEncoder.getVelocity());
     }
 
+    public double getSimFlywheelRPM() {
+        return convertFlywheelVelocity(shooterSim.getFlywheelRPM());
+    }
+
     public double getHoodAngle() {
         return hoodEncoder.getPosition();
+    }
+
+    public double getSimHoodAngle() {
+        return shooterSim.getHoodAngleDeg();
     }
 
     // In degrees
@@ -92,6 +101,6 @@ public class ShooterSubsystem extends SubsystemBase{
 
     public boolean flywheelAtSpeed(double targetRPM, double tolerance) {
         return Math.abs(getFlywheelRPM() - targetRPM) < tolerance;
-      }
     }
+}
 

@@ -20,13 +20,18 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.SimProjectileCommand;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation.GamePieceInfo;
 import org.ironmaple.simulation.seasonspecific.crescendo2024.CrescendoNoteOnField;
+import org.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
 
 import swervelib.SwerveInputStream;
 
@@ -107,7 +112,7 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    SimulatedArena.getInstance().addGamePiece(new CrescendoNoteOnField(new Translation2d(3, 3)));
+    SimulatedArena.getInstance().addGamePiece(new ReefscapeCoralOnField(new Pose2d(3, 3, new Rotation2d(0))));
   }
 
   /**
@@ -166,7 +171,7 @@ public class RobotContainer
       driverXbox.button(1).onTrue(angleHoodUp);
       driverXbox.button(2).onTrue(angleHoodDown);
       driverXbox.button(3).onTrue(runFlywheel);
-      driverXbox.button(4).onTrue(stopFlywheel);
+      driverXbox.button(4).onTrue(new SimProjectileCommand(drivebase, shooter));
 
 
 //      driverXbox.b().whileTrue(
