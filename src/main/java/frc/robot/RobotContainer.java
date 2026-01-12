@@ -22,8 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Shoot;
-import frc.robot.commands.SimProjectileCommand;
-import frc.robot.commands.swervedrive.drivebase.EndIfAligned;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -116,9 +114,7 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Shoot", new SimProjectileCommand(drivebase, shooter));
-    NamedCommands.registerCommand("Align", new Shoot(drivebase, shooter));
-    NamedCommands.registerCommand("Align Check", new EndIfAligned(drivebase));
+    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter));
   }
 
   /**
@@ -178,8 +174,6 @@ public class RobotContainer
       driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter));
       driverXbox.button(2).onTrue(angleHoodDown);
       driverXbox.button(3).onTrue(runFlywheel);
-      driverXbox.button(4).onTrue(new SimProjectileCommand(drivebase, shooter));
-
 
 //      driverXbox.b().whileTrue(
 //          drivebase.driveToPose(

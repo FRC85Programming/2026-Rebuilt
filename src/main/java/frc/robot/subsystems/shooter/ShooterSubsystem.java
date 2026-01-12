@@ -5,6 +5,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,10 +30,16 @@ public class ShooterSubsystem extends SubsystemBase{
     private final PIDController hoodPID = new PIDController(ShooterConstants.HOOD_P, ShooterConstants.HOOD_I, ShooterConstants.HOOD_D);
 
     double goalRpm = 0.0;
+    double goalAngle = 30;
+
+    boolean isSim;
+
+    public ShooterSubsystem() {
+        isSim = Robot.isSimulation();
+    }
 
     @Override
     public void periodic() {
-        final boolean isSim = Robot.isSimulation();
         final double flywheelRpmMeasured = isSim ? shooterSim.getFlywheelRPM() : getFlywheelRPM();
         final double flywheelPIDOut = flywheelPID.calculate(flywheelRpmMeasured, goalRpm);
         double flywheelOut = flywheelPIDOut;
@@ -64,7 +72,11 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public double getFlywheelRPM() {
-        return convertFlywheelVelocity(flywheelEncoder.getVelocity());
+        if (isSim) {
+            return convertFlywheelVelocity(shooterSim.getFlywheelRPM());
+        } else {
+            return convertFlywheelVelocity(flywheelEncoder.getVelocity());
+        }
     }
 
     public double getSimFlywheelRPM() {
@@ -72,7 +84,12 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public double getHoodAngle() {
-        return hoodEncoder.getPosition();
+        if (isSim) {
+            return shooterSim.getHoodAngleDeg();
+        } else {
+            // Needs to be converted to degrees on real robot
+            return hoodEncoder.getPosition();
+        }
     }
 
     public double getSimHoodAngle() {
@@ -88,20 +105,29 @@ public class ShooterSubsystem extends SubsystemBase{
         if (Robot.isSimulation()) {    
             shooterSim.setHoodAngle(angle);
         }
+        goalAngle = angle;
         hoodMotor.set(hoodPID.calculate(getHoodAngle(), angle));
     }
 
-    public boolean hoodAtAngle(double targetDeg, double tolerance) {
-        return Math.abs(getHoodAngle() - targetDeg) < tolerance;
+    public boolean hoodAtAngle(double tolerance) {
+        return Math.abs(getHoodAngle() - goalAngle) < tolerance;
     }
 
-    public boolean flywheelAtSpeed(double targetRPM, double tolerance) {
-        return Math.abs(getFlywheelRPM() - targetRPM) < tolerance;
+    public boolean flywheelAtSpeed(double tolerance) {
+        return Math.abs(getFlywheelRPM() - goalRpm) < tolerance;
     }
 
     public double mpsToRPM(double speed) {
         // Assume 16m/s = 6000 RPM as a placeholder
         return speed * 375.0;
+    }
+
+    public void simulatedShot(Pose2d pose, ChassisSpeeds velocity) {
+        shooterSim.generateProjectile(pose, velocity);
+    }
+
+    public boolean generateProjectileIsReady() {
+        return shooterSim.generateProjectileIsReady();
     }
 }
 

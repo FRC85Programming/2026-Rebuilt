@@ -69,5 +69,7 @@ public final class Constants
     public static final double HOOD_P = 0.3;
     public static final double HOOD_I = 0.0;
     public static final double HOOD_D = 0.0;
+
+    public static final double SHOOTER_HEIGHT_METERS = 0.305;
   }
 }

@@ -28,6 +28,9 @@ public class Shoot extends Command{
     List<Translation3d> fieldTrajectory3d;
     boolean calculated = false;
     double targetHeight = 1.829; // Rebuilt goal height
+    // Placeholder! Make sure to pull in the actual indexed ball count on the real robot
+    int heldCount = 8;
+    int shotCount = 0;
 
 
     public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter) {
@@ -108,7 +111,25 @@ public class Shoot extends Command{
             shooter.setHoodAngle(
                 Math.toDegrees(shotSolution.launchAngleRad())
             );
+            SmartDashboard.putBoolean("Flywheel at speed", shooter.flywheelAtSpeed(200));
+            SmartDashboard.putBoolean("Hood at angle", shooter.hoodAtAngle(3));
+
+
+            if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.03)) {
+                // Put indexer code here
+                if (shotCount < heldCount) {
+                    if (shooter.generateProjectileIsReady()) {
+                        shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
+                        shotCount++;
+                    }
+                }
+            }
         }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return shotCount >= heldCount;
     }
 
 
@@ -119,5 +140,7 @@ public class Shoot extends Command{
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
 
         calculated = false;
+
+        shotCount = 0;
     }
 }
