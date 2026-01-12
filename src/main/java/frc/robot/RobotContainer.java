@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.SimProjectileCommand;
+import frc.robot.commands.swervedrive.drivebase.EndIfAligned;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -117,6 +118,7 @@ public class RobotContainer
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
     NamedCommands.registerCommand("Shoot", new SimProjectileCommand(drivebase, shooter));
     NamedCommands.registerCommand("Align", new Shoot(drivebase, shooter));
+    NamedCommands.registerCommand("Align Check", new EndIfAligned(drivebase));
   }
 
   /**
@@ -147,7 +149,7 @@ public class RobotContainer
 
     if (RobotBase.isSimulation())
     {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityKeyboard);
     } else
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -215,7 +217,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("TestAuto");
+    return drivebase.getAutonomousCommand("16BallAuto");
   }
 
   public void setMotorBrake(boolean brake)

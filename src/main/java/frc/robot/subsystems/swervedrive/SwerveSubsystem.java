@@ -262,6 +262,12 @@ public class SwerveSubsystem extends SubsystemBase
     drive(new ChassisSpeeds(0, 0, aimOmega));
   }
 
+  /***
+   * Check if the robot is aimed at the target position within a certain tolerance.
+   * Assumes that you have already run aimAtPosition to set the aimController error.
+   * @param tolerance The error tolerance (in the same degrees the input was in)
+   * @return True if aimed within tolerance, false otherwise.
+   */
   public boolean isAimedAtPosition(double tolerance) {
     double angleError = aimController.getError();
 

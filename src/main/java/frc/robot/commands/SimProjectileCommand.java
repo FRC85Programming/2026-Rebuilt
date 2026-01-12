@@ -33,7 +33,7 @@ public class SimProjectileCommand extends Command {
             swerve.getRobotVelocity(),
             swerve.getPose().getRotation(),
             Units.Meters.of(0.305),
-            Units.MetersPerSecond.of(shooter.getSimFlywheelRPM() / 6000.0 * 20.0),
+            Units.MetersPerSecond.of(shooter.getSimFlywheelRPM() / 6900.0 * 20.0),
             Units.Radians.of(shooter.getSimHoodAngle()/180.0 * Math.PI)
         );
 

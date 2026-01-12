@@ -24,10 +24,10 @@ public class Shoot extends Command{
     ShooterSubsystem shooter;
     SwerveSubsystem swerve;
     ShotSolution shotSolution;
-    Translation2d targetTranslation = new Translation2d(8.25, 4.15); // 2022 hub location
+    Translation2d targetTranslation = new Translation2d(4.620, 4.030); // Rebuilt BLUE goal
     List<Translation3d> fieldTrajectory3d;
-    boolean calculated = true;
-    double targetHeight = 2.64;
+    boolean calculated = false;
+    double targetHeight = 1.829; // Rebuilt goal height
 
 
     public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter) {
@@ -40,7 +40,7 @@ public class Shoot extends Command{
             swerve.getPose().getTranslation().getDistance(targetTranslation),
             0.305,
             targetHeight,
-            Math.toRadians(55),
+            Math.toRadians(65),
             Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
             Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE)
         );
