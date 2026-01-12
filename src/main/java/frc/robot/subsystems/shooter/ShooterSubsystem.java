@@ -33,11 +33,8 @@ public class ShooterSubsystem extends SubsystemBase{
     public void periodic() {
         final boolean isSim = Robot.isSimulation();
         final double flywheelRpmMeasured = isSim ? shooterSim.getFlywheelRPM() : getFlywheelRPM();
-
-        // Simple feedforward in "percent output per RPM" (roughly 1 / freeSpeedRPM).
-        final double flywheelFF = ShooterConstants.FLYWHEEL_FF * goalRpm;
         final double flywheelPIDOut = flywheelPID.calculate(flywheelRpmMeasured, goalRpm);
-        double flywheelOut = flywheelFF + flywheelPIDOut;
+        double flywheelOut = flywheelPIDOut;
         flywheelOut = Math.max(-1.0, Math.min(1.0, flywheelOut));
 
         flywheelMotor.set(flywheelOut);
@@ -50,7 +47,6 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Flywheel Measured RPM", flywheelRpmMeasured);
         SmartDashboard.putNumber("Sim Flywheel Speed", shooterSim.getFlywheelRPM());
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
-        SmartDashboard.putNumber("Flywheel FF Out", flywheelFF);
         SmartDashboard.putNumber("Flywheel PID Out", flywheelPIDOut);
         SmartDashboard.putNumber("Flywheel Out", flywheelOut);
     }
@@ -101,6 +97,11 @@ public class ShooterSubsystem extends SubsystemBase{
 
     public boolean flywheelAtSpeed(double targetRPM, double tolerance) {
         return Math.abs(getFlywheelRPM() - targetRPM) < tolerance;
+    }
+
+    public double mpsToRPM(double speed) {
+        // Assume 16m/s = 6000 RPM as a placeholder
+        return speed * 375.0;
     }
 }
 

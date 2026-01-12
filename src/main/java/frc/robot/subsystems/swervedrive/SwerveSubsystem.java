@@ -5,6 +5,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Newton;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -52,6 +53,8 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import edu.wpi.first.math.controller.PIDController;
+
 
 public class SwerveSubsystem extends SubsystemBase
 {
@@ -68,6 +71,8 @@ public class SwerveSubsystem extends SubsystemBase
    * PhotonVision class to keep an accurate odometry.
    */
   private       Vision      vision;
+
+  PIDController aimController = new PIDController(1, 0, 0);
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -244,6 +249,14 @@ public class SwerveSubsystem extends SubsystemBase
         }
       }
     });
+  }
+
+  public void aimAtPosition(Translation2d position) {
+    Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle();
+
+    double omega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
+
+    drive(new ChassisSpeeds(0, 0, omega));
   }
 
   /**
