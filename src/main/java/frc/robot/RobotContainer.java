@@ -114,7 +114,7 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter));
+    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, 65));
   }
 
   /**
@@ -171,8 +171,8 @@ public class RobotContainer
       /*driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
-      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter));
-      driverXbox.button(2).onTrue(angleHoodDown);
+      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, 65));
+      driverXbox.button(2).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueFeedPosition, 65));
       driverXbox.button(3).onTrue(runFlywheel);
 
 //      driverXbox.b().whileTrue(
@@ -211,7 +211,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("16BallAuto");
+    return drivebase.getAutonomousCommand("16BallAutoLeftClimb");
   }
 
   public void setMotorBrake(boolean brake)

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -71,5 +73,11 @@ public final class Constants
     public static final double HOOD_D = 0.0;
 
     public static final double SHOOTER_HEIGHT_METERS = 0.305;
+  }
+
+  public static class FieldConstants {
+      public static final Translation3d blueHub = new Translation3d(4.620, 4.030, 1.829);
+      public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
+
   }
 }

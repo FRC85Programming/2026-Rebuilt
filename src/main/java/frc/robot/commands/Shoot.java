@@ -24,26 +24,28 @@ public class Shoot extends Command{
     ShooterSubsystem shooter;
     SwerveSubsystem swerve;
     ShotSolution shotSolution;
-    Translation2d targetTranslation = new Translation2d(4.620, 4.030); // Rebuilt BLUE goal
+    Translation3d targetTranslation;
     List<Translation3d> fieldTrajectory3d;
+    double dropAngle;
     boolean calculated = false;
-    double targetHeight = 1.829; // Rebuilt goal height
     // Placeholder! Make sure to pull in the actual indexed ball count on the real robot
     int heldCount = 8;
     int shotCount = 0;
 
 
-    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter) {
+    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, Translation3d targetTranslation, double dropAngle) {
         this.shooter = shooter;
         this.swerve = swerve;
+        this.dropAngle = dropAngle;
+        this.targetTranslation = targetTranslation;
     }
 
     private void calculateSolution() {
         var solution = ShotSolver.solve(
-            swerve.getPose().getTranslation().getDistance(targetTranslation),
+            swerve.getPose().getTranslation().getDistance(targetTranslation.toTranslation2d()),
             0.305,
-            targetHeight,
-            Math.toRadians(65),
+            targetTranslation.getZ(),
+            Math.toRadians(dropAngle),
             Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
             Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE)
         );
@@ -97,7 +99,7 @@ public class Shoot extends Command{
 
     @Override
     public void execute() {
-        swerve.aimAtPosition(targetTranslation);
+        swerve.aimAtPosition(targetTranslation.toTranslation2d());
 
         if (swerve.isAimedAtPosition(0.03) && !calculated) {
             calculateSolution();

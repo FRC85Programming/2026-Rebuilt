@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.301554921540655,
+        "y": 7.302011412268189
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.1592296718972896,
+        "y": 7.0691155492154065
+      },
+      "isLocked": false,
+      "linkedName": "LShoot"
+    },
+    {
+      "anchor": {
+        "x": 1.6065905848787443,
+        "y": 4.442567760342368
+      },
+      "prevControl": {
+        "x": 2.020627674750356,
+        "y": 4.597831669044222
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 1800.0,
+    "rotation": 179.484
+  },
+  "reversed": false,
+  "folder": "Left",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -67.92141889790871
+  },
+  "useDefaultConstraints": true
+}
