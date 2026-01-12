@@ -28,6 +28,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -72,7 +73,9 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private       Vision      vision;
 
-  PIDController aimController = new PIDController(1, 0, 0);
+  PIDController aimController = new PIDController(4, 0, 0);
+
+  double aimOmega = 0;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -254,9 +257,17 @@ public class SwerveSubsystem extends SubsystemBase
   public void aimAtPosition(Translation2d position) {
     Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle();
 
-    double omega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
+    aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
 
-    drive(new ChassisSpeeds(0, 0, omega));
+    drive(new ChassisSpeeds(0, 0, aimOmega));
+  }
+
+  public boolean isAimedAtPosition(double tolerance) {
+    double angleError = aimController.getError();
+
+    SmartDashboard.putNumber("angleError", angleError);
+
+    return Math.abs(angleError) < tolerance;
   }
 
   /**

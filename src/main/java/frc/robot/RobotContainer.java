@@ -115,6 +115,8 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
+    NamedCommands.registerCommand("Shoot", new SimProjectileCommand(drivebase, shooter));
+    NamedCommands.registerCommand("Align", new Shoot(drivebase, shooter));
   }
 
   /**
@@ -213,7 +215,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return drivebase.getAutonomousCommand("TestAuto");
   }
 
   public void setMotorBrake(boolean brake)

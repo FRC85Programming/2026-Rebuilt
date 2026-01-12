@@ -29,7 +29,7 @@ public class SimProjectileCommand extends Command {
     public void initialize() {
         ReefscapeAlgaeOnFly algaeOnFly = new ReefscapeAlgaeOnFly(
             swerve.getPose().getTranslation(),
-            new Translation2d(0.2, 0.0),
+            new Translation2d(0.0, 0.0),
             swerve.getRobotVelocity(),
             swerve.getPose().getRotation(),
             Units.Meters.of(0.305),
