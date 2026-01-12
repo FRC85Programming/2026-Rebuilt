@@ -3,6 +3,7 @@ package frc.robot.commands;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -26,7 +27,7 @@ public class SimProjectileCommand extends Command {
 
     @Override
     public void initialize() {
-        NoteOnFly noteOnFly = new NoteOnFly(
+        ReefscapeAlgaeOnFly algaeOnFly = new ReefscapeAlgaeOnFly(
             swerve.getPose().getTranslation(),
             new Translation2d(0.2, 0.0),
             swerve.getRobotVelocity(),
@@ -36,12 +37,12 @@ public class SimProjectileCommand extends Command {
             Units.Radians.of(shooter.getSimHoodAngle()/180.0 * Math.PI)
         );
 
-        noteOnFly.withProjectileTrajectoryDisplayCallBack(
+        algaeOnFly.withProjectileTrajectoryDisplayCallBack(
             (poseArray) -> Logger.recordOutput("Sim/Projectile/Trajectory", poseArray.toArray(Pose3d[]::new)),
             (poseArray) -> Logger.recordOutput("Sim/Projectile/Missed", poseArray.toArray(Pose3d[]::new))
         );
 
-        SimulatedArena.getInstance().addGamePieceProjectile(noteOnFly);
+        SimulatedArena.getInstance().addGamePieceProjectile(algaeOnFly);
 
         Logger.recordOutput("Sim/Projectile/Launched", swerve.getPose());
     }

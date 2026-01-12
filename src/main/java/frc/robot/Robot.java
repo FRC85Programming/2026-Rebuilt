@@ -184,8 +184,8 @@ public class Robot extends LoggedRobot
       SimulatedArena.getInstance().simulationPeriodic();
 
       Pose3d[] notesPoses = SimulatedArena.getInstance()
-                .getGamePiecesArrayByType("Note");
-      Logger.recordOutput("FieldSimulation/NotesPositions", notesPoses);
+                .getGamePiecesArrayByType("Algae");
+      Logger.recordOutput("FieldSimulation/Algae", notesPoses);
   }
 
   private void configureAdvantageKit()

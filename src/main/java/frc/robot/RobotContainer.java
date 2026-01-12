@@ -31,6 +31,7 @@ import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation.GamePieceInfo;
 import org.ironmaple.simulation.seasonspecific.crescendo2024.CrescendoNoteOnField;
 import org.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnField;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
 
 import swervelib.SwerveInputStream;
@@ -112,7 +113,6 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    SimulatedArena.getInstance().addGamePiece(new ReefscapeCoralOnField(new Pose2d(3, 3, new Rotation2d(0))));
   }
 
   /**
