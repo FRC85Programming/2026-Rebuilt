@@ -33,7 +33,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.subsystems.odometry.QuestNavSubsystem;
+import frc.robot.subsystems.odometry.QuestResult;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
+import gg.questnav.questnav.PoseFrame;
+import gg.questnav.questnav.QuestNav;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -68,6 +73,12 @@ public class SwerveSubsystem extends SubsystemBase
    * PhotonVision class to keep an accurate odometry.
    */
   private       Vision      vision;
+
+  private QuestNavSubsystem questNav = new QuestNavSubsystem();
+
+  PoseFrame[] questFrames;
+
+  boolean useQuestNav = true;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -143,6 +154,13 @@ public class SwerveSubsystem extends SubsystemBase
     {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
+    }
+    if (useQuestNav) {
+      for (PoseFrame questFrame : questFrames) {
+        QuestResult result = questNav.getResult(questFrame);
+
+        swerveDrive.addVisionMeasurement(result.getPose().toPose2d(), result.getTimeStamp(), questNav.getStdDevs());
+      }
     }
   }
 
