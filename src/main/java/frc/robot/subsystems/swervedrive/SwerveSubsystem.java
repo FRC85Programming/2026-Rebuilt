@@ -156,10 +156,13 @@ public class SwerveSubsystem extends SubsystemBase
       vision.updatePoseEstimation(swerveDrive);
     }
     if (useQuestNav) {
-      for (PoseFrame questFrame : questFrames) {
-        QuestResult result = questNav.getResult(questFrame);
+      questFrames = questNav.getAllUnreadPoseFrames();
+      if (questFrames != null) {
+        for (PoseFrame questFrame : questFrames) {
+            QuestResult result = questNav.getResult(questFrame);
 
-        swerveDrive.addVisionMeasurement(result.getPose().toPose2d(), result.getTimeStamp(), questNav.getStdDevs());
+            swerveDrive.addVisionMeasurement(result.getPose().toPose2d(), result.getTimeStamp(), questNav.getStdDevs());
+        }
       }
     }
   }
