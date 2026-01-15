@@ -30,7 +30,6 @@ public class ShooterSim extends SubsystemBase{
     private final LinearSystem<N1, N1, N1> flywheelPlant =
         LinearSystemId.createFlywheelSystem(flywheelMotor, flywheelMOI, gearRatio);
 
-    // THIS NAME NEEDS TO BE CHANGED
     private final FlywheelSim flywheelSim = new FlywheelSim(flywheelPlant, flywheelMotor, gearRatio);
   
     private double hoodAngleDeg = 30.0;

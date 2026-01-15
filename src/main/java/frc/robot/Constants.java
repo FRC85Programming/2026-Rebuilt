@@ -78,6 +78,9 @@ public final class Constants
   public static class FieldConstants {
       public static final Translation3d blueHub = new Translation3d(4.620, 4.030, 1.829);
       public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
+  }
 
+  public static class TurretConstants {
+      public static final int TURRET_MOTOR_ID = 32;
   }
 }

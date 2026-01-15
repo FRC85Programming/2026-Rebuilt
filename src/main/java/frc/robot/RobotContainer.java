@@ -21,10 +21,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.TurretConstants;
 import frc.robot.commands.Shoot;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
+
 import java.io.File;
 
 import org.ironmaple.simulation.SimulatedArena;
@@ -51,6 +54,8 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/neo"));
   private final ShooterSubsystem shooter = new ShooterSubsystem();
+
+  private final TurretSubsystem turret = new TurretSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -139,6 +144,8 @@ public class RobotContainer
     Command stopFlywheel = new InstantCommand(() -> shooter.setFlywheelRPM(0));
     Command angleHoodUp = new InstantCommand(() -> shooter.setHoodAngle(50.0));
     Command angleHoodDown = new InstantCommand(() -> shooter.setHoodAngle(20.0));
+    Command setTurretAngle = new InstantCommand(() -> turret.setTargetAngle(3.1415));
+
 
 
 
@@ -173,7 +180,7 @@ public class RobotContainer
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
       driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, 65));
       driverXbox.button(2).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueFeedPosition, 65));
-      driverXbox.button(3).onTrue(runFlywheel);
+      driverXbox.button(3).onTrue(setTurretAngle);
 
 //      driverXbox.b().whileTrue(
 //          drivebase.driveToPose(
