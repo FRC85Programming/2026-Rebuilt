@@ -1,7 +1,6 @@
 package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -394,7 +393,7 @@ public class Vision
     /**
      * Estimated robot pose.
      */
-    public Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
+    public        Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
 
     /**
      * Simulated camera instance which only exists during simulations.
@@ -524,15 +523,13 @@ public class Vision
     private void updateUnreadResults()
     {
       double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
-      double currentTimestamp    = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
-      double debounceTime        = Milliseconds.of(15).in(Seconds);
+      
       for (PhotonPipelineResult result : resultsList)
       {
         mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
       }
 
         resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
-        lastReadTimestamp = currentTimestamp;
         resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
           return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
         });
@@ -628,8 +625,5 @@ public class Vision
         }
       }
     }
-
-
   }
-
 }

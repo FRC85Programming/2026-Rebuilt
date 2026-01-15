@@ -24,7 +24,7 @@ https://broncbotz3481.github.io/YAGSL-Lib/yagsl/yagsl.json
 [Library here](https://github.com/BroncBotz3481/YAGSL/)  
 [Code here](https://github.com/BroncBotz3481/YAGSL/tree/main/swervelib)  
 [WIKI](https://github.com/BroncBotz3481/YAGSL/wiki)  
-[Config Generation](https://yet-another-software-suite.github.io/YAGSL-Example/)
+[Config Generation](https://broncbotz3481.github.io/YAGSL-Example/)
 
 # Create an issue if there is any errors you find!
 
@@ -113,6 +113,3 @@ SwerveDrive swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumS
 
 # Special Thanks to Team 7900! Trial N' Terror
 Without the debugging and aid of Team 7900 the project could never be as stable or active as it is. 
-
-# YAGSL is based off Swerve Code from Team 95 in 2023
-Thank you to team 95! (Note: Since then YAGSL has turned into the ship of Theseus)

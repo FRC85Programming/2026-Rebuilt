@@ -30,19 +30,15 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
-import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
-import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -55,27 +51,18 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase
 {
-
   /**
    * Swerve drive object.
    */
   private final SwerveDrive swerveDrive;
-  /**
-   * Enable vision odometry updates while driving.
-   */
-  private final boolean     visionDriveTest = false;
-  /**
-   * PhotonVision class to keep an accurate odometry.
-   */
-  private       Vision      vision;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
    * @param directory Directory of swerve drive config files.
    */
-  public SwerveSubsystem(File directory)
-  {
+   public SwerveSubsystem(File directory)
+  { 
     boolean blueAlliance = false;
     Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
                                                                       Meter.of(4)),
@@ -102,14 +89,8 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
-    if (visionDriveTest)
-    {
-      setupPhotonVision();
-      // Stop the odometry thread if we are using vision that way we can synchronize updates better.
-      swerveDrive.stopOdometryThread();
-    }
+
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
   }
 
   /**
@@ -127,23 +108,9 @@ public class SwerveSubsystem extends SubsystemBase
                                              Rotation2d.fromDegrees(0)));
   }
 
-  /**
-   * Setup the photon vision class.
-   */
-  public void setupPhotonVision()
-  {
-    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
-  }
-
   @Override
   public void periodic()
   {
-    // When vision is enabled we must manually update odometry in SwerveDrive
-    if (visionDriveTest)
-    {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
-    }
   }
 
   @Override
@@ -220,30 +187,6 @@ public class SwerveSubsystem extends SubsystemBase
     //Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
-  }
-
-  /**
-   * Aim the robot at the target returned by PhotonVision.
-   *
-   * @return A {@link Command} which will run the alignment.
-   */
-  public Command aimAtTarget(Cameras camera)
-  {
-
-    return run(() -> {
-      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-      if (resultO.isPresent())
-      {
-        var result = resultO.get();
-        if (result.hasTargets())
-        {
-          drive(getTargetSpeeds(0,
-                                0,
-                                Rotation2d.fromDegrees(result.getBestTarget()
-                                                             .getYaw()))); // Not sure if this will work, more math may be required.
-        }
-      }
-    });
   }
 
   /**
@@ -376,18 +319,17 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
   /**
-   * Returns a Command that drives the swerve drive to a specific distance at a given speed.
+   * Returns a Command that tells the robot to drive forward until the command ends.
    *
-   * @param distanceInMeters       the distance to drive in meters
-   * @param speedInMetersPerSecond the speed at which to drive in meters per second
-   * @return a Command that drives the swerve drive to a specific distance at a given speed
+   * @return a Command that tells the robot to drive forward until the command ends
    */
-  public Command driveToDistanceCommand(double distanceInMeters, double speedInMetersPerSecond)
+  public Command driveForward()
   {
-    return run(() -> drive(new ChassisSpeeds(speedInMetersPerSecond, 0, 0)))
-        .until(() -> swerveDrive.getPose().getTranslation().getDistance(new Translation2d(0, 0)) >
-                     distanceInMeters);
+    return run(() -> {
+      swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
+    }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
   }
+
 
   /**
    * Replaces the swerve module feedforward with a new SimpleMotorFeedforward object.
@@ -502,7 +444,6 @@ public class SwerveSubsystem extends SubsystemBase
   {
     swerveDrive.drive(velocity);
   }
-
 
   /**
    * Get the swerve drive kinematics object.
@@ -711,14 +652,6 @@ public class SwerveSubsystem extends SubsystemBase
   public Rotation2d getPitch()
   {
     return swerveDrive.getPitch();
-  }
-
-  /**
-   * Add a fake vision reading for testing purposes.
-   */
-  public void addFakeVisionReading()
-  {
-    swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
 
   /**
