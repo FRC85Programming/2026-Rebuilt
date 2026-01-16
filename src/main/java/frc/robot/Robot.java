@@ -82,7 +82,7 @@ public class Robot extends TimedRobot
     disabledTimer.reset();
     disabledTimer.start();
   }
-
+  
   @Override
   public void disabledPeriodic()
   {
@@ -103,10 +103,13 @@ public class Robot extends TimedRobot
     m_robotContainer.setMotorBrake(true);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
+    //Print the selected autonomous command upon autonomous init
+    System.out.println("Auto selected: " + m_autonomousCommand);
+
+    // schedule the autonomous command selected in the autoChooser
     if (m_autonomousCommand != null)
     {
-      m_autonomousCommand.schedule();
+      CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
   }
 
