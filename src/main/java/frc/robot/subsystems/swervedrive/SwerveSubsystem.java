@@ -27,6 +27,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -46,6 +47,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.ironmaple.utils.FieldMirroringUtils;
 import org.json.simple.parser.ParseException;
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
@@ -79,6 +82,8 @@ public class SwerveSubsystem extends SubsystemBase
   PoseFrame[] questFrames;
 
   boolean useQuestNav = true;
+
+  Field2d field = new Field2d();
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -162,8 +167,10 @@ public class SwerveSubsystem extends SubsystemBase
             QuestResult result = questNav.getResult(questFrame);
 
             swerveDrive.addVisionMeasurement(result.getPose().toPose2d(), result.getTimeStamp(), questNav.getStdDevs());
+            field.setRobotPose(result.getPose().toPose2d());
         }
       }
+      
     }
   }
 
