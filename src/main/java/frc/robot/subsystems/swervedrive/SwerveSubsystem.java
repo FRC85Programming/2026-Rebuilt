@@ -28,6 +28,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -83,7 +84,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   boolean useQuestNav = true;
 
-  Field2d field = new Field2d();
+  Field2d fieldQuest = new Field2d();
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -167,7 +168,8 @@ public class SwerveSubsystem extends SubsystemBase
             QuestResult result = questNav.getResult(questFrame);
 
             swerveDrive.addVisionMeasurement(result.getPose().toPose2d(), result.getTimeStamp(), questNav.getStdDevs());
-            field.setRobotPose(result.getPose().toPose2d());
+            fieldQuest.setRobotPose(result.getPose().toPose2d());
+            SmartDashboard.putData("QuestField", fieldQuest);
         }
       }
       

@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import gg.questnav.questnav.PoseFrame;
@@ -16,8 +17,8 @@ public class QuestNavSubsystem extends SubsystemBase {
     QuestNav questNav = new QuestNav();
     
     Transform3d ROBOT_TO_QUEST = new Transform3d(
-        new edu.wpi.first.math.geometry.Translation3d(0.0, 0.0, 0.0),
-        new edu.wpi.first.math.geometry.Rotation3d(0.0, 0.0, 0.0) 
+        new edu.wpi.first.math.geometry.Translation3d(0.0, Units.inchesToMeters(14.5), Units.inchesToMeters(6.5)),
+        new edu.wpi.first.math.geometry.Rotation3d(0.0, 0.0,0.0)
     );
     
     Matrix<N3, N1> QUESTNAV_STD_DEVS =
