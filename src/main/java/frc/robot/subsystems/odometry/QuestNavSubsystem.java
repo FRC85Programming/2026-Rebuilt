@@ -17,8 +17,8 @@ public class QuestNavSubsystem extends SubsystemBase {
     QuestNav questNav = new QuestNav();
     
     Transform3d ROBOT_TO_QUEST = new Transform3d(
-        new edu.wpi.first.math.geometry.Translation3d(0.0, Units.inchesToMeters(14.5), Units.inchesToMeters(6.5)),
-        new edu.wpi.first.math.geometry.Rotation3d(0.0, 0.0,0.0)
+        new edu.wpi.first.math.geometry.Translation3d(Units.inchesToMeters(14.5), 0.0, Units.inchesToMeters(13)),
+        new edu.wpi.first.math.geometry.Rotation3d(0.0, 0.0, 0.0)
     );
     
     Matrix<N3, N1> QUESTNAV_STD_DEVS =
@@ -52,5 +52,9 @@ public class QuestNavSubsystem extends SubsystemBase {
 
     public Matrix<N3, N1> getStdDevs() {
         return QUESTNAV_STD_DEVS;
+    }
+
+    public void setPose(Pose3d pose) {
+        questNav.setPose(pose);
     }
 }

@@ -19,6 +19,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -158,8 +159,8 @@ public class SwerveSubsystem extends SubsystemBase
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+      //swerveDrive.updateOdometry();
+      //vision.updatePoseEstimation(swerveDrive);
     }
     if (useQuestNav) {
       questFrames = questNav.getAllUnreadPoseFrames();
@@ -554,6 +555,7 @@ public class SwerveSubsystem extends SubsystemBase
   public void resetOdometry(Pose2d initialHolonomicPose)
   {
     swerveDrive.resetOdometry(initialHolonomicPose);
+    questNav.setPose(new Pose3d(initialHolonomicPose));
   }
 
   /**
