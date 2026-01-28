@@ -27,11 +27,6 @@ public class Shoot extends Command{
     Translation3d targetTranslation;
     List<Translation3d> fieldTrajectory3d;
     double dropAngle;
-    boolean calculated = false;
-    // Placeholder! Make sure to pull in the actual indexed ball count on the real robot
-    int heldCount = 8;
-    int shotCount = 0;
-
 
     public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, Translation3d targetTranslation, double dropAngle) {
         this.shooter = shooter;
@@ -41,13 +36,34 @@ public class Shoot extends Command{
     }
 
     private void calculateSolution() {
+        // Convert the field relative velocity into velocity relative to the goal
+        ChassisSpeeds robotVel = swerve.getFieldVelocity();
+        Translation2d toTarget2d =
+            targetTranslation.toTranslation2d()
+                .minus(swerve.getPose().getTranslation());
+
+        double distance = toTarget2d.getNorm();
+
+        // Protect against super short distances/pose glitches
+        if (distance < 1e-6) {
+            return;
+        }
+
+        Translation2d toTargetUnit = toTarget2d.div(distance);
+        
+        double robotVx = 
+            robotVel.vxMetersPerSecond * toTargetUnit.getX() 
+            + robotVel.vyMetersPerSecond * toTargetUnit.getY();
+
+            
         var solution = ShotSolver.solve(
             swerve.getPose().getTranslation().getDistance(targetTranslation.toTranslation2d()),
             0.305,
             targetTranslation.getZ(),
             Math.toRadians(dropAngle),
             Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
-            Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE)
+            Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE),
+            robotVx
         );
 
         if (solution.isEmpty()) {
@@ -57,6 +73,7 @@ public class Shoot extends Command{
 
         shotSolution = solution.get();
 
+        // Create trajectories for sim visulization (could be wrapped in a sim check if the code runs slow)
         var shooterRelativeTrajectory =
             BallisticTrajectory3d.generate(
                 shotSolution.launchVelocityMps(),
@@ -99,12 +116,13 @@ public class Shoot extends Command{
 
     @Override
     public void execute() {
+        // Placeholder! Needs to use shot leading or use turret code instead
         swerve.aimAtPosition(targetTranslation.toTranslation2d());
 
-        if (swerve.isAimedAtPosition(0.03) && !calculated) {
+        if (swerve.isAimedAtPosition(0.03)) {
             calculateSolution();
-            calculated = true;
         }
+
         if (shotSolution != null) {
             shooter.setFlywheelRPM(
                 shooter.mpsToRPM(shotSolution.launchVelocityMps())
@@ -118,12 +136,8 @@ public class Shoot extends Command{
 
 
             if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.03)) {
-                // Put indexer code here
-                if (shotCount < heldCount) {
-                    if (shooter.generateProjectileIsReady()) {
+                 if (shooter.generateProjectileIsReady()) {
                         shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
-                        shotCount++;
-                    }
                 }
             }
         }
@@ -131,7 +145,7 @@ public class Shoot extends Command{
 
     @Override
     public boolean isFinished() {
-        return shotCount >= heldCount;
+        return false;
     }
 
 
@@ -140,9 +154,5 @@ public class Shoot extends Command{
         swerve.drive(new ChassisSpeeds(0, 0, 0));
 
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
-
-        calculated = false;
-
-        shotCount = 0;
     }
 }

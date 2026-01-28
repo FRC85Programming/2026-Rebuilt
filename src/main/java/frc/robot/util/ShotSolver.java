@@ -21,7 +21,8 @@ public final class ShotSolver {
      */
     public record ShotSolution(
             double launchAngleRad,
-            double launchVelocityMps
+            double launchVelocityMps,
+            double flightTimeSec
     ) {}
 
     /**
@@ -33,16 +34,19 @@ public final class ShotSolver {
      * @param requiredImpactAngleRad    Minimum downward impact angle (radians)
      * @param minLaunchAngleRad         Minimum allowed hood angle
      * @param maxLaunchAngleRad         Maximum allowed hood angle
+     * @param robotVxMetersPerSec       The robot velocity in m/s in the x direction (field relative)
+     * @param robotVyMetersPerSec       The robot velocity in m/s in the y direction (field relative)
      *
      * @return Optional ShotSolution if a valid trajectory exists
      */
     public static Optional<ShotSolution> solve(
-            double horizontalDistanceMeters,
-            double shooterHeightMeters,
-            double targetHeightMeters,
-            double requiredImpactAngleRad,
-            double minLaunchAngleRad,
-            double maxLaunchAngleRad
+        double horizontalDistanceMeters,
+        double shooterHeightMeters,
+        double targetHeightMeters,
+        double requiredImpactAngleRad,
+        double minLaunchAngleRad,
+        double maxLaunchAngleRad,
+        double robotVxMetersPerSec
     ) {
 
         if (horizontalDistanceMeters <= 0.0) {
@@ -50,64 +54,55 @@ public final class ShotSolver {
         }
 
         ShotSolution bestSolution = null;
-        // Used as placeholder before incrementing through lower velcities
         double lowestVelocity = Double.POSITIVE_INFINITY;
 
         for (double theta = minLaunchAngleRad;
-             theta <= maxLaunchAngleRad;
-             theta += ANGLE_STEP_RAD) {
+            theta <= maxLaunchAngleRad;
+            theta += ANGLE_STEP_RAD) {
 
             double cos = Math.cos(theta);
+            double sin = Math.sin(theta);
             double tan = Math.tan(theta);
 
-            // Prevent divide-by-zero / vertical shots
-            if (Math.abs(cos) < 1e-6) {
-                continue;
-            }
+            if (Math.abs(cos) < 1e-6) continue;
 
             double heightTerm =
                     horizontalDistanceMeters * tan
                             + shooterHeightMeters
                             - targetHeightMeters;
 
-            if (heightTerm <= 0.0) {
-                continue;
-            }
+            if (heightTerm <= 0.0) continue;
 
             double velocitySquared =
                     (GRAVITY * horizontalDistanceMeters * horizontalDistanceMeters)
                             / (2.0 * cos * cos * heightTerm);
 
-            if (velocitySquared <= 0.0) {
-                continue;
-            }
+            if (velocitySquared <= 0.0) continue;
 
             double velocity = Math.sqrt(velocitySquared);
 
-            // Calculate time to reach target horizontally
-            double time =
-                    horizontalDistanceMeters / (velocity * cos);
+            // Field-relative horizontal velocity
+            double vxField = velocity * cos + robotVxMetersPerSec;
+            if (vxField <= 0.0) continue;
 
-            double vx = velocity * cos;
-            double vy = velocity * Math.sin(theta) - GRAVITY * time;
+            // Time of flight
+            double time = horizontalDistanceMeters / vxField;
 
-            // Must be descending
-            if (vy >= 0.0) {
-                continue;
-            }
+            // Field-relative vertical velocity at impact
+            double vyFinal =
+                    velocity * sin
+                            - GRAVITY * time;
 
-            // Impact angle check
+            if (vyFinal >= 0.0) continue;
+
             double impactAngle =
-                    Math.atan2(Math.abs(vy), vx);
+                    Math.atan2(Math.abs(vyFinal), vxField);
 
-            if (impactAngle < requiredImpactAngleRad) {
-                continue;
-            }
+            if (impactAngle < requiredImpactAngleRad) continue;
 
-            // Keep the lowest-energy valid solution
             if (velocity < lowestVelocity) {
                 lowestVelocity = velocity;
-                bestSolution = new ShotSolution(theta, velocity);
+                bestSolution = new ShotSolution(theta, velocity, time);
             }
         }
 

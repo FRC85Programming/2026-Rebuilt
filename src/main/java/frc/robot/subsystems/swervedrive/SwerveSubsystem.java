@@ -77,6 +77,10 @@ public class SwerveSubsystem extends SubsystemBase
 
   double aimOmega = 0;
 
+  ChassisSpeeds commandedVelocity = new ChassisSpeeds();
+
+  Supplier<ChassisSpeeds> velocitySupplier;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -259,7 +263,8 @@ public class SwerveSubsystem extends SubsystemBase
 
     aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
 
-    drive(new ChassisSpeeds(0, 0, aimOmega));
+    // Still allow movement when aiming
+    driveFieldOriented(new ChassisSpeeds(getCommandedVelocity().vxMetersPerSecond, getCommandedVelocity().vyMetersPerSecond, aimOmega));
   }
 
   /***
@@ -521,6 +526,14 @@ public class SwerveSubsystem extends SubsystemBase
     return run(() -> {
       swerveDrive.driveFieldOriented(velocity.get());
     });
+  }
+
+  public void setVelocitySupplier(Supplier<ChassisSpeeds> velocity) {
+    velocitySupplier = velocity;
+  }
+
+  public ChassisSpeeds getCommandedVelocity() {
+    return velocitySupplier.get();
   }
 
   /**
