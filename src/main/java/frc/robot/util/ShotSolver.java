@@ -35,7 +35,6 @@ public final class ShotSolver {
      * @param minLaunchAngleRad         Minimum allowed hood angle
      * @param maxLaunchAngleRad         Maximum allowed hood angle
      * @param robotVxMetersPerSec       The robot velocity in m/s in the x direction (field relative)
-     * @param robotVyMetersPerSec       The robot velocity in m/s in the y direction (field relative)
      *
      * @return Optional ShotSolution if a valid trajectory exists
      */
@@ -54,7 +53,7 @@ public final class ShotSolver {
         }
 
         ShotSolution bestSolution = null;
-        double lowestVelocity = Double.POSITIVE_INFINITY;
+        double bestCost = Double.POSITIVE_INFINITY;
 
         for (double theta = minLaunchAngleRad;
             theta <= maxLaunchAngleRad;
@@ -100,11 +99,22 @@ public final class ShotSolver {
 
             if (impactAngle < requiredImpactAngleRad) continue;
 
-            if (velocity < lowestVelocity) {
-                lowestVelocity = velocity;
-                bestSolution = new ShotSolution(theta, velocity, time);
+            // Add a minimum shooter velocity as to not calculate dumb angles
+            double shooterVx = velocity * Math.cos(theta);
+                if (shooterVx < 1.5) continue;
+
+
+            // Add a cost factor so that the calculation doesn't give extreme angles when driving towards the target
+            double cost =
+                velocity
+            + 10.0 * Math.abs(theta - Math.toRadians(35))
+            + 2.0 * time;
+
+            if (cost < bestCost) {
+                    bestCost = cost;
+                    bestSolution = new ShotSolution(theta, velocity, time);
+                }
             }
-        }
 
         return Optional.ofNullable(bestSolution);
     }
