@@ -185,7 +185,7 @@ public class RobotContainer
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
       driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, false));
       driverXbox.button(2).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueFeedPosition, false));
-      driverXbox.button(3).onTrue(runFlywheel);
+      driverXbox.button(3).onTrue(new InstantCommand(() -> shooter.cleanupPieces()));
 
 //      driverXbox.b().whileTrue(
 //          drivebase.driveToPose(

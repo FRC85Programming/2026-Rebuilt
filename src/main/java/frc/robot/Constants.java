@@ -53,8 +53,8 @@ public final class Constants
 
   public static class ShooterConstants
   {
-    public static final int FLYWHEEL_MOTOR_ID = 30;
-    public static final int HOOD_MOTOR_ID = 31;
+    public static final int FLYWHEEL_MOTOR_ID = 14;
+    public static final int HOOD_MOTOR_ID = 15;
 
     public static final double FLYWHEEL_GEAR_RATIO = 1.0;
     public static final double HOOD_GEAR_RATIO = 100.0;

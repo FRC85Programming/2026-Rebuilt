@@ -1,14 +1,12 @@
 package frc.robot.subsystems.shooter;
 
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
@@ -39,7 +37,7 @@ public class ShooterSim extends SubsystemBase{
 
     private final Timer shotSpacingTimer = new Timer();
 
-    ReefscapeAlgaeOnFly algaeOnFly = new ReefscapeAlgaeOnFly(
+    RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
             new Translation2d(),
             new Translation2d(),
             new ChassisSpeeds(),
@@ -70,7 +68,7 @@ public class ShooterSim extends SubsystemBase{
     public void generateProjectile(Pose2d pose, ChassisSpeeds velocity) {
       shotSpacingTimer.reset();
       shotSpacingTimer.start();
-      algaeOnFly = new ReefscapeAlgaeOnFly(
+      fuelOnFly = new RebuiltFuelOnFly(
             pose.getTranslation(),
             new Translation2d(0.0, 0.0),
             velocity,
@@ -80,18 +78,18 @@ public class ShooterSim extends SubsystemBase{
             Units.Radians.of(getHoodAngleDeg()/180.0 * Math.PI)
         );
 
-        algaeOnFly.withProjectileTrajectoryDisplayCallBack(
+        fuelOnFly.withProjectileTrajectoryDisplayCallBack(
             (poseArray) -> Logger.recordOutput("Sim/Projectile/Trajectory", poseArray.toArray(Pose3d[]::new)),
             (poseArray) -> Logger.recordOutput("Sim/Projectile/Missed", poseArray.toArray(Pose3d[]::new))
         );
 
-        SimulatedArena.getInstance().addGamePieceProjectile(algaeOnFly);
+        SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
 
         Logger.recordOutput("Sim/Projectile/Launched", pose);
     }
 
     public void cleanupPieces() {
-        algaeOnFly.cleanUp();
+        fuelOnFly.cleanUp();
     }
 
     public boolean generateProjectileIsReady() {
