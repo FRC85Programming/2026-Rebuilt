@@ -34,6 +34,18 @@
           "data": {
             "pathName": "LIntake1-DriveBy"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DriveBy-Depot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Depot-Approach"
+          }
         }
       ]
     }
