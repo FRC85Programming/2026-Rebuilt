@@ -14,6 +14,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -104,18 +105,25 @@ public class RobotContainer
                                                                                .translationHeadingOffset(true)
                                                                                .translationHeadingOffset(Rotation2d.fromDegrees(
                                                                                    0));
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer()
-  {
+  {    
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
     NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, false));
     NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, true));
+
+    // Configure an auto selector that just selects strings
+    m_chooser.setDefaultOption("Left Auto", "Left"); // Set a default option
+    m_chooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
+
+    SmartDashboard.putData("Auto Selector", m_chooser);
   }
 
   /**
@@ -214,7 +222,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("Left+Depot");
+    return drivebase.getAutonomousCommand(m_chooser.getSelected());
   }
 
   public void setMotorBrake(boolean brake)

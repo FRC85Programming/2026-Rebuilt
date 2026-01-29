@@ -1,0 +1,96 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.484188888888889,
+        "y": 5.983888888888889
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.4391444444444446,
+        "y": 5.993633333333333
+      },
+      "isLocked": false,
+      "linkedName": "Depot"
+    },
+    {
+      "anchor": {
+        "x": 2.023811111111111,
+        "y": 4.824300000000001
+      },
+      "prevControl": {
+        "x": 2.3481498781502608,
+        "y": 5.821885224480901
+      },
+      "nextControl": {
+        "x": 1.6994723440719608,
+        "y": 3.8267147755191004
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.433077777777778,
+        "y": 2.4661444444444443
+      },
+      "prevControl": {
+        "x": 1.9653444444444448,
+        "y": 3.1579999999999995
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "DriveByLeft2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7434108527131811,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "DriveBy",
+      "waypointRelativePos": 0.721705426356582,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "DriveBy"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 39.2205141748441
+  },
+  "reversed": false,
+  "folder": "Center",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
