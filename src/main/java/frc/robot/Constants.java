@@ -79,5 +79,7 @@ public final class Constants
       public static final Translation3d blueHub = new Translation3d(4.620, 4.030, 1.829);
       public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
 
+      public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
+      public static final Translation3d redFeedPosition = new Translation3d(8.0, 0.7, 0);
   }
 }

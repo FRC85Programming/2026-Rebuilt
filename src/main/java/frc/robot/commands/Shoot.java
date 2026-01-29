@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -24,16 +25,17 @@ import frc.robot.util.TrajectoryTransform3d;
 public class Shoot extends Command{
     ShooterSubsystem shooter;
     SwerveSubsystem swerve;
-    Translation3d targetTranslation;
+    Supplier<Translation3d> target;
     List<Translation3d> fieldTrajectory3d;
     double goalRPM = 0;
     double goalAngle = 0;
     boolean isPathPlanner;
+    Translation3d targetTranslation;
 
-    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, Translation3d targetTranslation, boolean isPathPlaner) {
+    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, Supplier<Translation3d> target, boolean isPathPlaner) {
         this.shooter = shooter;
         this.swerve = swerve;
-        this.targetTranslation = targetTranslation;
+        this.target = target;
         this.isPathPlanner = isPathPlaner;
     }
 
@@ -44,6 +46,7 @@ public class Shoot extends Command{
     }
 
     private void calculateSolution() {
+        targetTranslation = target.get();
         // Convert the field relative velocity into velocity relative to the goal
         ChassisSpeeds robotVel = swerve.getFieldVelocity();
         Translation2d toTarget2d =
