@@ -75,6 +75,15 @@ public class Shoot extends Command{
         double compensatedDistance = distance - robotVx * timeOfFlight;
         goalAngle = ShooterTable.getSetpoint(compensatedDistance).hoodAngle().getRadians();
 
+        // Calculate lead angle based on velocity (this should be commented out on first real robot test)
+        double robotVy =
+            -robotVel.vxMetersPerSecond * toTargetUnit.getY()
+            + robotVel.vyMetersPerSecond * toTargetUnit.getX();
+
+        double lead = robotVy * timeOfFlight;
+
+        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), -lead);
+
         // Create trajectories for sim visulization (could be wrapped in a sim check if the code runs slow) - this does not affect the shots at all
         var shooterRelativeTrajectory =
             BallisticTrajectory3d.generate(
@@ -119,9 +128,6 @@ public class Shoot extends Command{
     public void execute() {
         calculateSolution();
 
-        // Placeholder! Currently just aims straight at the target. Needs to be calculated
-        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0);
-
         shooter.setFlywheelRPM(
             goalRPM
         );
@@ -133,7 +139,7 @@ public class Shoot extends Command{
         SmartDashboard.putBoolean("Hood at angle", shooter.hoodAtAngle(3));
 
 
-        if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.03)) {
+        if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.1)) {
                 if (shooter.generateProjectileIsReady()) {
                     shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
             }
