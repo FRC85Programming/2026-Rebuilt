@@ -16,6 +16,7 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.util.BallisticTrajectory;
 import frc.robot.util.BallisticTrajectory3d;
+import frc.robot.util.ShooterTable;
 import frc.robot.util.ShotSolver;
 import frc.robot.util.ShotSolver.ShotSolution;
 import frc.robot.util.TrajectoryTransform3d;
@@ -23,16 +24,21 @@ import frc.robot.util.TrajectoryTransform3d;
 public class Shoot extends Command{
     ShooterSubsystem shooter;
     SwerveSubsystem swerve;
-    ShotSolution shotSolution;
     Translation3d targetTranslation;
     List<Translation3d> fieldTrajectory3d;
-    double dropAngle;
+    double goalRPM = 0;
+    double goalAngle = 0;
 
-    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, Translation3d targetTranslation, double dropAngle) {
+    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, Translation3d targetTranslation) {
         this.shooter = shooter;
         this.swerve = swerve;
-        this.dropAngle = dropAngle;
         this.targetTranslation = targetTranslation;
+    }
+
+    @Override
+    public void initialize()
+    {
+        shooter.cleanupPieces();
     }
 
     private void calculateSolution() {
@@ -44,6 +50,8 @@ public class Shoot extends Command{
 
         double distance = toTarget2d.getNorm();
 
+        SmartDashboard.putNumber("Distance From Hub", distance);
+
         // Protect against super short distances/pose glitches
         if (distance < 1e-6) {
             return;
@@ -51,33 +59,20 @@ public class Shoot extends Command{
 
         Translation2d toTargetUnit = toTarget2d.div(distance);
         
+        // Used for time of flight calc
         double robotVx = 
             robotVel.vxMetersPerSecond * toTargetUnit.getX() 
             + robotVel.vyMetersPerSecond * toTargetUnit.getY();
 
             
-        var solution = ShotSolver.solve(
-            swerve.getPose().getTranslation().getDistance(targetTranslation.toTranslation2d()),
-            0.305,
-            targetTranslation.getZ(),
-            Math.toRadians(dropAngle),
-            Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
-            Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE),
-            robotVx
-        );
-
-        if (solution.isEmpty()) {
-            SmartDashboard.putString("ShotSolver Status", "NO VALID SOLUTION");
-            return;
-        }
-
-        shotSolution = solution.get();
+        goalRPM = ShooterTable.getSetpoint(distance).flywheelRPM();
+        goalAngle = ShooterTable.getSetpoint(distance).hoodAngle().getRadians();
 
         // Create trajectories for sim visulization (could be wrapped in a sim check if the code runs slow)
         var shooterRelativeTrajectory =
             BallisticTrajectory3d.generate(
-                shotSolution.launchVelocityMps(),
-                shotSolution.launchAngleRad(),
+                shooter.rpmToMps(goalRPM),
+                goalAngle,
                 0.305, 
                 3.0, 
                 0.02   
@@ -99,46 +94,41 @@ public class Shoot extends Command{
 
         SmartDashboard.putNumber(
             "Calculated Shot Angle (deg)",
-            Math.toDegrees(shotSolution.launchAngleRad())
+            Math.toDegrees(goalAngle)
         );
 
         SmartDashboard.putNumber(
             "Calculated Shot Speed (mps)",
-            shotSolution.launchVelocityMps()
+            shooter.rpmToMps(goalRPM)
         );
 
         SmartDashboard.putNumber(
             "Calculated Shot Speed (rpm)",
-            shooter.mpsToRPM(shotSolution.launchVelocityMps())
+            goalRPM
         );
     }
-
 
     @Override
     public void execute() {
         // Placeholder! Needs to use shot leading or use turret code instead
-        swerve.aimAtPosition(targetTranslation.toTranslation2d());
+        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0);
 
-        if (swerve.isAimedAtPosition(0.03)) {
-            calculateSolution();
-        }
+        calculateSolution();
 
-        if (shotSolution != null) {
-            shooter.setFlywheelRPM(
-                shooter.mpsToRPM(shotSolution.launchVelocityMps())
-            );
+        shooter.setFlywheelRPM(
+            goalRPM
+        );
     
-            shooter.setHoodAngle(
-                Math.toDegrees(shotSolution.launchAngleRad())
-            );
-            SmartDashboard.putBoolean("Flywheel at speed", shooter.flywheelAtSpeed(200));
-            SmartDashboard.putBoolean("Hood at angle", shooter.hoodAtAngle(3));
+        shooter.setHoodAngle(
+            Math.toDegrees(goalAngle)
+        );
+        SmartDashboard.putBoolean("Flywheel at speed", shooter.flywheelAtSpeed(200));
+        SmartDashboard.putBoolean("Hood at angle", shooter.hoodAtAngle(3));
 
 
-            if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.03)) {
-                 if (shooter.generateProjectileIsReady()) {
-                        shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
-                }
+        if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.03)) {
+                if (shooter.generateProjectileIsReady()) {
+                    //shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
             }
         }
     }

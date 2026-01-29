@@ -11,7 +11,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.util.ShotSolver;
+import frc.robot.util.ShotSolver.ShotSolution;
 import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase{
@@ -117,9 +120,13 @@ public class ShooterSubsystem extends SubsystemBase{
         return Math.abs(getFlywheelRPM() - goalRpm) < tolerance;
     }
 
-    public double mpsToRPM(double speed) {
+    public double mpsToRpm(double speed) {
         // Assume 16m/s = 6000 RPM as a placeholder
         return speed * 375.0;
+    }
+
+    public double rpmToMps(double rpm) {
+        return rpm / 375.0;
     }
 
     public void simulatedShot(Pose2d pose, ChassisSpeeds velocity) {
@@ -128,6 +135,29 @@ public class ShooterSubsystem extends SubsystemBase{
 
     public boolean generateProjectileIsReady() {
         return shooterSim.generateProjectileIsReady();
+    }
+
+    public void cleanupPieces() {
+        shooterSim.cleanupPieces();
+    }
+
+    public void calculateLookupTable() {
+        // Calculate a placeholder table based on perfect physics
+        for (var i=2; i <= 6.0; i+=0.5) {
+            var solution = ShotSolver.solve(
+                i,
+                0.305,
+                Constants.FieldConstants.blueHub.getZ(),
+                Math.toRadians(65),
+                Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
+                Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE),
+                0
+            );
+            ShotSolution shotSolution = solution.get();
+
+            SmartDashboard.putNumber("TABLE Solved Speed" + i, mpsToRpm(shotSolution.launchVelocityMps()));
+            SmartDashboard.putNumber("TABLE Solved Angle" + i, Math.toDegrees(shotSolution.launchAngleRad()));
+        }
     }
 }
 

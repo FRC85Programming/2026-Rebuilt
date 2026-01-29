@@ -60,8 +60,8 @@ public final class Constants
     public static final double HOOD_GEAR_RATIO = 100.0;
 
     // Hood limits - degrees
-    public static final double HOOD_MIN_ANGLE = 0.0;
-    public static final double HOOD_MAX_ANGLE = 180.0;
+    public static final double HOOD_MIN_ANGLE = 50;
+    public static final double HOOD_MAX_ANGLE = 75;
 
     public static final double FLYWHEEL_P = 0.005;
     public static final double FLYWHEEL_I = 0.0;

@@ -73,7 +73,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private       Vision      vision;
 
-  PIDController aimController = new PIDController(4, 0, 0);
+  PIDController aimController = new PIDController(7, 0, 0);
 
   double aimOmega = 0;
 
@@ -258,8 +258,8 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
-  public void aimAtPosition(Translation2d position) {
-    Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle();
+  public void aimAtPositionWithLead(Translation2d position, double lead) {
+    Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle().plus(new Rotation2d(lead));
 
     aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
 

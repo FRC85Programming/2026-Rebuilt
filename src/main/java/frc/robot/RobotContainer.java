@@ -114,7 +114,7 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, 65));
+    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub));
   }
 
   /**
@@ -173,8 +173,8 @@ public class RobotContainer
       /*driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
-      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, 65));
-      driverXbox.button(2).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueFeedPosition, 65));
+      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub));
+      driverXbox.button(2).whileTrue(new Shoot(drivebase, shooter, Constants.FieldConstants.blueFeedPosition));
       driverXbox.button(3).onTrue(runFlywheel);
 
 //      driverXbox.b().whileTrue(

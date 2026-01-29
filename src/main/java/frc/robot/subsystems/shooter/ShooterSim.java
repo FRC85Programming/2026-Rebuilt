@@ -7,6 +7,8 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
@@ -37,7 +39,17 @@ public class ShooterSim extends SubsystemBase{
 
     private final Timer shotSpacingTimer = new Timer();
 
-  
+    ReefscapeAlgaeOnFly algaeOnFly = new ReefscapeAlgaeOnFly(
+            new Translation2d(),
+            new Translation2d(),
+            new ChassisSpeeds(),
+            new Rotation2d(),
+             Units.Meters.of(0),
+             Units.MetersPerSecond.of(0),
+             Units.Radians.of(0)
+        );
+
+
     public void update(double flywheelVoltage, double dt) {
         flywheelSim.setInputVoltage(flywheelVoltage);
         flywheelSim.update(dt);
@@ -58,7 +70,7 @@ public class ShooterSim extends SubsystemBase{
     public void generateProjectile(Pose2d pose, ChassisSpeeds velocity) {
       shotSpacingTimer.reset();
       shotSpacingTimer.start();
-      ReefscapeAlgaeOnFly algaeOnFly = new ReefscapeAlgaeOnFly(
+      algaeOnFly = new ReefscapeAlgaeOnFly(
             pose.getTranslation(),
             new Translation2d(0.0, 0.0),
             velocity,
@@ -76,6 +88,10 @@ public class ShooterSim extends SubsystemBase{
         SimulatedArena.getInstance().addGamePieceProjectile(algaeOnFly);
 
         Logger.recordOutput("Sim/Projectile/Launched", pose);
+    }
+
+    public void cleanupPieces() {
+        algaeOnFly.cleanUp();
     }
 
     public boolean generateProjectileIsReady() {
