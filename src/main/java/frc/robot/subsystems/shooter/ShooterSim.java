@@ -95,6 +95,6 @@ public class ShooterSim extends SubsystemBase{
     }
 
     public boolean generateProjectileIsReady() {
-      return shotSpacingTimer.hasElapsed(0.15) || !shotSpacingTimer.isRunning();
+      return shotSpacingTimer.hasElapsed(0.25) || !shotSpacingTimer.isRunning();
     }
 }

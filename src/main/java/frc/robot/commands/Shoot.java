@@ -58,8 +58,6 @@ public class Shoot extends Command{
         }
 
         Translation2d toTargetUnit = toTarget2d.div(distance);
-        
-        // Used for time of flight calc
         double robotVx = 
             robotVel.vxMetersPerSecond * toTargetUnit.getX() 
             + robotVel.vyMetersPerSecond * toTargetUnit.getY();
@@ -68,7 +66,16 @@ public class Shoot extends Command{
         goalRPM = ShooterTable.getSetpoint(distance).flywheelRPM();
         goalAngle = ShooterTable.getSetpoint(distance).hoodAngle().getRadians();
 
-        // Create trajectories for sim visulization (could be wrapped in a sim check if the code runs slow)
+        // Calculate new speeds based of robot velocity (this should be commented out on first real robot test)
+        double shotSpeed = shooter.rpmToMps(goalRPM);
+        double timeOfFlight = distance / shotSpeed;
+        double compensatedShotSpeed = shotSpeed - robotVx;
+        goalRPM = shooter.mpsToRpm(compensatedShotSpeed);
+
+        double compensatedDistance = distance - robotVx * timeOfFlight;
+        goalAngle = ShooterTable.getSetpoint(compensatedDistance).hoodAngle().getRadians();
+
+        // Create trajectories for sim visulization (could be wrapped in a sim check if the code runs slow) - this does not affect the shots at all
         var shooterRelativeTrajectory =
             BallisticTrajectory3d.generate(
                 shooter.rpmToMps(goalRPM),
@@ -110,10 +117,10 @@ public class Shoot extends Command{
 
     @Override
     public void execute() {
-        // Placeholder! Needs to use shot leading or use turret code instead
-        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0);
-
         calculateSolution();
+
+        // Placeholder! Currently just aims straight at the target. Needs to be calculated
+        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0);
 
         shooter.setFlywheelRPM(
             goalRPM
@@ -128,7 +135,7 @@ public class Shoot extends Command{
 
         if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.03)) {
                 if (shooter.generateProjectileIsReady()) {
-                    //shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
+                    shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
             }
         }
     }

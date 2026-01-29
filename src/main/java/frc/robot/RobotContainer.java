@@ -213,7 +213,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("16BallAutoLeftClimb");
+    return drivebase.getAutonomousCommand("16BallAutoLeft");
   }
 
   public void setMotorBrake(boolean brake)

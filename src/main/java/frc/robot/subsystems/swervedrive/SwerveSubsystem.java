@@ -5,7 +5,6 @@
 package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Newton;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -264,7 +263,7 @@ public class SwerveSubsystem extends SubsystemBase
     aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
 
     // Still allow movement when aiming
-    driveFieldOriented(new ChassisSpeeds(getCommandedVelocity().vxMetersPerSecond, getCommandedVelocity().vyMetersPerSecond, aimOmega));
+    driveFieldOriented(new ChassisSpeeds(getCommandedVelocity().vxMetersPerSecond/3, getCommandedVelocity().vyMetersPerSecond/3, aimOmega));
   }
 
   /***
