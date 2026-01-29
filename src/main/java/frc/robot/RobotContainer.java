@@ -54,9 +54,6 @@ public class RobotContainer
                                                                                 "swerve/neo"));
   private final ShooterSubsystem shooter = new ShooterSubsystem();
 
-  // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
-  private final SendableChooser<Command> autoChooser;
-
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
@@ -109,7 +106,7 @@ public class RobotContainer
                                                                                .translationHeadingOffset(true)
                                                                                .translationHeadingOffset(Rotation2d.fromDegrees(
                                                                                    0));
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -124,10 +121,10 @@ public class RobotContainer
     NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, Constants.FieldConstants.blueHub, true));
 
     // Configure an auto selector that just selects strings
-    m_chooser.setDefaultOption("Left Auto", "Left"); // Set a default option
-    m_chooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
+    autoChooser.setDefaultOption("Left Auto", "Left"); // Set a default option
+    autoChooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
 
-    SmartDashboard.putData("Auto Selector", m_chooser);
+    SmartDashboard.putData("Auto Selector", autoChooser);
   }
 
   /**
@@ -224,7 +221,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand(m_chooser.getSelected());
+    return drivebase.getAutonomousCommand(autoChooser.getSelected());
   }
 
   public void setMotorBrake(boolean brake)
