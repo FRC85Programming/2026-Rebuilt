@@ -72,7 +72,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private       Vision      vision;
 
-  PIDController aimController = new PIDController(7, 0, 0);
+  PIDController aimController = new PIDController(9, 0, 0);
 
   double aimOmega = 0;
 
@@ -257,13 +257,23 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
-  public void aimAtPositionWithLead(Translation2d position, double lead) {
+  public void aimAtPositionWithLead(Translation2d position, double lead, boolean isPathPlanner) {
     Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle().plus(new Rotation2d(lead));
 
     aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
 
-    // Still allow movement when aiming
-    driveFieldOriented(new ChassisSpeeds(getCommandedVelocity().vxMetersPerSecond/3, getCommandedVelocity().vyMetersPerSecond/3, aimOmega));
+    if (!isPathPlanner) {
+      // Still allow movement when aiming in tele
+      driveFieldOriented(new ChassisSpeeds(getCommandedVelocity().vxMetersPerSecond/5, getCommandedVelocity().vyMetersPerSecond/5, aimOmega));
+    } else {
+      PPHolonomicDriveController.overrideRotationFeedback(() -> {
+          return aimOmega;
+      });
+    }
+  }
+
+  public void resetPathPlannerRotOverride() {
+    PPHolonomicDriveController.clearRotationFeedbackOverride();
   }
 
   /***
@@ -531,6 +541,7 @@ public class SwerveSubsystem extends SubsystemBase
     velocitySupplier = velocity;
   }
 
+  // You need to set the supplier yourself
   public ChassisSpeeds getCommandedVelocity() {
     return velocitySupplier.get();
   }

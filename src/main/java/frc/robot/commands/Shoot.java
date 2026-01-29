@@ -28,11 +28,13 @@ public class Shoot extends Command{
     List<Translation3d> fieldTrajectory3d;
     double goalRPM = 0;
     double goalAngle = 0;
+    boolean isPathPlanner;
 
-    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, Translation3d targetTranslation) {
+    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, Translation3d targetTranslation, boolean isPathPlaner) {
         this.shooter = shooter;
         this.swerve = swerve;
         this.targetTranslation = targetTranslation;
+        this.isPathPlanner = isPathPlaner;
     }
 
     @Override
@@ -82,7 +84,7 @@ public class Shoot extends Command{
 
         double lead = robotVy * timeOfFlight;
 
-        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), -lead);
+        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), -lead, isPathPlanner);
 
         // Create trajectories for sim visulization (could be wrapped in a sim check if the code runs slow) - this does not affect the shots at all
         var shooterRelativeTrajectory =
@@ -157,5 +159,6 @@ public class Shoot extends Command{
         swerve.drive(new ChassisSpeeds(0, 0, 0));
 
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
+        swerve.resetPathPlannerRotOverride();
     }
 }
