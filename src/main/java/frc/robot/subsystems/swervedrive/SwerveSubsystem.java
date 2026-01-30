@@ -25,6 +25,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -63,6 +64,7 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 
 
 public class SwerveSubsystem extends SubsystemBase
@@ -89,7 +91,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   Field2d fieldQuest = new Field2d();
 
-  PIDController aimController = new PIDController(9, 0, 0);
+  ProfiledPIDController aimController;
 
   double aimOmega = 0;
 
@@ -113,7 +115,6 @@ public class SwerveSubsystem extends SubsystemBase
                                                     Rotation2d.fromDegrees(180));
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-    aimController.enableContinuousInput(-Math.PI, Math.PI);
     try
     {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED, startingPose);
@@ -140,7 +141,21 @@ public class SwerveSubsystem extends SubsystemBase
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
 
-    SmartDashboard.putNumber("Rot D", 0.1);
+    aimController =
+        new ProfiledPIDController(
+            4.0, 
+            0.0,
+            0.2,  
+            new TrapezoidProfile.Constraints(
+                3.0, 
+                6.0   
+            )
+        );
+
+    aimController.enableContinuousInput(-Math.PI, Math.PI);
+    aimController.setTolerance(0.02, 0.1);
+    
+    SmartDashboard.putNumber("Rot D", 0);
     SmartDashboard.putNumber("Rot P", 1);
     SmartDashboard.putNumber("Rot Tolerance Pos", 0.02);
     SmartDashboard.putNumber("Rot Tolerance Vel", 0.1);
@@ -302,7 +317,7 @@ public class SwerveSubsystem extends SubsystemBase
     Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle().plus(new Rotation2d(lead));
 
     aimController.setP(SmartDashboard.getNumber("Rot P", 1));
-    aimController.setD(SmartDashboard.getNumber("Rot D", 0.1));
+    aimController.setD(SmartDashboard.getNumber("Rot D", 0));
     aimController.setTolerance(
       Units.degreesToRadians(SmartDashboard.getNumber("Rot Tolerance Pos", 0.02)),  // position tolerance
       Units.degreesToRadians(SmartDashboard.getNumber("Rot Tolerance Vel", 0.1))   // velocity tolerance
@@ -310,7 +325,10 @@ public class SwerveSubsystem extends SubsystemBase
 
     aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
 
-    if (aimController.atSetpoint()) {
+    SmartDashboard.putBoolean("Rot At Setpoint", aimController.atGoal());
+    SmartDashboard.putNumber("Rot Error", aimController.getPositionError());
+
+    if (aimController.atGoal()) {
       aimOmega = 0.0;
     }
 
@@ -335,7 +353,7 @@ public class SwerveSubsystem extends SubsystemBase
    * @return True if aimed within tolerance, false otherwise.
    */
   public boolean isAimedAtPosition(double tolerance) {
-    double angleError = aimController.getError();
+    double angleError = aimController.getPositionError();
 
     SmartDashboard.putNumber("angleError", angleError);
 
