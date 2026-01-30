@@ -28,6 +28,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -138,6 +139,11 @@ public class SwerveSubsystem extends SubsystemBase
     }
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+
+    SmartDashboard.putNumber("Rot D", 0.1);
+    SmartDashboard.putNumber("Rot P", 1);
+    SmartDashboard.putNumber("Rot Tolerance Pos", 0.02);
+    SmartDashboard.putNumber("Rot Tolerance Vel", 0.1);
   }
 
   /**
@@ -214,24 +220,29 @@ public class SwerveSubsystem extends SubsystemBase
           this::getRobotVelocity,
           // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
           (speedsRobotRelative, moduleFeedForwards) -> {
+            ChassisSpeeds modifiedSpeeds = new ChassisSpeeds(
+                speedsRobotRelative.vxMetersPerSecond,
+                speedsRobotRelative.vyMetersPerSecond,
+                speedsRobotRelative.omegaRadiansPerSecond 
+            );
             if (enableFeedforward)
             {
               swerveDrive.drive(
-                  speedsRobotRelative,
+                  modifiedSpeeds,
                   swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
                   moduleFeedForwards.linearForces()
                                );
             } else
             {
-              swerveDrive.setChassisSpeeds(speedsRobotRelative);
+              swerveDrive.setChassisSpeeds(modifiedSpeeds);
             }
           },
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.0),
+              new PIDConstants(1.7, 0.0, 0.1),
               // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0)
+              new PIDConstants(0.15, 0.0, 0.0)
               // Rotation PID constants
           ),
           config,
@@ -290,7 +301,18 @@ public class SwerveSubsystem extends SubsystemBase
   public void aimAtPositionWithLead(Translation2d position, double lead, boolean isPathPlanner) {
     Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle().plus(new Rotation2d(lead));
 
+    aimController.setP(SmartDashboard.getNumber("Rot P", 1));
+    aimController.setD(SmartDashboard.getNumber("Rot D", 0.1));
+    aimController.setTolerance(
+      Units.degreesToRadians(SmartDashboard.getNumber("Rot Tolerance Pos", 0.02)),  // position tolerance
+      Units.degreesToRadians(SmartDashboard.getNumber("Rot Tolerance Vel", 0.1))   // velocity tolerance
+    );
+
     aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
+
+    if (aimController.atSetpoint()) {
+      aimOmega = 0.0;
+    }
 
     if (!isPathPlanner) {
       // Still allow movement when aiming in tele

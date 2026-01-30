@@ -42,7 +42,7 @@ public class Shoot extends Command{
     @Override
     public void initialize()
     {
-        shooter.cleanupPieces();
+        shooter.cleanupPieces();    
     }
 
     private void calculateSolution() {
