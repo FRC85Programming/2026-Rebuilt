@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.AlphaMechanism3d;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.util.ShotSolver;
@@ -33,7 +34,7 @@ public class ShooterSubsystem extends SubsystemBase{
     private final PIDController hoodPID = new PIDController(ShooterConstants.HOOD_P, ShooterConstants.HOOD_I, ShooterConstants.HOOD_D);
 
     double goalRpm = 0.0;
-    double goalAngle = 30;
+    double goalAngle = 80;
 
     boolean isSim;
 
@@ -43,15 +44,24 @@ public class ShooterSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        final double flywheelRpmMeasured = isSim ? shooterSim.getFlywheelRPM() : getFlywheelRPM();
-        final double flywheelPIDOut = flywheelPID.calculate(flywheelRpmMeasured, goalRpm);
+        double flywheelRpmMeasured = isSim ? shooterSim.getFlywheelRPM() : getFlywheelRPM();
+        double flywheelPIDOut = flywheelPID.calculate(flywheelRpmMeasured, goalRpm);
         double flywheelOut = flywheelPIDOut;
         flywheelOut = Math.max(-1.0, Math.min(1.0, flywheelOut));
 
+        double hoodAngleMeasured = isSim ? shooterSim.getHoodAngleDeg() : getHoodAngle();
+        double hoodPIDOut = hoodPID.calculate(hoodAngleMeasured, goalAngle);
+        double hoodOut = hoodPIDOut;
+        hoodOut = Math.max(-1.0, Math.min(1.0, flywheelOut));
+
+        AlphaMechanism3d.setHoodAngle(getHoodAngle());
+
         flywheelMotor.set(flywheelOut);
+        hoodMotor.set(hoodOut);
 
         if (isSim) {
-            shooterSim.update(flywheelOut * 12.0, 0.02);
+            shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
+            shooterSim.updateHood(hoodOut, 0.02);
         }
 
         SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
@@ -105,9 +115,6 @@ public class ShooterSubsystem extends SubsystemBase{
             ShooterConstants.HOOD_MIN_ANGLE,
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
            
-        if (Robot.isSimulation()) {    
-            shooterSim.setHoodAngle(angle);
-        }
         goalAngle = angle;
         hoodMotor.set(hoodPID.calculate(getHoodAngle(), angle));
     }

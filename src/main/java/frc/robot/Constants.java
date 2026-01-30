@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -60,8 +62,8 @@ public final class Constants
     public static final double HOOD_GEAR_RATIO = 100.0;
 
     // Hood limits - degrees
-    public static final double HOOD_MIN_ANGLE = 50;
-    public static final double HOOD_MAX_ANGLE = 75;
+    public static final double HOOD_MIN_ANGLE = 0;
+    public static final double HOOD_MAX_ANGLE = 90;
 
     public static final double FLYWHEEL_P = 0.005;
     public static final double FLYWHEEL_I = 0.0;
@@ -84,5 +86,7 @@ public final class Constants
 
   public static class TurretConstants {
       public static final int TURRET_MOTOR_ID = 16;
+
+      public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
   }
 }

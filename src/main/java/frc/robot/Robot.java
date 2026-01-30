@@ -81,6 +81,7 @@ public class Robot extends LoggedRobot
     CommandScheduler.getInstance().run();
 
     super.robotPeriodic();
+    AlphaMechanism3d.getMeasured().log("Mechanism3d/Alpha");
   }
 
   /**

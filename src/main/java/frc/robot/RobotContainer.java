@@ -196,6 +196,11 @@ public class RobotContainer
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
       driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
+      driverXbox.button(2).onTrue(new InstantCommand(() -> shooter.setHoodAngle(90)));
+      driverXbox.button(3).onTrue(new InstantCommand(() -> shooter.setHoodAngle(0)));
+      driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
+
+
 //      driverXbox.b().whileTrue(
 //          drivebase.driveToPose(
 //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
