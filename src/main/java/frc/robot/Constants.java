@@ -21,10 +21,10 @@ import swervelib.math.Matter;
 public final class Constants
 {
 
-  public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
+  public static final double ROBOT_MASS = (50) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = Units.feetToMeters(14.5);
+  public static final double MAX_SPEED  = Units.feetToMeters(17.6);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants
@@ -53,15 +53,15 @@ public final class Constants
 
   public static class ShooterConstants
   {
-    public static final int FLYWHEEL_MOTOR_ID = 30;
-    public static final int HOOD_MOTOR_ID = 31;
+    public static final int FLYWHEEL_MOTOR_ID = 14;
+    public static final int HOOD_MOTOR_ID = 15;
 
     public static final double FLYWHEEL_GEAR_RATIO = 1.0;
     public static final double HOOD_GEAR_RATIO = 100.0;
 
     // Hood limits - degrees
-    public static final double HOOD_MIN_ANGLE = 0.0;
-    public static final double HOOD_MAX_ANGLE = 180.0;
+    public static final double HOOD_MIN_ANGLE = 50;
+    public static final double HOOD_MAX_ANGLE = 75;
 
     public static final double FLYWHEEL_P = 0.005;
     public static final double FLYWHEEL_I = 0.0;
@@ -78,9 +78,11 @@ public final class Constants
   public static class FieldConstants {
       public static final Translation3d blueHub = new Translation3d(4.620, 4.030, 1.829);
       public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
+      public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
+      public static final Translation3d redFeedPosition = new Translation3d(8.0, 0.7, 0);
   }
 
   public static class TurretConstants {
-      public static final int TURRET_MOTOR_ID = 32;
+      public static final int TURRET_MOTOR_ID = 16;
   }
 }

@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 
 public final class TrajectoryTransform3d {
 
-    private TrajectoryTransform3d() {} // prevent instantiation
+    private TrajectoryTransform3d() {} 
 
     public static List<Translation3d> toFieldRelative(
             Translation2d shooterPosition,

@@ -5,7 +5,6 @@
 package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Newton;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -20,14 +19,17 @@ import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -35,7 +37,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.subsystems.odometry.QuestNavSubsystem;
+import frc.robot.subsystems.odometry.QuestResult;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
+import gg.questnav.questnav.PoseFrame;
+import gg.questnav.questnav.QuestNav;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -43,6 +50,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.ironmaple.utils.FieldMirroringUtils;
 import org.json.simple.parser.ParseException;
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
@@ -55,6 +64,7 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 
 
 public class SwerveSubsystem extends SubsystemBase
@@ -73,9 +83,21 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private       Vision      vision;
 
-  PIDController aimController = new PIDController(4, 0, 0);
+  private QuestNavSubsystem questNav = new QuestNavSubsystem();
+
+  PoseFrame[] questFrames;
+
+  boolean useQuestNav = true;
+
+  Field2d fieldQuest = new Field2d();
+
+  ProfiledPIDController aimController;
 
   double aimOmega = 0;
+
+  ChassisSpeeds commandedVelocity = new ChassisSpeeds();
+
+  Supplier<ChassisSpeeds> velocitySupplier;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -118,6 +140,25 @@ public class SwerveSubsystem extends SubsystemBase
     }
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+
+    aimController =
+        new ProfiledPIDController(
+            4.0, 
+            0.0,
+            0.2,  
+            new TrapezoidProfile.Constraints(
+                3.0, 
+                6.0   
+            )
+        );
+
+    aimController.enableContinuousInput(-Math.PI, Math.PI);
+    aimController.setTolerance(0.02, 0.1);
+    
+    SmartDashboard.putNumber("Rot D", 0);
+    SmartDashboard.putNumber("Rot P", 1);
+    SmartDashboard.putNumber("Rot Tolerance Pos", 0.02);
+    SmartDashboard.putNumber("Rot Tolerance Vel", 0.1);
   }
 
   /**
@@ -149,8 +190,21 @@ public class SwerveSubsystem extends SubsystemBase
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+      //swerveDrive.updateOdometry();
+      //vision.updatePoseEstimation(swerveDrive);
+    }
+    if (useQuestNav) {
+      questFrames = questNav.getAllUnreadPoseFrames();
+      if (questFrames != null) {
+        for (PoseFrame questFrame : questFrames) {
+            QuestResult result = questNav.getResult(questFrame);
+
+            swerveDrive.addVisionMeasurement(result.getPose().toPose2d(), result.getTimeStamp(), questNav.getStdDevs());
+            fieldQuest.setRobotPose(result.getPose().toPose2d());
+            SmartDashboard.putData("QuestField", fieldQuest);
+        }
+      }
+      
     }
   }
 
@@ -181,24 +235,29 @@ public class SwerveSubsystem extends SubsystemBase
           this::getRobotVelocity,
           // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
           (speedsRobotRelative, moduleFeedForwards) -> {
+            ChassisSpeeds modifiedSpeeds = new ChassisSpeeds(
+                speedsRobotRelative.vxMetersPerSecond,
+                speedsRobotRelative.vyMetersPerSecond,
+                speedsRobotRelative.omegaRadiansPerSecond 
+            );
             if (enableFeedforward)
             {
               swerveDrive.drive(
-                  speedsRobotRelative,
+                  modifiedSpeeds,
                   swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
                   moduleFeedForwards.linearForces()
                                );
             } else
             {
-              swerveDrive.setChassisSpeeds(speedsRobotRelative);
+              swerveDrive.setChassisSpeeds(modifiedSpeeds);
             }
           },
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.0),
+              new PIDConstants(1.7, 0.0, 0.1),
               // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0)
+              new PIDConstants(0.15, 0.0, 0.0)
               // Rotation PID constants
           ),
           config,
@@ -254,12 +313,37 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
-  public void aimAtPosition(Translation2d position) {
-    Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle();
+  public void aimAtPositionWithLead(Translation2d position, double lead, boolean isPathPlanner) {
+    Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle().plus(new Rotation2d(lead));
+
+    aimController.setP(SmartDashboard.getNumber("Rot P", 1));
+    aimController.setD(SmartDashboard.getNumber("Rot D", 0));
+    aimController.setTolerance(
+      Units.degreesToRadians(SmartDashboard.getNumber("Rot Tolerance Pos", 0.02)),  // position tolerance
+      Units.degreesToRadians(SmartDashboard.getNumber("Rot Tolerance Vel", 0.1))   // velocity tolerance
+    );
 
     aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
 
-    drive(new ChassisSpeeds(0, 0, aimOmega));
+    SmartDashboard.putBoolean("Rot At Setpoint", aimController.atGoal());
+    SmartDashboard.putNumber("Rot Error", aimController.getPositionError());
+
+    if (aimController.atGoal()) {
+      aimOmega = 0.0;
+    }
+
+    if (!isPathPlanner) {
+      // Still allow movement when aiming in tele
+      driveFieldOriented(new ChassisSpeeds(getCommandedVelocity().vxMetersPerSecond/5, getCommandedVelocity().vyMetersPerSecond/5, aimOmega));
+    } else {
+      PPHolonomicDriveController.overrideRotationFeedback(() -> {
+          return aimOmega;
+      });
+    }
+  }
+
+  public void resetPathPlannerRotOverride() {
+    PPHolonomicDriveController.clearRotationFeedbackOverride();
   }
 
   /***
@@ -269,7 +353,7 @@ public class SwerveSubsystem extends SubsystemBase
    * @return True if aimed within tolerance, false otherwise.
    */
   public boolean isAimedAtPosition(double tolerance) {
-    double angleError = aimController.getError();
+    double angleError = aimController.getPositionError();
 
     SmartDashboard.putNumber("angleError", angleError);
 
@@ -523,6 +607,15 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
+  public void setVelocitySupplier(Supplier<ChassisSpeeds> velocity) {
+    velocitySupplier = velocity;
+  }
+
+  // You need to set the supplier yourself
+  public ChassisSpeeds getCommandedVelocity() {
+    return velocitySupplier.get();
+  }
+
   /**
    * Drive according to the chassis robot oriented velocity.
    *
@@ -554,6 +647,7 @@ public class SwerveSubsystem extends SubsystemBase
   public void resetOdometry(Pose2d initialHolonomicPose)
   {
     swerveDrive.resetOdometry(initialHolonomicPose);
+    questNav.setPose(new Pose3d(initialHolonomicPose));
   }
 
   /**

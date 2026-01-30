@@ -93,7 +93,7 @@ public class Robot extends LoggedRobot
     disabledTimer.reset();
     disabledTimer.start();
   }
-
+  
   @Override
   public void disabledPeriodic()
   {
@@ -114,10 +114,13 @@ public class Robot extends LoggedRobot
     m_robotContainer.setMotorBrake(true);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
+    //Print the selected autonomous command upon autonomous init
+    System.out.println("Auto selected: " + m_autonomousCommand);
+
+    // schedule the autonomous command selected in the autoChooser
     if (m_autonomousCommand != null)
     {
-      m_autonomousCommand.schedule();
+      CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
   }
 
@@ -183,9 +186,9 @@ public class Robot extends LoggedRobot
   public void simulationPeriodic() {
       SimulatedArena.getInstance().simulationPeriodic();
 
-      Pose3d[] notesPoses = SimulatedArena.getInstance()
-                .getGamePiecesArrayByType("Algae");
-      Logger.recordOutput("FieldSimulation/Algae", notesPoses);
+      Pose3d[] fuelPoses = SimulatedArena.getInstance()
+                .getGamePiecesArrayByType("Fuel");
+      Logger.recordOutput("FieldSimulation/Fuel", fuelPoses);
   }
 
   private void configureAdvantageKit()
