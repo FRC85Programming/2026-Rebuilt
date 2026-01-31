@@ -1,5 +1,7 @@
 package frc.robot.subsystems.turret;
 
+import java.util.function.Supplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -34,15 +36,24 @@ public class TurretSubsystem extends SubsystemBase {
 
     private double goalAngleDeg = 0.0;
     private final boolean isSim;
+    
+    private Supplier<Double> autoAngleSupplier = null;
 
     public TurretSubsystem() {
         isSim = Robot.isSimulation();
 
-        angleController.setTolerance(1.0); // degrees
+        angleController.setTolerance(1.0);
     }
 
     @Override
     public void periodic() {
+        if (autoAngleSupplier != null) {
+            Double suppliedAngle = autoAngleSupplier.get();
+            if (suppliedAngle != null) {
+                goalAngleDeg = suppliedAngle;
+            }
+        }
+        
         double turretAngleDeg =
             isSim
                 ? Math.toDegrees(turretSim.getTurretAngleRads())
@@ -55,7 +66,6 @@ public class TurretSubsystem extends SubsystemBase {
 
         double turretOut = Math.max(-1.0, Math.min(1.0, pidOut));
 
-        // Safety check :)
         if (turretAngleDeg <= 0 && pidOut < 0) pidOut = 0;
         if (turretAngleDeg >= 360 && pidOut > 0) pidOut = 0;
 
@@ -72,7 +82,6 @@ public class TurretSubsystem extends SubsystemBase {
             angleController.getSetpoint().position
         );
 
-        // Visualization (expects radians)
         AlphaMechanism3d.setTurretAngle(
             isSim ? turretSim.getTurretAngleRads() : getTurretAngleRads()
         );
@@ -98,6 +107,14 @@ public class TurretSubsystem extends SubsystemBase {
             return turretSim.getTurretAngleRads();
         }
         return turretEncoder.getPosition();
+    }
+    
+    public void setAutoAngleSupplier(Supplier<Double> angleSupplier) {
+        this.autoAngleSupplier = angleSupplier;
+    }
+    
+    public void clearAutoAngleSupplier() {
+        this.autoAngleSupplier = null;
     }
 
     private static double placeGoalNearCurrent(double currentDeg, double targetDeg) {

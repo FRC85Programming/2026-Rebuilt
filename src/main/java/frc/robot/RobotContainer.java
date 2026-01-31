@@ -31,6 +31,7 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.util.TargetingCalculator;
 
 import java.io.File;
 import java.util.Optional;
@@ -121,19 +122,35 @@ public class RobotContainer
    */
   public RobotContainer()
   {    
-    // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
     NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
     NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, turret, () -> getTarget(), true));
 
-    // Configure an auto selector that just selects strings
-    autoChooser.setDefaultOption("Left Auto", "Left"); // Set a default option
+    autoChooser.setDefaultOption("Left Auto", "Left");
     autoChooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
     autoChooser.addOption("Test", "TestAuto");
 
     SmartDashboard.putData("Auto Selector", autoChooser);
+    
+    turret.setAutoAngleSupplier(() -> {
+      var solution = TargetingCalculator.calculateShot(
+        getTarget(),
+        drivebase.getPose(),
+        drivebase.getFieldVelocity(),
+        turret.getTurretAngleRads(),
+        new TargetingCalculator.RpmConverter() {
+          public double rpmToMps(double rpm) {
+            return shooter.rpmToMps(rpm);
+          }
+          public double mpsToRpm(double mps) {
+            return shooter.mpsToRpm(mps);
+          }
+        }
+      );
+      return solution.turretAngleDegrees;
+    });
   }
 
   /**

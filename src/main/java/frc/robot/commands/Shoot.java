@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -8,19 +7,14 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
-import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
-import frc.robot.util.BallisticTrajectory3d;
-import frc.robot.util.ShooterTable;
-import frc.robot.util.TrajectoryTransform3d;
+import frc.robot.util.TargetingCalculator;
 
 public class Shoot extends Command {
     private final ShooterSubsystem shooter;
@@ -28,13 +22,9 @@ public class Shoot extends Command {
     private final TurretSubsystem turret;
     private final Supplier<Translation3d> target;
 
-    private List<Translation3d> fieldTrajectory3d;
-
-    private double goalRPM = 0.0;
-    private double goalAngle = 0.0;
+    private TargetingCalculator.TargetingSolution currentSolution;
 
     private final boolean isPathPlanner;
-    private Translation3d targetTranslation;
 
     public Shoot(
         SwerveSubsystem swerve,
@@ -55,123 +45,29 @@ public class Shoot extends Command {
     @Override
     public void initialize() {
         shooter.cleanupPieces();
-    }
-
-    private void calculateSolution() {
-        targetTranslation = target.get();
-
-        // Robot pose
-        var robotPose = swerve.getPose();
-        Translation2d robotTranslation = robotPose.getTranslation();
-        Rotation2d robotRotation = robotPose.getRotation();
-
-        // Vector from robot center to target
-        Translation2d toTarget2d =
-            targetTranslation.toTranslation2d().minus(robotTranslation);
-
-        double distance = toTarget2d.getNorm();
-        SmartDashboard.putNumber("Distance From Hub", distance);
-
-        if (distance < 1e-6) {
-            return;
-        }
-
-        Translation2d toTargetUnit = toTarget2d.div(distance);
-
-        // Robot velocity along shot direction
-        ChassisSpeeds robotVel = swerve.getFieldVelocity();
-        double robotVx =
-            robotVel.vxMetersPerSecond * toTargetUnit.getX()
-          + robotVel.vyMetersPerSecond * toTargetUnit.getY();
-
-        goalRPM = ShooterTable.getSetpoint(distance).flywheelRPM();
-        goalAngle = ShooterTable.getSetpoint(distance).hoodAngle().getRadians();
-
-        // Velocity compensation
-        double shotSpeed = shooter.rpmToMps(goalRPM);
-        double timeOfFlight = distance / shotSpeed;
-
-        double compensatedShotSpeed = shotSpeed - robotVx;
-        goalRPM = shooter.mpsToRpm(compensatedShotSpeed);
-
-        double compensatedDistance = distance - robotVx * timeOfFlight;
-        goalAngle =
-            ShooterTable.getSetpoint(compensatedDistance)
-                .hoodAngle()
-                .getRadians();
-
-        // Lateral lead
-        double robotVy =
-            -robotVel.vxMetersPerSecond * toTargetUnit.getY()
-            + robotVel.vyMetersPerSecond * toTargetUnit.getX();
-
-        double lead = robotVy * timeOfFlight;
-
-        swerve.aimAtPositionWithLead(
-            targetTranslation.toTranslation2d(),
-            -lead,
-            isPathPlanner
-        );
-
-
-        var shooterRelativeTrajectory =
-            BallisticTrajectory3d.generate(
-                shooter.rpmToMps(goalRPM),
-                goalAngle,
-                Constants.ShooterConstants.SHOOTER_HEIGHT_METERS,
-                3.0,
-                0.02
-            );
-
-        // Rotate turret offset into field frame
-        Translation2d turretOffsetField =
-            TurretConstants.ROBOT_TO_TURRET_2D.getTranslation().rotateBy(robotRotation);
-
-        // Shooter origin in field space
-        Translation2d shooterFieldTranslation =
-            robotTranslation.plus(turretOffsetField);
-
-        // Combined shooting angle = robot rotation + turret rotation
-        Rotation2d combinedShootingAngle = 
-            robotRotation.rotateBy(new Rotation2d(turret.getTurretAngleRads()));
-
-        // Convert to field-relative trajectory
-        fieldTrajectory3d =
-            TrajectoryTransform3d.toFieldRelative(
-                shooterFieldTranslation,
-                combinedShootingAngle,
-                shooterRelativeTrajectory
-            );
-
-        Pose3d[] poses =
-            fieldTrajectory3d.stream()
-                .map(p -> new Pose3d(p, new Rotation3d()))
-                .toArray(Pose3d[]::new);
-
-        Logger.recordOutput("Shot/Trajectory3d", poses);
-
-        SmartDashboard.putNumber(
-            "Calculated Shot Angle (deg)",
-            Math.toDegrees(goalAngle)
-        );
-
-        SmartDashboard.putNumber(
-            "Calculated Shot Speed (mps)",
-            shooter.rpmToMps(goalRPM)
-        );
-
-        SmartDashboard.putNumber(
-            "Calculated Shot Speed (rpm)",
-            goalRPM
-        );
+        swerve.resetAimController();
     }
 
     @Override
     public void execute() {
-        calculateSolution();
+        currentSolution = TargetingCalculator.calculateShot(
+            target.get(),
+            swerve.getPose(),
+            swerve.getFieldVelocity(),
+            turret.getTurretAngleRads(),
+            new TargetingCalculator.RpmConverter() {
+                public double rpmToMps(double rpm) {
+                    return shooter.rpmToMps(rpm);
+                }
+                public double mpsToRpm(double mps) {
+                    return shooter.mpsToRpm(mps);
+                }
+            }
+        );
 
-        shooter.setFlywheelRPM(goalRPM);
-        shooter.setHoodAngle(Math.toDegrees(goalAngle));
+        shooter.setFlywheelRPM(currentSolution.flywheelRPM);
+        shooter.setHoodAngle(currentSolution.hoodAngleDegrees);
+        turret.setAngle(currentSolution.turretAngleDegrees);
 
         SmartDashboard.putBoolean(
             "Flywheel at speed",
@@ -186,6 +82,7 @@ public class Shoot extends Command {
         if (
             shooter.flywheelAtSpeed(200)
             && shooter.hoodAtAngle(3)
+            && turret.atGoal()
             && swerve.isAimedAtPosition(0.1)
         ) {
             if (shooter.generateProjectileIsReady()) {

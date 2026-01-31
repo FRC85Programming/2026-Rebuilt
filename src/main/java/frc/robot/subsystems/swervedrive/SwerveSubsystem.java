@@ -346,6 +346,15 @@ public class SwerveSubsystem extends SubsystemBase
     PPHolonomicDriveController.clearRotationFeedbackOverride();
   }
 
+  /**
+   * Reset the aim controller to the current robot rotation.
+   * This should be called before starting any command that uses aimAtPositionWithLead
+   * to prevent the profiled controller from having stale state.
+   */
+  public void resetAimController() {
+    aimController.reset(getPose().getRotation().getRadians());
+  }
+
   /***
    * Check if the robot is aimed at the target position within a certain tolerance.
    * Assumes that you have already run aimAtPosition to set the aimController error.
