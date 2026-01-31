@@ -38,6 +38,9 @@ public class TurretSubsystem extends SubsystemBase {
     private final boolean isSim;
     
     private Supplier<Double> autoAngleSupplier = null;
+    
+    private static final double LOWER_LIMIT = 5.0;
+    private static final double UPPER_LIMIT = 355.0;
 
     public TurretSubsystem() {
         isSim = Robot.isSimulation();
@@ -50,7 +53,10 @@ public class TurretSubsystem extends SubsystemBase {
         if (autoAngleSupplier != null) {
             Double suppliedAngle = autoAngleSupplier.get();
             if (suppliedAngle != null) {
-                goalAngleDeg = suppliedAngle;
+                goalAngleDeg = getSmartWrappedGoal(
+                    isSim ? Math.toDegrees(turretSim.getTurretAngleRads()) : Math.toDegrees(getTurretAngleRads()),
+                    suppliedAngle
+                );
             }
         }
         
@@ -66,8 +72,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         double turretOut = Math.max(-1.0, Math.min(1.0, pidOut));
 
-        if (turretAngleDeg <= 0 && pidOut < 0) pidOut = 0;
-        if (turretAngleDeg >= 360 && pidOut > 0) pidOut = 0;
+        if (turretAngleDeg <= 0 && pidOut < 0) turretOut = 0;
+        if (turretAngleDeg >= 360 && pidOut > 0) turretOut = 0;
 
         if (angleController.atGoal()) {
             turretOut = 0;
@@ -77,6 +83,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Turret Angle Measured (deg)", turretAngleDeg);
         SmartDashboard.putNumber("Turret Goal (deg)", goalAngleDeg);
+        SmartDashboard.putNumber("Turret Mapped Goal (deg)", mappedGoalDeg);
         SmartDashboard.putNumber(
             "Turret Setpoint (deg)",
             angleController.getSetpoint().position
@@ -120,5 +127,47 @@ public class TurretSubsystem extends SubsystemBase {
     private static double placeGoalNearCurrent(double currentDeg, double targetDeg) {
         double delta = Math.IEEEremainder(targetDeg - currentDeg, 360.0);
         return currentDeg + delta;
+    }
+    
+    // This doesn't need to be a setpoint switch, just a power switch
+    private double getSmartWrappedGoal(double currentAngle, double desiredAngle) {
+        double normalizedDesired = normalizeAngle(desiredAngle);
+        double normalizedCurrent = normalizeAngle(currentAngle);
+        
+        double directPath = placeGoalNearCurrent(normalizedCurrent, normalizedDesired);
+        
+        if (directPath > UPPER_LIMIT && normalizedCurrent < LOWER_LIMIT) {
+            return normalizedDesired - 360.0;
+        }
+        
+        if (directPath < LOWER_LIMIT && normalizedCurrent > UPPER_LIMIT) {
+            return normalizedDesired + 360.0;
+        }
+        
+        if (normalizedCurrent > UPPER_LIMIT && normalizedDesired < LOWER_LIMIT) {
+            double goingForward = 360.0 - normalizedCurrent + normalizedDesired;
+            double goingBackward = normalizedCurrent - normalizedDesired;
+            if (goingBackward < goingForward) {
+                return normalizedDesired;
+            }
+        }
+        
+        if (normalizedCurrent < LOWER_LIMIT && normalizedDesired > UPPER_LIMIT) {
+            double goingBackward = normalizedCurrent + (360.0 - normalizedDesired);
+            double goingForward = normalizedDesired - normalizedCurrent;
+            if (goingForward < goingBackward) {
+                return normalizedDesired;
+            }
+        }
+        
+        return normalizedDesired;
+    }
+    
+    private static double normalizeAngle(double angleDeg) {
+        double normalized = angleDeg % 360.0;
+        if (normalized < 0) {
+            normalized += 360.0;
+        }
+        return normalized;
     }
 }

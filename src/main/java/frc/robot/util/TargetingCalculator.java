@@ -114,7 +114,7 @@ public class TargetingCalculator {
             .minus(robotPose.getTranslation())
             .getAngle()
             .minus(robotRotation)
-            .plus(new Rotation2d(-lead))
+            /** .plus(new Rotation2d(-lead))*/
             .getDegrees();
         
         return new TargetingSolution(goalRPM, Math.toDegrees(goalAngle), turretAngleDegrees, fieldTrajectory3d);
