@@ -125,8 +125,8 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, () -> getTarget(), false));
-    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, () -> getTarget(), true));
+    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
+    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, turret, () -> getTarget(), true));
 
     // Configure an auto selector that just selects strings
     autoChooser.setDefaultOption("Left Auto", "Left"); // Set a default option
@@ -158,10 +158,6 @@ public class RobotContainer
     Command stopFlywheel = new InstantCommand(() -> shooter.setFlywheelRPM(0));
     Command angleHoodUp = new InstantCommand(() -> shooter.setHoodAngle(50.0));
     Command angleHoodDown = new InstantCommand(() -> shooter.setHoodAngle(20.0));
-    Command setTurretAngle = new InstantCommand(() -> turret.setTargetAngle(3.1415));
-
-
-
 
 
     if (RobotBase.isSimulation())
@@ -195,9 +191,9 @@ public class RobotContainer
       /*driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
-      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
-      driverXbox.button(2).onTrue(new InstantCommand(() -> shooter.setHoodAngle(90)));
-      driverXbox.button(3).onTrue(new InstantCommand(() -> shooter.setHoodAngle(0)));
+      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
+      driverXbox.button(2).onTrue(new InstantCommand(() -> turret.setAngle(180)));
+      driverXbox.button(3).onTrue(new InstantCommand(() -> turret.setAngle(0)));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
 
 
@@ -224,7 +220,7 @@ public class RobotContainer
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.522, 7.406, new Rotation2d(Math.toRadians(-90))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
+      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
     }
 
   }

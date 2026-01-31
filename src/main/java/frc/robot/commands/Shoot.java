@@ -17,6 +17,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.ShooterTable;
 import frc.robot.util.TrajectoryTransform3d;
@@ -24,6 +25,7 @@ import frc.robot.util.TrajectoryTransform3d;
 public class Shoot extends Command {
     private final ShooterSubsystem shooter;
     private final SwerveSubsystem swerve;
+    private final TurretSubsystem turret;
     private final Supplier<Translation3d> target;
 
     private List<Translation3d> fieldTrajectory3d;
@@ -37,11 +39,13 @@ public class Shoot extends Command {
     public Shoot(
         SwerveSubsystem swerve,
         ShooterSubsystem shooter,
+        TurretSubsystem turret,
         Supplier<Translation3d> target,
         boolean isPathPlanner
     ) {
         this.shooter = shooter;
         this.swerve = swerve;
+        this.turret = turret;
         this.target = target;
         this.isPathPlanner = isPathPlanner;
 
@@ -80,11 +84,10 @@ public class Shoot extends Command {
             robotVel.vxMetersPerSecond * toTargetUnit.getX()
           + robotVel.vyMetersPerSecond * toTargetUnit.getY();
 
-        // Base lookup
         goalRPM = ShooterTable.getSetpoint(distance).flywheelRPM();
         goalAngle = ShooterTable.getSetpoint(distance).hoodAngle().getRadians();
 
-        // Velocity compensation (optional but you already had this)
+        // Velocity compensation
         double shotSpeed = shooter.rpmToMps(goalRPM);
         double timeOfFlight = distance / shotSpeed;
 
@@ -128,11 +131,15 @@ public class Shoot extends Command {
         Translation2d shooterFieldTranslation =
             robotTranslation.plus(turretOffsetField);
 
+        // Combined shooting angle = robot rotation + turret rotation
+        Rotation2d combinedShootingAngle = 
+            robotRotation.rotateBy(new Rotation2d(turret.getTurretAngleRads()));
+
         // Convert to field-relative trajectory
         fieldTrajectory3d =
             TrajectoryTransform3d.toFieldRelative(
                 shooterFieldTranslation,
-                robotRotation,
+                combinedShootingAngle,
                 shooterRelativeTrajectory
             );
 
@@ -184,7 +191,8 @@ public class Shoot extends Command {
             if (shooter.generateProjectileIsReady()) {
                 shooter.simulatedShot(
                     swerve.getPose(),
-                    swerve.getFieldVelocity()
+                    swerve.getFieldVelocity(),
+                    new Rotation2d(turret.getTurretAngleRads())
                 );
             }
         }

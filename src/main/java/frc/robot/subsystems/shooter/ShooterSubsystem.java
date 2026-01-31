@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -135,8 +136,8 @@ public class ShooterSubsystem extends SubsystemBase{
         return rpm / 375.0;
     }
 
-    public void simulatedShot(Pose2d pose, ChassisSpeeds velocity) {
-        shooterSim.generateProjectile(pose, velocity);
+    public void simulatedShot(Pose2d pose, ChassisSpeeds velocity, Rotation2d turretAngle) {
+        shooterSim.generateProjectile(pose, velocity, turretAngle);
     }
 
     public boolean generateProjectileIsReady() {

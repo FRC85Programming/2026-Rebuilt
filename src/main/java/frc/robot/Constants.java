@@ -92,5 +92,7 @@ public final class Constants
 
       public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
       public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(-0.19685, 0.0, Rotation2d.kZero);
+
+      public static final double TURRET_GEAR_RATIO = 50.0;
   }
 }

@@ -82,14 +82,22 @@ public class ShooterSim extends SubsystemBase{
       return Math.toDegrees(hoodSim.getAngleRads());
     }
 
-    public void generateProjectile(Pose2d pose, ChassisSpeeds velocity) {
+    public void generateProjectile(Pose2d pose, ChassisSpeeds velocity, Rotation2d turretAngle) {
       shotSpacingTimer.reset();
       shotSpacingTimer.start();
+      // Calculate the combined shooting direction (robot + turret)
+      Rotation2d shootingDirection = pose.getRotation().plus(turretAngle);
+      
+      Translation2d turretOffsetRotated = 
+          TurretConstants.ROBOT_TO_TURRET_2D.getTranslation()
+              .rotateBy(shootingDirection)
+              .unaryMinus();
+      
       fuelOnFly = new RebuiltFuelOnFly(
             pose.getTranslation(),
-            TurretConstants.ROBOT_TO_TURRET_2D.getTranslation(),
+            turretOffsetRotated,
             velocity,
-            pose.getRotation(),
+            shootingDirection,
             Units.Meters.of(TurretConstants.ROBOT_TO_TURRET.getZ()),
             Units.MetersPerSecond.of(getFlywheelRPM() / 6900.0 * 20.0),
             Units.Radians.of(getHoodAngleDeg()/180.0 * Math.PI)

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AlphaMechanism3d;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TurretConstants;
 
     public class TurretSim extends SubsystemBase{
         private final DCMotor turretMotor = DCMotor.getNeoVortex(1);
@@ -22,22 +23,17 @@ import frc.robot.Constants.ShooterConstants;
         SingleJointedArmSim turretSim =
                 new SingleJointedArmSim(
                     turretMotor,  
-                    100.0,         
+                    TurretConstants.TURRET_GEAR_RATIO,         
                     0.02,                    
                     0.5,                
-                    Units.degreesToRadians(-180),
-                    Units.degreesToRadians(180),
-                    false,    // gravity OFF for turret
+                    Units.degreesToRadians(0),
+                    Units.degreesToRadians(360),
+                    false,  
                     0.0                      
                 );
 
-        @Override
-        public void periodic() {
-            AlphaMechanism3d.setTurretAngle(0);
-        }
-
-        public void update(double flywheelVoltage, double dt) {
-            turretSim.setInputVoltage(flywheelVoltage);
+        public void update(double turretVoltage, double dt) {
+            turretSim.setInputVoltage(turretVoltage);
             turretSim.update(dt);
         }   
         
