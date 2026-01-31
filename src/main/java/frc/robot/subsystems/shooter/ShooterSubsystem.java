@@ -52,9 +52,7 @@ public class ShooterSubsystem extends SubsystemBase{
         double hoodAngleMeasured = isSim ? shooterSim.getHoodAngleDeg() : getHoodAngle();
         double hoodPIDOut = hoodPID.calculate(hoodAngleMeasured, goalAngle);
         double hoodOut = hoodPIDOut;
-        hoodOut = Math.max(-1.0, Math.min(1.0, flywheelOut));
-
-        AlphaMechanism3d.setHoodAngle(getHoodAngle());
+        hoodOut = Math.max(-1.0, Math.min(1.0, hoodOut));
 
         flywheelMotor.set(flywheelOut);
         hoodMotor.set(hoodOut);
@@ -63,6 +61,8 @@ public class ShooterSubsystem extends SubsystemBase{
             shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
             shooterSim.updateHood(hoodOut, 0.02);
         }
+
+        AlphaMechanism3d.setHoodAngle(getHoodAngle());
 
         SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
         SmartDashboard.putNumber("Flywheel Measured RPM", flywheelRpmMeasured);
@@ -116,7 +116,6 @@ public class ShooterSubsystem extends SubsystemBase{
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
            
         goalAngle = angle;
-        hoodMotor.set(hoodPID.calculate(getHoodAngle(), angle));
     }
 
     public boolean hoodAtAngle(double tolerance) {

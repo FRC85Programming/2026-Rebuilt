@@ -5,7 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -62,7 +64,7 @@ public final class Constants
     public static final double HOOD_GEAR_RATIO = 100.0;
 
     // Hood limits - degrees
-    public static final double HOOD_MIN_ANGLE = 0;
+    public static final double HOOD_MIN_ANGLE = 10;
     public static final double HOOD_MAX_ANGLE = 90;
 
     public static final double FLYWHEEL_P = 0.005;
@@ -70,11 +72,12 @@ public final class Constants
     public static final double FLYWHEEL_D = 0.0;
     public static final double FLYWHEEL_FF = 1.0 / 6000.0;
 
-    public static final double HOOD_P = 0.3;
+    public static final double HOOD_P = 1;
     public static final double HOOD_I = 0.0;
     public static final double HOOD_D = 0.0;
 
     public static final double SHOOTER_HEIGHT_METERS = 0.305;
+    public static final double HOOD_LENGTH_METERS = .3;
   }
 
   public static class FieldConstants {
@@ -88,5 +91,6 @@ public final class Constants
       public static final int TURRET_MOTOR_ID = 16;
 
       public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
+      public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(-0.19685, 0.0, Rotation2d.kZero);
   }
 }
