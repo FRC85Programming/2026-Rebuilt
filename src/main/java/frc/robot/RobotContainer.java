@@ -126,6 +126,9 @@ public class RobotContainer
     // Configure an auto selector that just selects strings
     autoChooser.setDefaultOption("Left Auto", "Left"); // Set a default option
     autoChooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
+    autoChooser.addOption("Left+Depot Auto", "Left+Depot");
+    autoChooser.addOption("Bump Auto", "Bump");
+
     autoChooser.addOption("Test", "TestAuto");
 
     SmartDashboard.putData("Auto Selector", autoChooser);

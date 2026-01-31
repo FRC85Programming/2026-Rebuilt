@@ -16,6 +16,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
@@ -23,15 +24,23 @@ import frc.robot.Constants.ShooterConstants;
 public class ShooterSim extends SubsystemBase{
 
     private final DCMotor flywheelMotor = DCMotor.getNeoVortex(1);
-    private final double gearRatio = ShooterConstants.FLYWHEEL_GEAR_RATIO;
+    private final double gearRatioFlywheel = ShooterConstants.FLYWHEEL_GEAR_RATIO;
+
+     private final DCMotor hoodMotor = DCMotor.getNeoVortex(1);
+    private final double gearRatioHood = ShooterConstants.HOOD_GEAR_RATIO;
 
     private final double flywheelMOI = 0.003;
+    private final double hoodMOI = 0.0025;
 
     private final LinearSystem<N1, N1, N1> flywheelPlant =
-        LinearSystemId.createFlywheelSystem(flywheelMotor, flywheelMOI, gearRatio);
+        LinearSystemId.createFlywheelSystem(flywheelMotor, flywheelMOI, gearRatioFlywheel);
 
-    // THIS NAME NEEDS TO BE CHANGED
-    private final FlywheelSim flywheelSim = new FlywheelSim(flywheelPlant, flywheelMotor, gearRatio);
+    private final FlywheelSim flywheelSim = new FlywheelSim(flywheelPlant, flywheelMotor, gearRatioFlywheel);
+
+    private final LinearSystem<N1, N1, N1> hoodPLant =
+        LinearSystemId.createFlywheelSystem(hoodMotor, flywheelMOI, gearRatioHood);
+
+    private final FlywheelSim hoodSim = new FlywheelSim(hoodPLant, hoodMotor, gearRatioHood);
   
     private double hoodAngleDeg = 30.0;
 
@@ -48,8 +57,18 @@ public class ShooterSim extends SubsystemBase{
         );
 
 
-    public void update(double flywheelVoltage, double dt) {
+    @Override
+    public void periodic() {
+      hoodAngleDeg += Math.toDegrees(hoodSim.getAngularVelocityRadPerSec() * 0.02);
+    }
+    
+    public void updateFlywheel(double flywheelVoltage, double dt) {
         flywheelSim.setInputVoltage(flywheelVoltage);
+        flywheelSim.update(dt);
+    }
+    
+    public void updateHood(double hoodVoltage, double dt) {
+        hoodSim.setInputVoltage(hoodVoltage);
         flywheelSim.update(dt);
     }  
   
@@ -59,10 +78,6 @@ public class ShooterSim extends SubsystemBase{
   
     public double getHoodAngleDeg() {
       return hoodAngleDeg;
-    }
-
-    public void setHoodAngle(double angle) {
-      hoodAngleDeg = angle;
     }
 
     public void generateProjectile(Pose2d pose, ChassisSpeeds velocity) {

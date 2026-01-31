@@ -51,7 +51,7 @@ public class ShooterSubsystem extends SubsystemBase{
         flywheelMotor.set(flywheelOut);
 
         if (isSim) {
-            shooterSim.update(flywheelOut * 12.0, 0.02);
+            //shooterSim.update(flywheelOut * 12.0, 0.02);
         }
 
         SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
@@ -106,7 +106,7 @@ public class ShooterSubsystem extends SubsystemBase{
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
            
         if (Robot.isSimulation()) {    
-            shooterSim.setHoodAngle(angle);
+            //shooterSim.setHoodAngle(angle);
         }
         goalAngle = angle;
         hoodMotor.set(hoodPID.calculate(getHoodAngle(), angle));
