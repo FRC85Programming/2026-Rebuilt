@@ -133,6 +133,8 @@ public class RobotContainer
     autoChooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
     autoChooser.addOption("Left+Depot Auto", "Left+Depot");
     autoChooser.addOption("Bump Auto", "Bump");
+    autoChooser.addOption("Test Auto", "Test");
+
 
     autoChooser.addOption("Test", "TestAuto");
 
@@ -218,11 +220,11 @@ public class RobotContainer
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.522, 7.406, new Rotation2d(Math.toRadians(-90))))));
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.522, 7.406, new Rotation2d(Math.toRadians(90))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
-      driverXbox.leftTrigger().whileTrue(new Intake(intake, () -> SmartDashboard.getNumber("Intake Speed", 0.6)));
+      driverXbox.leftTrigger().whileTrue(new Intake(intake, () -> SmartDashboard.getNumber("Intake Speed", 0.8)));
     }
   }
 

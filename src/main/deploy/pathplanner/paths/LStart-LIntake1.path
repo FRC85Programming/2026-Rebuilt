@@ -8,36 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.299600570613409,
-        "y": 7.6125392296718974
+        "x": 7.196091298145506,
+        "y": 7.53490727532097
       },
       "isLocked": false,
       "linkedName": "LStart"
     },
     {
       "anchor": {
-        "x": 7.700699001426534,
-        "y": 6.590385164051355
+        "x": 7.817146932952923,
+        "y": 6.629201141226819
       },
       "prevControl": {
-        "x": 7.7260369453453315,
-        "y": 7.198495818102451
+        "x": 7.778330955777459,
+        "y": 7.664293865905849
       },
       "nextControl": {
-        "x": 7.674821683309556,
-        "y": 5.969329529243937
+        "x": 7.840440354712736,
+        "y": 6.008043227631822
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.700699001426534,
-        "y": 5.542353780313838
+        "x": 7.817146932952923,
+        "y": 5.011868758915835
       },
       "prevControl": {
-        "x": 7.687760342368046,
-        "y": 5.943452211126962
+        "x": 7.804208273894435,
+        "y": 5.412967189728959
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.6695095948827349,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 90.0
     }
   ],
   "constraintZones": [
@@ -69,7 +69,7 @@
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 0.6604010025062654,
+      "waypointRelativePos": 0.3295739348370956,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -81,7 +81,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 1.5,
-    "maxAcceleration": 1.5,
+    "maxAcceleration": 1.2,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -89,13 +89,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "Left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": false
 }

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.700699001426534,
-        "y": 5.542353780313838
+        "x": 7.817146932952923,
+        "y": 5.011868758915835
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.403109843081312,
-        "y": 6.771526390870186
+        "x": 7.519557774607701,
+        "y": 6.241041369472183
       },
       "isLocked": false,
       "linkedName": "LIntake1"
@@ -47,7 +47,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1.2537313432835806,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 90.0
     }
   ],
   "constraintZones": [],
@@ -63,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -67.92141889790871
+    "rotation": 109.92558065818432
   },
   "reversed": false,
   "folder": "Left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }
