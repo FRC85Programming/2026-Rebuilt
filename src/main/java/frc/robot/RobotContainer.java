@@ -24,9 +24,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Intake;
 import frc.robot.commands.Shoot;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -56,6 +58,7 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/neo"));
   private final ShooterSubsystem shooter = new ShooterSubsystem();
+  private final IntakeSubsystem intake = new IntakeSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -122,6 +125,8 @@ public class RobotContainer
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
     NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, () -> getTarget(), false));
     NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, () -> getTarget(), true));
+    NamedCommands.registerCommand("Intake", new Intake(intake, () -> 0.7));
+
 
     // Configure an auto selector that just selects strings
     autoChooser.setDefaultOption("Left Auto", "Left"); // Set a default option
@@ -132,6 +137,7 @@ public class RobotContainer
     autoChooser.addOption("Test", "TestAuto");
 
     SmartDashboard.putData("Auto Selector", autoChooser);
+    SmartDashboard.putNumber("Intake Speed", 0.7);
   }
 
   /**
@@ -216,8 +222,8 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
+      driverXbox.leftTrigger().whileTrue(new Intake(intake, () -> SmartDashboard.getNumber("Intake Speed", 0.6)));
     }
-
   }
 
   /**

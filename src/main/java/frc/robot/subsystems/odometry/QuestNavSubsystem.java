@@ -24,7 +24,7 @@ public class QuestNavSubsystem extends SubsystemBase {
                 0.0,
                 Units.inchesToMeters(13)
             ),
-            new Rotation3d()
+            new Rotation3d(0.0, 0.0, 0.0)
         );
 
     private static final Matrix<N3, N1> QUESTNAV_STD_DEVS =
