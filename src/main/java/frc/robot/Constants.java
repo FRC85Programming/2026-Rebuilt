@@ -95,4 +95,8 @@ public final class Constants
 
       public static final double TURRET_GEAR_RATIO = 50.0;
   }
+  public static class IndexerConstants {
+      public static final int INDEXER_MOTOR_ID = 0;
+
+  }
 }

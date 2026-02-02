@@ -28,6 +28,7 @@ import frc.robot.Constants.TurretConstants;
 import frc.robot.commands.Shoot;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -62,6 +63,8 @@ public class RobotContainer
   private final ShooterSubsystem shooter = new ShooterSubsystem();
 
   private final TurretSubsystem turret = new TurretSubsystem();
+
+  private final IndexerSubsystem indexer = new IndexerSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -125,8 +128,8 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
-    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, turret, () -> getTarget(), true));
+    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, turret, indexer, () -> getTarget(), false));
+    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, turret, indexer, () -> getTarget(), true));
 
     autoChooser.setDefaultOption("Left Auto", "Left");
     autoChooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
@@ -208,7 +211,7 @@ public class RobotContainer
       /*driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
-      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
+      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, turret, indexer, () -> getTarget(), false));
       driverXbox.button(2).onTrue(new InstantCommand(() -> turret.setAngle(180)));
       driverXbox.button(3).onTrue(new InstantCommand(() -> turret.setAngle(0)));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
@@ -237,7 +240,7 @@ public class RobotContainer
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.522, 7.406, new Rotation2d(Math.toRadians(-90))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
+      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, turret, indexer, () -> getTarget(), false));
     }
 
   }

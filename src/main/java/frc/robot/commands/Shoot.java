@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -20,6 +21,7 @@ public class Shoot extends Command {
     private final ShooterSubsystem shooter;
     private final SwerveSubsystem swerve;
     private final TurretSubsystem turret;
+    private final IndexerSubsystem indexer;
     private final Supplier<Translation3d> target;
 
     private TargetingCalculator.TargetingSolution currentSolution;
@@ -30,12 +32,14 @@ public class Shoot extends Command {
         SwerveSubsystem swerve,
         ShooterSubsystem shooter,
         TurretSubsystem turret,
+        IndexerSubsystem indexer,
         Supplier<Translation3d> target,
         boolean isPathPlanner
     ) {
         this.shooter = shooter;
         this.swerve = swerve;
         this.turret = turret;
+        this.indexer = indexer;
         this.target = target;
         this.isPathPlanner = isPathPlanner;
 
@@ -85,6 +89,7 @@ public class Shoot extends Command {
             && turret.atGoal()
             && swerve.isAimedAtPosition(0.1)
         ) {
+            indexer.index(0.5);
             if (shooter.generateProjectileIsReady()) {
                 shooter.simulatedShot(
                     swerve.getPose(),
@@ -105,5 +110,6 @@ public class Shoot extends Command {
         swerve.drive(new ChassisSpeeds(0, 0, 0));
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
         swerve.resetPathPlannerRotOverride();
+        indexer.index(0);
     }
 }
