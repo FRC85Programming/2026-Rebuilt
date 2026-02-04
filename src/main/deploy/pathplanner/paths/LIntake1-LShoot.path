@@ -8,36 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.519557774607701,
-        "y": 6.241041369472183
+        "x": 7.763288888888889,
+        "y": 6.334688888888889
       },
       "isLocked": false,
       "linkedName": "LIntake1"
     },
     {
       "anchor": {
-        "x": 6.380955777460769,
-        "y": 7.444336661911555
+        "x": 6.720633333333333,
+        "y": 7.406577777777777
       },
       "prevControl": {
-        "x": 7.575245185449357,
-        "y": 7.336784058487874
+        "x": 7.5684,
+        "y": 7.296766365509589
       },
       "nextControl": {
-        "x": 5.186666369472181,
-        "y": 7.551889265335236
+        "x": 5.53144548774282,
+        "y": 7.56061355426084
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.301554921540655,
-        "y": 7.302011412268189
+        "x": 3.0859555555555556,
+        "y": 7.2799000000000005
       },
       "prevControl": {
-        "x": 4.349586305278173,
-        "y": 7.431398002853067
+        "x": 4.133986939293074,
+        "y": 7.409286590584879
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,16 +46,16 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.2537313432835806,
-      "rotationDegrees": 90.0
+      "waypointRelativePos": 1.5553816046966706,
+      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.5,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -63,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 109.92558065818432
+    "rotation": -68.17392034535509
   },
   "reversed": false,
   "folder": "Left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

@@ -234,13 +234,13 @@ public class SwerveSubsystem extends SubsystemBase
             ChassisSpeeds modifiedSpeeds = new ChassisSpeeds(
                 speedsRobotRelative.vxMetersPerSecond,
                 speedsRobotRelative.vyMetersPerSecond,
-                speedsRobotRelative.omegaRadiansPerSecond
+                -speedsRobotRelative.omegaRadiansPerSecond
             );
             if (enableFeedforward)
             {
               swerveDrive.drive(
                   modifiedSpeeds,
-                  swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
+                  swerveDrive.kinematics.toSwerveModuleStates(modifiedSpeeds),
                   moduleFeedForwards.linearForces()
                                );
             } else
@@ -251,9 +251,9 @@ public class SwerveSubsystem extends SubsystemBase
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(2.0, 0.0, 0.0),
+              new PIDConstants(6.35, 0.1, 0.05),
               // Translation PID constants
-              new PIDConstants(0.5, 0.0, 0.0)
+              new PIDConstants(3.0, 0.0, 0.0)
               // Rotation PID constants
           ),
           config,

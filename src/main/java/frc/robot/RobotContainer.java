@@ -134,6 +134,8 @@ public class RobotContainer
     autoChooser.addOption("Left+Depot Auto", "Left+Depot");
     autoChooser.addOption("Bump Auto", "Bump");
     autoChooser.addOption("Test Auto", "Test");
+    autoChooser.addOption("Double Cycle", "24BallAutoLeft");
+
 
 
     autoChooser.addOption("Test", "TestAuto");
@@ -220,7 +222,7 @@ public class RobotContainer
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.522, 7.406, new Rotation2d(Math.toRadians(90))))));
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));

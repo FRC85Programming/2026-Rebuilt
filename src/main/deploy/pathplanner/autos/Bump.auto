@@ -34,6 +34,12 @@
           "data": {
             "pathName": "MShoot-MIntake"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MIntake-MShoot2"
+          }
         }
       ]
     }
