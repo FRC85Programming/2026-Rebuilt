@@ -99,7 +99,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
     public double getHoodAngle() {
         if (isSim) {
-            return shooterSim.getHoodAngleDeg();
+            return getSimHoodAngle();
         } else {
             // Needs to be converted to degrees on real robot
             return hoodEncoder.getPosition();
@@ -116,12 +116,10 @@ public class ShooterSubsystem extends SubsystemBase{
             ShooterConstants.HOOD_MIN_ANGLE,
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
            
-        if (Robot.isSimulation()) {    
-            //shooterSim.setHoodAngle(angle);
-        }
         goalAngle = angle;
     }
 
+    // TODO: These should be changed to come directly from the PID controllre
     public boolean hoodAtAngle(double tolerance) {
         return Math.abs(getHoodAngle() - goalAngle) < tolerance;
     }

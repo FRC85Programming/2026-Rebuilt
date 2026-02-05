@@ -1,20 +1,9 @@
 package frc.robot.subsystems.turret;
 
-import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.AlphaMechanism3d;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 
     public class TurretSim extends SubsystemBase{
@@ -22,7 +11,7 @@ import frc.robot.Constants.TurretConstants;
 
         SingleJointedArmSim turretSim =
                 new SingleJointedArmSim(
-                    turretMotor,  
+                    DCMotor.getNeoVortex(2),  
                     TurretConstants.TURRET_GEAR_RATIO,         
                     0.02,                    
                     0.5,                
@@ -39,5 +28,9 @@ import frc.robot.Constants.TurretConstants;
         
         public double getTurretAngleRads() {
             return turretSim.getAngleRads();
+        }
+
+        public double getTurretSpeed() {
+            return turretSim.getVelocityRadPerSec();
         }
 }

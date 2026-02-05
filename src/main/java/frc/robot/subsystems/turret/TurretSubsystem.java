@@ -63,7 +63,20 @@ public class TurretSubsystem extends SubsystemBase {
                 : Math.toDegrees(getTurretAngleRads());
 
         double mappedGoalDeg =
-            placeGoalNearCurrent(turretAngleDeg, goalAngleDeg);
+            chooseGoalAvoidingLimits(turretAngleDeg, goalAngleDeg);
+        
+        boolean takingLongPath =
+            Math.abs(mappedGoalDeg - turretAngleDeg) > 180.0;
+
+        if (takingLongPath) {
+            angleController.setConstraints(
+                new TrapezoidProfile.Constraints(500.0, 720.0)
+            );
+        } else {
+            angleController.setConstraints(
+                new TrapezoidProfile.Constraints(500.0, 720.0)
+            );
+        }
 
         double pidOut = angleController.calculate(turretAngleDeg, mappedGoalDeg);
 
@@ -85,6 +98,14 @@ public class TurretSubsystem extends SubsystemBase {
             "Turret Setpoint (deg)",
             angleController.getSetpoint().position
         );
+        SmartDashboard.putNumber(
+            "Turret Vel Set",
+            Math.toRadians(angleController.getSetpoint().velocity)
+        );
+        SmartDashboard.putNumber(
+            "Turret Vel Read",
+            turretSim.getTurretSpeed()
+        );
 
         AlphaMechanism3d.setTurretAngle(
             isSim ? turretSim.getTurretAngleRads() : getTurretAngleRads()
@@ -95,9 +116,6 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
-    /**
-     * Sets the turret's goal angle (degrees)
-     */
     public void setAngle(double angleDeg) {
         goalAngleDeg = angleDeg;
     }
@@ -133,4 +151,31 @@ public class TurretSubsystem extends SubsystemBase {
         }
         return normalized;
     }
+
+    private static boolean pathCrossesLimit(double startDeg, double endDeg, double lowerLimit, double upperLimit) {
+        double step = Math.signum(endDeg - startDeg);
+        if (step == 0) return false;
+
+        for (double a = startDeg; Math.abs(a - endDeg) > 0.5; a += step) {
+            double norm = normalizeAngle(a);
+            if (norm <= lowerLimit || norm >= upperLimit) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static double chooseGoalAvoidingLimits(double currentDeg, double targetDeg) {
+        double shortGoal = placeGoalNearCurrent(currentDeg, targetDeg);
+
+        // Long path = short ± 360
+        double longGoal =
+            shortGoal + (shortGoal > currentDeg ? -360.0 : 360.0);
+
+        boolean shortHitsLimit =
+            pathCrossesLimit(currentDeg, shortGoal, LOWER_LIMIT, UPPER_LIMIT);
+
+        return shortHitsLimit ? longGoal : shortGoal;
+    }
+
 }
