@@ -38,8 +38,6 @@ public class ShooterSim extends SubsystemBase{
 
     private final FlywheelSim flywheelSim = new FlywheelSim(flywheelPlant, flywheelMotor, gearRatioFlywheel);
   
-    private double hoodAngleDeg = 30.0;
-
     private final SingleJointedArmSim hoodSim =
       new SingleJointedArmSim(
           hoodMotor,
@@ -49,7 +47,7 @@ public class ShooterSim extends SubsystemBase{
           Math.toRadians(ShooterConstants.HOOD_MIN_ANGLE),
           Math.toRadians(ShooterConstants.HOOD_MAX_ANGLE),
           true, 
-          Math.toRadians(hoodAngleDeg)
+          Math.toRadians(30)
       );
 
     private final Timer shotSpacingTimer = new Timer();
@@ -71,7 +69,7 @@ public class ShooterSim extends SubsystemBase{
     
     public void updateHood(double hoodVoltage, double dt) {
         hoodSim.setInputVoltage(hoodVoltage);
-        flywheelSim.update(dt);
+        hoodSim.update(dt);
     }  
   
     public double getFlywheelRPM() {

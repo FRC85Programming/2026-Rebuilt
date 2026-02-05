@@ -20,10 +20,9 @@ public class AlphaMechanism3d {
     return measured;
   }
 
-  public static Rotation2d turretAngle = Rotation2d.kZero; // Robot-relative
-  public static Rotation2d hoodAngle = Rotation2d.kZero; // Relative to the ground
+  public static Rotation2d turretAngle = Rotation2d.kZero;
+  public static Rotation2d hoodAngle = Rotation2d.kZero; 
 
-  /** Log the component poses and camera pose. */
   public void log(String key) {
     var turretPose =
         TurretConstants.ROBOT_TO_TURRET
@@ -42,10 +41,6 @@ public class AlphaMechanism3d {
   }
 
   public static void setHoodAngle(double angle) {
-    // Angle input: 0° = forward (horizontal), 90° = straight up (vertical)
-    // The Transform3d uses negative pitch, so we need to convert:
-    // Input 0° (forward) → 90° internal → pitch = -90° → horizontal
-    // Input 90° (up) → 0° internal → pitch = 0° → vertical
     hoodAngle = new Rotation2d(Math.toRadians(90 - angle));
   }
 }

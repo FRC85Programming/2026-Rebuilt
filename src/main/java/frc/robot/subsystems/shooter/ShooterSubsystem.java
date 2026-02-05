@@ -4,6 +4,8 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -60,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
         if (isSim) {
             shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
-            shooterSim.updateHood(hoodOut, 0.02);
+            shooterSim.updateHood(hoodOut * 12.0, 0.02);
         }
 
         AlphaMechanism3d.setHoodAngle(getHoodAngle());
@@ -71,6 +73,18 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
         SmartDashboard.putNumber("Flywheel PID Out", flywheelPIDOut);
         SmartDashboard.putNumber("Flywheel Out", flywheelOut);
+        
+        SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
+        SmartDashboard.putNumber("Hood Measured Angle", hoodAngleMeasured);
+        SmartDashboard.putNumber("Hood PID Out", hoodPIDOut);
+        SmartDashboard.putNumber("Hood Out", hoodOut);
+        
+        Logger.recordOutput("Shooter/FlywheelGoalRPM", goalRpm);
+        Logger.recordOutput("Shooter/FlywheelMeasuredRPM", flywheelRpmMeasured);
+        Logger.recordOutput("Shooter/FlywheelOut", flywheelOut);
+        Logger.recordOutput("Shooter/HoodGoalAngle", goalAngle);
+        Logger.recordOutput("Shooter/HoodMeasuredAngle", hoodAngleMeasured);
+        Logger.recordOutput("Shooter/HoodOut", hoodOut);
     }
 
     private double convertFlywheelVelocity(double velocity) {
