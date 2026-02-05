@@ -38,14 +38,11 @@ public class TurretSubsystem extends SubsystemBase {
     private final boolean isSim;
     
     private Supplier<Double> autoAngleSupplier = null;
-    
-    private static final double LOWER_LIMIT = 5.0;
-    private static final double UPPER_LIMIT = 355.0;
 
     public TurretSubsystem() {
         isSim = Robot.isSimulation();
 
-        angleController.setTolerance(1.0);
+        angleController.setTolerance(2.0);
     }
 
     @Override
@@ -173,7 +170,7 @@ public class TurretSubsystem extends SubsystemBase {
             shortGoal + (shortGoal > currentDeg ? -360.0 : 360.0);
 
         boolean shortHitsLimit =
-            pathCrossesLimit(currentDeg, shortGoal, LOWER_LIMIT, UPPER_LIMIT);
+            pathCrossesLimit(currentDeg, shortGoal, 0, 360);
 
         return shortHitsLimit ? longGoal : shortGoal;
     }

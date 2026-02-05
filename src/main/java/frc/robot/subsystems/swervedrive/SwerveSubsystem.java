@@ -100,6 +100,12 @@ public class SwerveSubsystem extends SubsystemBase
   Supplier<ChassisSpeeds> velocitySupplier;
 
   /**
+   * Speed multiplier for slowing down drive during certain commands (e.g., shooting).
+   * Defaults to 1.0 (full speed).
+   */
+  private double speedMultiplier = 1.0;
+
+  /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
    * @param directory Directory of swerve drive config files.
@@ -309,6 +315,7 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
+  // Currently unused
   public void aimAtPositionWithLead(Translation2d position, double lead, boolean isPathPlanner) {
     Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle().plus(new Rotation2d(lead));
 
@@ -321,14 +328,7 @@ public class SwerveSubsystem extends SubsystemBase
       aimOmega = 0.0;
     }
 
-    if (!isPathPlanner) {
-      // Still allow movement when aiming in tele
-      driveFieldOriented(new ChassisSpeeds(getCommandedVelocity().vxMetersPerSecond/3, getCommandedVelocity().vyMetersPerSecond/3, aimOmega));
-    } else {
-      PPHolonomicDriveController.overrideRotationFeedback(() -> {
-          return aimOmega;
-      });
-    }
+    driveFieldOriented(new ChassisSpeeds(getCommandedVelocity().vxMetersPerSecond/5, getCommandedVelocity().vyMetersPerSecond/5, aimOmega));
   }
 
   public void resetPathPlannerRotOverride() {
@@ -590,7 +590,13 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public void driveFieldOriented(ChassisSpeeds velocity)
   {
-    swerveDrive.driveFieldOriented(velocity);
+    // Apply speed multiplier
+    ChassisSpeeds scaledVelocity = new ChassisSpeeds(
+      velocity.vxMetersPerSecond * speedMultiplier,
+      velocity.vyMetersPerSecond * speedMultiplier,
+      velocity.omegaRadiansPerSecond * speedMultiplier
+    );
+    swerveDrive.driveFieldOriented(scaledVelocity);
   }
 
   /**
@@ -601,7 +607,14 @@ public class SwerveSubsystem extends SubsystemBase
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity)
   {
     return run(() -> {
-      swerveDrive.driveFieldOriented(velocity.get());
+      ChassisSpeeds vel = velocity.get();
+      // Apply speed multiplier
+      ChassisSpeeds scaledVelocity = new ChassisSpeeds(
+        vel.vxMetersPerSecond * speedMultiplier,
+        vel.vyMetersPerSecond * speedMultiplier,
+        vel.omegaRadiansPerSecond * speedMultiplier
+      );
+      swerveDrive.driveFieldOriented(scaledVelocity);
     });
   }
 
@@ -612,6 +625,32 @@ public class SwerveSubsystem extends SubsystemBase
   // You need to set the supplier yourself
   public ChassisSpeeds getCommandedVelocity() {
     return velocitySupplier.get();
+  }
+
+  /**
+   * Set the speed multiplier for drive commands.
+   * This allows commands to temporarily slow down the robot (e.g., during shooting).
+   *
+   * @param multiplier Speed multiplier (0.0 to 1.0)
+   */
+  public void setSpeedMultiplier(double multiplier) {
+    this.speedMultiplier = Math.max(0.0, Math.min(1.0, multiplier));
+  }
+
+  /**
+   * Reset the speed multiplier to full speed (1.0).
+   */
+  public void resetSpeedMultiplier() {
+    this.speedMultiplier = 1.0;
+  }
+
+  /**
+   * Get the current speed multiplier.
+   *
+   * @return Current speed multiplier
+   */
+  public double getSpeedMultiplier() {
+    return this.speedMultiplier;
   }
 
   /**

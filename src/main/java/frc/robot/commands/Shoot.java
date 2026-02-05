@@ -46,6 +46,8 @@ public class Shoot extends Command {
     public void initialize() {
         shooter.cleanupPieces();
         swerve.resetAimController();
+        // Set drive speed to 50% while shooting
+        swerve.setSpeedMultiplier(0.5);
     }
 
     @Override
@@ -102,5 +104,7 @@ public class Shoot extends Command {
     @Override
     public void end(boolean interrupted) {
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
+        // Reset drive speed to full speed
+        swerve.resetSpeedMultiplier();
     }
 }
