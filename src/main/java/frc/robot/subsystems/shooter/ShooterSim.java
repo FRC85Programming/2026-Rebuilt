@@ -38,6 +38,11 @@ public class ShooterSim extends SubsystemBase{
 
     private final FlywheelSim flywheelSim = new FlywheelSim(flywheelPlant, flywheelMotor, gearRatioFlywheel);
 
+    private final LinearSystem<N1, N1, N1> hoodPLant =
+        LinearSystemId.createFlywheelSystem(hoodMotor, flywheelMOI, gearRatioHood);
+
+    private final FlywheelSim hoodSim = new FlywheelSim(hoodPLant, hoodMotor, gearRatioHood);
+  
     private double hoodAngleDeg = 30.0;
 
     private final SingleJointedArmSim hoodSim =
@@ -64,15 +69,21 @@ public class ShooterSim extends SubsystemBase{
              Units.Radians.of(0)
         );
 
+
+    @Override
+    public void periodic() {
+      hoodAngleDeg += Math.toDegrees(hoodSim.getAngularVelocityRadPerSec() * 0.02);
+    }
+    
     public void updateFlywheel(double flywheelVoltage, double dt) {
-      flywheelSim.setInputVoltage(flywheelVoltage);
-      flywheelSim.update(dt);
+        flywheelSim.setInputVoltage(flywheelVoltage);
+        flywheelSim.update(dt);
     }
     
     public void updateHood(double hoodVoltage, double dt) {
-      hoodSim.setInputVoltage(hoodVoltage);
-      hoodSim.update(dt);
-    }
+        hoodSim.setInputVoltage(hoodVoltage);
+        flywheelSim.update(dt);
+    }  
   
     public double getFlywheelRPM() {
       return flywheelSim.getAngularVelocityRPM();

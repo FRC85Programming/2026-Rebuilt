@@ -25,9 +25,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.commands.Intake;
 import frc.robot.commands.Shoot;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -60,6 +62,7 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/neo"));
   private final ShooterSubsystem shooter = new ShooterSubsystem();
+  private final IntakeSubsystem intake = new IntakeSubsystem();
 
   private final TurretSubsystem turret = new TurretSubsystem();
 
@@ -125,11 +128,20 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
-    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, turret, () -> getTarget(), true));
+    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, () -> getTarget(), false));
+    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, () -> getTarget(), true));
+    NamedCommands.registerCommand("Intake", new Intake(intake, () -> 0.7));
+
 
     autoChooser.setDefaultOption("Left Auto", "Left");
     autoChooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
+    autoChooser.addOption("Left+Depot Auto", "Left+Depot");
+    autoChooser.addOption("Bump Auto", "Bump");
+    autoChooser.addOption("Test Auto", "Test");
+    autoChooser.addOption("Double Cycle", "24BallAutoLeft");
+
+
+
     autoChooser.addOption("Test", "TestAuto");
 
     SmartDashboard.putData("Auto Selector", autoChooser);
@@ -151,6 +163,7 @@ public class RobotContainer
       );
       return solution.turretAngleDegrees;
     });
+    SmartDashboard.putNumber("Intake Speed", 0.7);
   }
 
   /**
@@ -234,12 +247,12 @@ public class RobotContainer
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.522, 7.406, new Rotation2d(Math.toRadians(-90))))));
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
+      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, turret,() -> getTarget(), false));
+      driverXbox.leftTrigger().whileTrue(new Intake(intake, () -> SmartDashboard.getNumber("Intake Speed", 0.8)));
     }
-
   }
 
   /**

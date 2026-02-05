@@ -95,4 +95,8 @@ public final class Constants
 
       public static final double TURRET_GEAR_RATIO = 50.0;
   }
+  
+  public static class IntakeConstants {
+    public static final int INTAKE_MOTOR_ID = 17;
+  }
 }

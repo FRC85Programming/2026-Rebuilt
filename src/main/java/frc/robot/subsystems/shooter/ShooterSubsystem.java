@@ -116,6 +116,9 @@ public class ShooterSubsystem extends SubsystemBase{
             ShooterConstants.HOOD_MIN_ANGLE,
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
            
+        if (Robot.isSimulation()) {    
+            //shooterSim.setHoodAngle(angle);
+        }
         goalAngle = angle;
     }
 
