@@ -60,11 +60,13 @@ public class TargetingCalculator {
         double goalAngle = ShooterTable.getSetpoint(distance).hoodAngle().getRadians();
         
         double shotSpeed = rpmConverter.rpmToMps(goalRPM);
-        double timeOfFlight = distance / shotSpeed;
         
         double compensatedShotSpeed = shotSpeed - robotVx;
+        compensatedShotSpeed = Math.max(compensatedShotSpeed, 0.1);
         goalRPM = rpmConverter.mpsToRpm(compensatedShotSpeed);
-        
+
+        double timeOfFlight = distance / compensatedShotSpeed;
+
         double compensatedDistance = distance - robotVx * timeOfFlight;
         goalAngle = ShooterTable.getSetpoint(compensatedDistance).hoodAngle().getRadians();
         
@@ -72,7 +74,8 @@ public class TargetingCalculator {
             -robotVel.vxMetersPerSecond * toTargetUnit.getY()
             + robotVel.vyMetersPerSecond * toTargetUnit.getX();
         
-        double lead = robotVy * timeOfFlight;
+        double lateralLeadMeters = robotVy * timeOfFlight;
+        double leadAngleRad = Math.atan2(lateralLeadMeters, distance);
         
         var shooterRelativeTrajectory = 
             BallisticTrajectory3d.generate(
@@ -114,7 +117,7 @@ public class TargetingCalculator {
             .minus(robotPose.getTranslation())
             .getAngle()
             .minus(robotRotation)
-            /** .plus(new Rotation2d(-lead))*/
+            .plus(new Rotation2d(-leadAngleRad))
             .getDegrees();
         
         return new TargetingSolution(goalRPM, Math.toDegrees(goalAngle), turretAngleDegrees, fieldTrajectory3d);
@@ -125,4 +128,3 @@ public class TargetingCalculator {
         double mpsToRpm(double mps);
     }
 }
-
