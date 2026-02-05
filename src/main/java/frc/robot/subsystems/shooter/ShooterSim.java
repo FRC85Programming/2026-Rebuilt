@@ -86,14 +86,17 @@ public class ShooterSim extends SubsystemBase{
       // Calculate the combined shooting direction (robot + turret)
       Rotation2d shootingDirection = pose.getRotation().plus(turretAngle);
       
-      Translation2d turretOffsetRotated = 
+      // Calculate turret position in field frame (same as TargetingCalculator)
+      Translation2d turretOffsetField = 
           TurretConstants.ROBOT_TO_TURRET_2D.getTranslation()
-              .rotateBy(shootingDirection)
-              .unaryMinus();
+              .rotateBy(pose.getRotation());
+      
+      Translation2d turretFieldPosition = 
+          pose.getTranslation().plus(turretOffsetField);
       
       fuelOnFly = new RebuiltFuelOnFly(
-            pose.getTranslation(),
-            turretOffsetRotated,
+            turretFieldPosition,
+            new Translation2d(),  // No offset needed - origin is at turret
             velocity,
             shootingDirection,
             Units.Meters.of(TurretConstants.ROBOT_TO_TURRET.getZ()),

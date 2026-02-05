@@ -83,7 +83,6 @@ public class Shoot extends Command {
             shooter.flywheelAtSpeed(200)
             && shooter.hoodAtAngle(3)
             && turret.atGoal()
-            && swerve.isAimedAtPosition(0.1)
         ) {
             if (shooter.generateProjectileIsReady()) {
                 shooter.simulatedShot(
@@ -102,8 +101,6 @@ public class Shoot extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        swerve.drive(new ChassisSpeeds(0, 0, 0));
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
-        swerve.resetPathPlannerRotOverride();
     }
 }

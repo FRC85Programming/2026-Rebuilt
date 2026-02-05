@@ -10,8 +10,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AlphaMechanism3d;
@@ -19,6 +17,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.util.ShotSolver;
 import frc.robot.util.ShotSolver.ShotSolution;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase{
@@ -133,7 +132,7 @@ public class ShooterSubsystem extends SubsystemBase{
         goalAngle = angle;
     }
 
-    // TODO: These should be changed to come directly from the PID controllre
+    // TODO: These should be changed to come directly from the PID controller
     public boolean hoodAtAngle(double tolerance) {
         return Math.abs(getHoodAngle() - goalAngle) < tolerance;
     }
@@ -169,7 +168,7 @@ public class ShooterSubsystem extends SubsystemBase{
             var solution = ShotSolver.solve(
                 i,
                 0.305,
-                Constants.FieldConstants.blueHub.getZ(),
+                FieldConstants.blueHub.getZ(),
                 Math.toRadians(65),
                 Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
                 Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE),

@@ -146,6 +146,7 @@ public class RobotContainer
 
     SmartDashboard.putData("Auto Selector", autoChooser);
     
+    // Passive trajectory calculation - TargetingCalculator handles turret offset internally
     turret.setAutoAngleSupplier(() -> {
       var solution = TargetingCalculator.calculateShot(
         getTarget(),
@@ -203,7 +204,7 @@ public class RobotContainer
 
     if (Robot.isSimulation())
     {
-      Pose2d target = new Pose2d(new Translation2d(1, 4),
+      /*Pose2d target = new Pose2d(new Translation2d(1, 4),
                                  Rotation2d.fromDegrees(90));
       //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
       driveDirectAngleKeyboard.driveToPose(() -> target,
@@ -217,13 +218,13 @@ public class RobotContainer
                                                                      new Constraints(Units.degreesToRadians(360),
                                                                                      Units.degreesToRadians(180))
                                            ));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d(0)))));
+      //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d(0)))));
       /*driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
       driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
       driverXbox.button(2).onTrue(new InstantCommand(() -> turret.setAngle(180)));
-      driverXbox.button(3).onTrue(new InstantCommand(() -> turret.setAngle(0)));
+      driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
 
 

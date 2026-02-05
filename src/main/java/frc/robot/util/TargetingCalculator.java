@@ -81,7 +81,7 @@ public class TargetingCalculator {
             BallisticTrajectory3d.generate(
                 rpmConverter.rpmToMps(goalRPM),
                 goalAngle,
-                Constants.ShooterConstants.SHOOTER_HEIGHT_METERS,
+                TurretConstants.ROBOT_TO_TURRET.getZ(),
                 3.0,
                 0.02
             );
