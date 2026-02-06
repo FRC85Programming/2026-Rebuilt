@@ -20,9 +20,9 @@ public class QuestNavSubsystem extends SubsystemBase {
     private static final Transform3d ROBOT_TO_QUEST =
         new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(14.5),
+                Units.inchesToMeters(12),
                 0.0,
-                Units.inchesToMeters(13)
+                Units.inchesToMeters(14)
             ),
             new Rotation3d(0.0, 0.0, 0.0)
         );
