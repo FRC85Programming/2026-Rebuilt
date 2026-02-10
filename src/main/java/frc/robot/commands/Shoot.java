@@ -47,6 +47,7 @@ public class Shoot extends Command{
 
     private void calculateSolution() {
         targetTranslation = target.get();
+        
         // Convert the field relative velocity into velocity relative to the goal
         ChassisSpeeds robotVel = swerve.getFieldVelocity();
         Translation2d toTarget2d =

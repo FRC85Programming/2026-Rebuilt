@@ -8,17 +8,23 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.util.ShooterTable;
 import frc.robot.util.ShotSolver;
 import frc.robot.util.ShotSolver.ShotSolution;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 public class ShooterSubsystem extends SubsystemBase{
-     private final SparkFlex flywheelMotor =
+     private final SparkFlex flywheelMotorLeft =
+      new SparkFlex(ShooterConstants.FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
+
+    private final SparkFlex flywheelMotorRight =
       new SparkFlex(ShooterConstants.FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
 
     private final SparkFlex hoodMotor =
@@ -26,32 +32,61 @@ public class ShooterSubsystem extends SubsystemBase{
 
     private final ShooterSim shooterSim = new ShooterSim();
 
-    private final RelativeEncoder flywheelEncoder = flywheelMotor.getEncoder();
-    private final RelativeEncoder hoodEncoder = hoodMotor.getEncoder();
+    private final DutyCycleEncoder hoodEncoder = null;
 
-    private final PIDController flywheelPID = new PIDController(ShooterConstants.FLYWHEEL_P, ShooterConstants.FLYWHEEL_I, ShooterConstants.FLYWHEEL_D);
-    private final PIDController hoodPID = new PIDController(ShooterConstants.HOOD_P, ShooterConstants.HOOD_I, ShooterConstants.HOOD_D);
+    private final PIDController flywheelPID = new PIDController(0.00007, 0.000166, 0.000004);
+    private final PIDController hoodPID = new PIDController(0.1, 0, 0);
 
     double goalRpm = 0.0;
-    double goalAngle = 30;
+    double goalAngle = 70;
+
+    boolean readyToFire = false;
 
     boolean isSim;
 
+    double hoodHome = 0;
+
     public ShooterSubsystem() {
         isSim = Robot.isSimulation();
+
+        SmartDashboard.putNumber("Flywheel P Value", 0.00007);
+        SmartDashboard.putNumber("Flywheel I Value", 0.000166);
+        SmartDashboard.putNumber("Flywheel D Value", 0.000004);
+
+        SmartDashboard.putNumber("TUNE Shot RPM", 0);
+        SmartDashboard.putNumber("TUNE Shot Angle", 80);
     }
 
     @Override
     public void periodic() {
-        final double flywheelRpmMeasured = isSim ? shooterSim.getFlywheelRPM() : getFlywheelRPM();
+        flywheelPID.setP(SmartDashboard.getNumber("Flywheel P Value", 0.00007));
+        flywheelPID.setI(SmartDashboard.getNumber("Flywheel I Value", 0.000166));
+        flywheelPID.setD(SmartDashboard.getNumber("Flywheel D Value", 0.000004));
+
+        hoodPID.setP(SmartDashboard.getNumber("Hood P Value", 0.1));
+        hoodPID.setI(SmartDashboard.getNumber("Hood I Value", 0.0));
+        hoodPID.setD(SmartDashboard.getNumber("Hoodl D Value", 0.0));
+
+        final double flywheelRpmMeasured = getFlywheelRPM();
         final double flywheelPIDOut = flywheelPID.calculate(flywheelRpmMeasured, goalRpm);
         double flywheelOut = flywheelPIDOut;
         flywheelOut = Math.max(-1.0, Math.min(1.0, flywheelOut));
 
-        flywheelMotor.set(flywheelOut);
+        if (goalRpm != 0) {
+            setFlywheelSpeed(flywheelOut);
+        } else {
+            setFlywheelSpeed(0);
+        }
+
+        final double hoodAngle = getHoodAngle();
+        final double hoodPIDOut = hoodPID.calculate(hoodAngle, goalAngle);
+        double hoodOut = hoodPIDOut;
+        hoodOut = Math.max(-1.0, Math.min(1.0, hoodOut));
+
+        //hoodMotor.set(hoodOut);
 
         if (isSim) {
-            //shooterSim.update(flywheelOut * 12.0, 0.02);
+            shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
         }
 
         SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
@@ -60,6 +95,7 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
         SmartDashboard.putNumber("Flywheel PID Out", flywheelPIDOut);
         SmartDashboard.putNumber("Flywheel Out", flywheelOut);
+        SmartDashboard.putNumber("Hood Encoder", hoodEncoder.get());
     }
 
     private double convertFlywheelVelocity(double velocity) {
@@ -71,14 +107,15 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public void stopFlywheel() {
-        flywheelMotor.stopMotor();
+        flywheelMotorLeft.stopMotor();
+        flywheelMotorRight.stopMotor();
     }
 
     public double getFlywheelRPM() {
         if (isSim) {
             return convertFlywheelVelocity(shooterSim.getFlywheelRPM());
         } else {
-            return convertFlywheelVelocity(flywheelEncoder.getVelocity());
+            return convertFlywheelVelocity(getFlywheelRPM());
         }
     }
 
@@ -90,8 +127,8 @@ public class ShooterSubsystem extends SubsystemBase{
         if (isSim) {
             return shooterSim.getHoodAngleDeg();
         } else {
-            // Needs to be converted to degrees on real robot
-            return hoodEncoder.getPosition();
+            // Assume encoder is in rotations?
+            return ((hoodEncoder.get() - hoodHome)/ShooterConstants.HOOD_GEAR_RATIO) + ShooterConstants.HOOD_HOME_ANGLE;
         }
     }
 
@@ -141,23 +178,11 @@ public class ShooterSubsystem extends SubsystemBase{
         shooterSim.cleanupPieces();
     }
 
-    public void calculateLookupTable() {
-        // Calculate a placeholder table based on perfect physics
-        for (var i=2; i <= 6.0; i+=0.5) {
-            var solution = ShotSolver.solve(
-                i,
-                0.305,
-                Constants.FieldConstants.blueHub.getZ(),
-                Math.toRadians(65),
-                Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
-                Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE),
-                0
-            );
-            ShotSolution shotSolution = solution.get();
-
-            SmartDashboard.putNumber("TABLE Solved Speed" + i, mpsToRpm(shotSolution.launchVelocityMps()));
-            SmartDashboard.putNumber("TABLE Solved Angle" + i, Math.toDegrees(shotSolution.launchAngleRad()));
-        }
+    public void setFlywheelSpeed(double speed) {
+        flywheelMotorLeft.set(speed);
+        flywheelMotorRight.set(-speed);
     }
+
+
 }
 

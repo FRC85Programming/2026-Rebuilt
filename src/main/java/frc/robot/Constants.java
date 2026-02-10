@@ -4,7 +4,10 @@
 
 package frc.robot;
 
+import org.dyn4j.geometry.Rotation;
+
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -55,24 +58,21 @@ public final class Constants
   {
     public static final int FLYWHEEL_MOTOR_ID = 14;
     public static final int HOOD_MOTOR_ID = 15;
+    public static final int FEED_MOTOR_ID = 16;
+
 
     public static final double FLYWHEEL_GEAR_RATIO = 1.0;
-    public static final double HOOD_GEAR_RATIO = 100.0;
+    public static final double HOOD_GEAR_RATIO = 265/25;
 
     // Hood limits - degrees
     public static final double HOOD_MIN_ANGLE = 50;
-    public static final double HOOD_MAX_ANGLE = 75;
-
-    public static final double FLYWHEEL_P = 0.005;
-    public static final double FLYWHEEL_I = 0.0;
-    public static final double FLYWHEEL_D = 0.0;
-    public static final double FLYWHEEL_FF = 1.0 / 6000.0;
-
-    public static final double HOOD_P = 0.3;
-    public static final double HOOD_I = 0.0;
-    public static final double HOOD_D = 0.0;
+    public static final double HOOD_MAX_ANGLE = 80;
 
     public static final double SHOOTER_HEIGHT_METERS = 0.305;
+
+    // Distance from robot center
+    public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(0, 0);
+    public static final double HOOD_HOME_ANGLE = 80;
   }
 
   public static class FieldConstants {
