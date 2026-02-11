@@ -84,6 +84,6 @@ public final class Constants
   }
 
   public static class IntakeConstants {
-    public static final int INTAKE_MOTOR_ID = 17;
+    public static final int INTAKE_MOTOR_ID = 18;
   }
 }

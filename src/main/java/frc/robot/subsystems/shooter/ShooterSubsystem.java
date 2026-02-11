@@ -22,17 +22,20 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 public class ShooterSubsystem extends SubsystemBase{
      private final SparkFlex flywheelMotorLeft =
-      new SparkFlex(ShooterConstants.FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
+      new SparkFlex(14, MotorType.kBrushless);
 
     private final SparkFlex flywheelMotorRight =
-      new SparkFlex(ShooterConstants.FLYWHEEL_MOTOR_ID, MotorType.kBrushless);
+      new SparkFlex(17, MotorType.kBrushless);
 
     private final SparkFlex hoodMotor =
         new SparkFlex(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless);
 
+    private final SparkFlex feedMotor =
+        new SparkFlex(ShooterConstants.FEED_MOTOR_ID, MotorType.kBrushless);
+
     private final ShooterSim shooterSim = new ShooterSim();
 
-    private final DutyCycleEncoder hoodEncoder = null;
+    private final DutyCycleEncoder hoodEncoder = new DutyCycleEncoder(0);
 
     private final PIDController flywheelPID = new PIDController(0.00007, 0.000166, 0.000004);
     private final PIDController hoodPID = new PIDController(0.1, 0, 0);
@@ -44,7 +47,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
     boolean isSim;
 
-    double hoodHome = 0;
+    double hoodHome = 0.8904780222619506;
 
     public ShooterSubsystem() {
         isSim = Robot.isSimulation();
@@ -55,6 +58,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
         SmartDashboard.putNumber("TUNE Shot RPM", 0);
         SmartDashboard.putNumber("TUNE Shot Angle", 80);
+        hoodMotor.getEncoder().setPosition((hoodEncoder.get() - hoodHome)*9);
     }
 
     @Override
@@ -95,7 +99,10 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
         SmartDashboard.putNumber("Flywheel PID Out", flywheelPIDOut);
         SmartDashboard.putNumber("Flywheel Out", flywheelOut);
-        SmartDashboard.putNumber("Hood Encoder", hoodEncoder.get());
+        SmartDashboard.putNumber("Hood Encoder ABS", hoodEncoder.get());
+        SmartDashboard.putNumber("Hood Encoder", hoodMotor.getEncoder().getPosition()*360);
+        SmartDashboard.putNumber("Hood Encoder Converted", hoodMotor.getEncoder().getPosition()*360/9);
+        SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.6) + 80);
     }
 
     private double convertFlywheelVelocity(double velocity) {
@@ -115,7 +122,7 @@ public class ShooterSubsystem extends SubsystemBase{
         if (isSim) {
             return convertFlywheelVelocity(shooterSim.getFlywheelRPM());
         } else {
-            return convertFlywheelVelocity(getFlywheelRPM());
+            return convertFlywheelVelocity(flywheelMotorLeft.getEncoder().getVelocity());
         }
     }
 
@@ -128,7 +135,7 @@ public class ShooterSubsystem extends SubsystemBase{
             return shooterSim.getHoodAngleDeg();
         } else {
             // Assume encoder is in rotations?
-            return ((hoodEncoder.get() - hoodHome)/ShooterConstants.HOOD_GEAR_RATIO) + ShooterConstants.HOOD_HOME_ANGLE;
+            return (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.6) + 80;
         }
     }
 
@@ -183,6 +190,8 @@ public class ShooterSubsystem extends SubsystemBase{
         flywheelMotorRight.set(-speed);
     }
 
-
+    public void setFeedSpeed(double speed) {
+        feedMotor.set(speed);
+    }
 }
 

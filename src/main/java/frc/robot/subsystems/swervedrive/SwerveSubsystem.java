@@ -312,7 +312,7 @@ public class SwerveSubsystem extends SubsystemBase
   public void aimAtPositionWithLead(Translation2d position, double lead, boolean isPathPlanner) {
     Rotation2d targetAngle = position.minus(getPose().getTranslation()).getAngle().plus(new Rotation2d(lead));
 
-    aimOmega = aimController.calculate(getPose().getRotation().getRadians(), targetAngle.getRadians());
+    aimOmega = aimController.calculate(getPose().getRotation().getRadians() + (Math.PI/2), targetAngle.getRadians());
 
     SmartDashboard.putBoolean("Rot At Setpoint", aimController.atGoal());
     SmartDashboard.putNumber("Rot Error", aimController.getPositionError());
