@@ -65,7 +65,7 @@ public final class Constants
     public static final double HOOD_GEAR_RATIO = 265/25;
 
     // Hood limits - degrees
-    public static final double HOOD_MIN_ANGLE = 50;
+    public static final double HOOD_MIN_ANGLE = 40;
     public static final double HOOD_MAX_ANGLE = 80;
 
     public static final double SHOOTER_HEIGHT_METERS = 0.305;

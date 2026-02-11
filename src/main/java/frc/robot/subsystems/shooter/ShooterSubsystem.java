@@ -38,16 +38,16 @@ public class ShooterSubsystem extends SubsystemBase{
     private final DutyCycleEncoder hoodEncoder = new DutyCycleEncoder(0);
 
     private final PIDController flywheelPID = new PIDController(0.00007, 0.000166, 0.000004);
-    private final PIDController hoodPID = new PIDController(0.1, 0, 0);
+    private final PIDController hoodPID = new PIDController(0.035, 0, 0);
 
     double goalRpm = 0.0;
-    double goalAngle = 70;
+    double goalAngle = 69;
 
     boolean readyToFire = false;
 
     boolean isSim;
 
-    double hoodHome = 0.8904780222619506;
+    double hoodHome = 0.890926322273158;
 
     public ShooterSubsystem() {
         isSim = Robot.isSimulation();
@@ -58,6 +58,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
         SmartDashboard.putNumber("TUNE Shot RPM", 0);
         SmartDashboard.putNumber("TUNE Shot Angle", 80);
+        SmartDashboard.putNumber("Set Hood Angle", 69);
         hoodMotor.getEncoder().setPosition((hoodEncoder.get() - hoodHome)*9);
     }
 
@@ -67,9 +68,6 @@ public class ShooterSubsystem extends SubsystemBase{
         flywheelPID.setI(SmartDashboard.getNumber("Flywheel I Value", 0.000166));
         flywheelPID.setD(SmartDashboard.getNumber("Flywheel D Value", 0.000004));
 
-        hoodPID.setP(SmartDashboard.getNumber("Hood P Value", 0.1));
-        hoodPID.setI(SmartDashboard.getNumber("Hood I Value", 0.0));
-        hoodPID.setD(SmartDashboard.getNumber("Hoodl D Value", 0.0));
 
         final double flywheelRpmMeasured = getFlywheelRPM();
         final double flywheelPIDOut = flywheelPID.calculate(flywheelRpmMeasured, goalRpm);
@@ -87,7 +85,7 @@ public class ShooterSubsystem extends SubsystemBase{
         double hoodOut = hoodPIDOut;
         hoodOut = Math.max(-1.0, Math.min(1.0, hoodOut));
 
-        //hoodMotor.set(hoodOut);
+        hoodMotor.set(hoodOut);
 
         if (isSim) {
             shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);

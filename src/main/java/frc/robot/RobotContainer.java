@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Shoot;
+import frc.robot.commands.TuneShot;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -225,7 +226,7 @@ public class RobotContainer
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
+      driverXbox.rightTrigger().whileTrue(new TuneShot(drivebase, shooter, () -> getTarget()));
       driverXbox.leftTrigger().whileTrue(new Intake(intake, () -> SmartDashboard.getNumber("Intake Speed", 0.8)));
     }
   }

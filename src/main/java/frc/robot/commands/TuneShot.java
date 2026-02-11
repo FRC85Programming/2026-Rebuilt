@@ -92,5 +92,7 @@ public class TuneShot extends Command{
     @Override
     public void end(boolean interrupted) {
         swerve.drive(new ChassisSpeeds(0, 0, 0));
+        shooter.setFeedSpeed(0);
+        shooter.setFlywheelRPM(0);
     }
 }
