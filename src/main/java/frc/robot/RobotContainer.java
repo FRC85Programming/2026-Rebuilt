@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.TurretConstants;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TuneShot;
@@ -32,6 +33,9 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.util.TargetingCalculator;
+
 import java.io.File;
 import java.util.Optional;
 
@@ -60,6 +64,8 @@ public class RobotContainer
                                                                                 "swerve/neo"));
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final IntakeSubsystem intake = new IntakeSubsystem();
+
+  private final TurretSubsystem turret = new TurretSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -120,17 +126,15 @@ public class RobotContainer
    */
   public RobotContainer()
   {    
-    // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, () -> getTarget(), false));
-    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, () -> getTarget(), true));
+    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
+    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, turret, () -> getTarget(), true));
     NamedCommands.registerCommand("Intake", new Intake(intake, () -> 0.7));
 
 
-    // Configure an auto selector that just selects strings
-    autoChooser.setDefaultOption("Left Auto", "Left"); // Set a default option
+    autoChooser.setDefaultOption("Left Auto", "Left");
     autoChooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
     autoChooser.addOption("Left+Depot Auto", "Left+Depot");
     autoChooser.addOption("Bump Auto", "Bump");
@@ -142,6 +146,25 @@ public class RobotContainer
     autoChooser.addOption("Test", "TestAuto");
 
     SmartDashboard.putData("Auto Selector", autoChooser);
+    
+    // Passive trajectory calculation - TargetingCalculator handles turret offset internally
+    turret.setAutoAngleSupplier(() -> {
+      var solution = TargetingCalculator.calculateShot(
+        getTarget(),
+        drivebase.getPose(),
+        drivebase.getFieldVelocity(),
+        turret.getTurretAngleRads(),
+        new TargetingCalculator.RpmConverter() {
+          public double rpmToMps(double rpm) {
+            return shooter.rpmToMps(rpm);
+          }
+          public double mpsToRpm(double mps) {
+            return shooter.mpsToRpm(mps);
+          }
+        }
+      );
+      return solution.turretAngleDegrees;
+    });
     SmartDashboard.putNumber("Intake Speed", 0.7);
   }
 
@@ -169,8 +192,6 @@ public class RobotContainer
     Command angleHoodDown = new InstantCommand(() -> shooter.setHoodAngle(20.0));
 
 
-
-
     if (RobotBase.isSimulation())
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityKeyboard);
@@ -184,7 +205,7 @@ public class RobotContainer
 
     if (Robot.isSimulation())
     {
-      Pose2d target = new Pose2d(new Translation2d(1, 4),
+      /*Pose2d target = new Pose2d(new Translation2d(1, 4),
                                  Rotation2d.fromDegrees(90));
       //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
       driveDirectAngleKeyboard.driveToPose(() -> target,
@@ -198,11 +219,16 @@ public class RobotContainer
                                                                      new Constraints(Units.degreesToRadians(360),
                                                                                      Units.degreesToRadians(180))
                                            ));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d(0)))));
+      //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d(0)))));
       /*driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
-      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
+      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
+      driverXbox.button(2).onTrue(new InstantCommand(() -> turret.setAngle(180)));
+      driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
+      driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
+
+
 //      driverXbox.b().whileTrue(
 //          drivebase.driveToPose(
 //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
@@ -221,8 +247,8 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      //driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      //driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());

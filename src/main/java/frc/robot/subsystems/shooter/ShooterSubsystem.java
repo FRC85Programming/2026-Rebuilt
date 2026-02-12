@@ -4,19 +4,24 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.AlphaMechanism3d;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.util.ShooterTable;
 import frc.robot.util.ShotSolver;
 import frc.robot.util.ShotSolver.ShotSolution;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
@@ -89,7 +94,10 @@ public class ShooterSubsystem extends SubsystemBase{
 
         if (isSim) {
             shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
+            shooterSim.updateHood(hoodOut * 12.0, 0.02);
         }
+
+        AlphaMechanism3d.setHoodAngle(getHoodAngle());
 
         SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
         SmartDashboard.putNumber("Flywheel Measured RPM", flywheelRpmMeasured);
@@ -101,6 +109,18 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Hood Encoder", hoodMotor.getEncoder().getPosition()*360);
         SmartDashboard.putNumber("Hood Encoder Converted", hoodMotor.getEncoder().getPosition()*360/9);
         SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.6) + 80);
+        
+        SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
+        SmartDashboard.putNumber("Hood Measured Angle", hoodAngleMeasured);
+        SmartDashboard.putNumber("Hood PID Out", hoodPIDOut);
+        SmartDashboard.putNumber("Hood Out", hoodOut);
+        
+        Logger.recordOutput("Shooter/FlywheelGoalRPM", goalRpm);
+        Logger.recordOutput("Shooter/FlywheelMeasuredRPM", flywheelRpmMeasured);
+        Logger.recordOutput("Shooter/FlywheelOut", flywheelOut);
+        Logger.recordOutput("Shooter/HoodGoalAngle", goalAngle);
+        Logger.recordOutput("Shooter/HoodMeasuredAngle", hoodAngleMeasured);
+        Logger.recordOutput("Shooter/HoodOut", hoodOut);
     }
 
     private double convertFlywheelVelocity(double velocity) {
@@ -130,7 +150,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
     public double getHoodAngle() {
         if (isSim) {
-            return shooterSim.getHoodAngleDeg();
+            return getSimHoodAngle();
         } else {
             // Assume encoder is in rotations?
             return (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.6) + 80;
@@ -147,13 +167,10 @@ public class ShooterSubsystem extends SubsystemBase{
             ShooterConstants.HOOD_MIN_ANGLE,
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
            
-        if (Robot.isSimulation()) {    
-            //shooterSim.setHoodAngle(angle);
-        }
         goalAngle = angle;
-        hoodMotor.set(hoodPID.calculate(getHoodAngle(), angle));
     }
 
+    // TODO: These should be changed to come directly from the PID controller
     public boolean hoodAtAngle(double tolerance) {
         return Math.abs(getHoodAngle() - goalAngle) < tolerance;
     }
@@ -171,8 +188,8 @@ public class ShooterSubsystem extends SubsystemBase{
         return rpm / 375.0;
     }
 
-    public void simulatedShot(Pose2d pose, ChassisSpeeds velocity) {
-        shooterSim.generateProjectile(pose, velocity);
+    public void simulatedShot(Pose2d pose, ChassisSpeeds velocity, Rotation2d turretAngle) {
+        shooterSim.generateProjectile(pose, velocity, turretAngle);
     }
 
     public boolean generateProjectileIsReady() {
@@ -187,6 +204,19 @@ public class ShooterSubsystem extends SubsystemBase{
         flywheelMotorLeft.set(speed);
         flywheelMotorRight.set(-speed);
     }
+    public void calculateLookupTable() {
+        // Calculate a placeholder table based on perfect physics
+        for (var i=2; i <= 6.0; i+=0.5) {
+            var solution = ShotSolver.solve(
+                i,
+                0.305,
+                FieldConstants.blueHub.getZ(),
+                Math.toRadians(65),
+                Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
+                Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE),
+                0
+            );
+            ShotSolution shotSolution = solution.get();
 
     public void setFeedSpeed(double speed) {
         feedMotor.set(speed);

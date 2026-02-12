@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TurretConstants;
 
 public class ShooterSim extends SubsystemBase{
 
@@ -36,13 +37,18 @@ public class ShooterSim extends SubsystemBase{
         LinearSystemId.createFlywheelSystem(flywheelMotor, flywheelMOI, gearRatioFlywheel);
 
     private final FlywheelSim flywheelSim = new FlywheelSim(flywheelPlant, flywheelMotor, gearRatioFlywheel);
-
-    private final LinearSystem<N1, N1, N1> hoodPLant =
-        LinearSystemId.createFlywheelSystem(hoodMotor, flywheelMOI, gearRatioHood);
-
-    private final FlywheelSim hoodSim = new FlywheelSim(hoodPLant, hoodMotor, gearRatioHood);
   
-    private double hoodAngleDeg = 30.0;
+    private final SingleJointedArmSim hoodSim =
+      new SingleJointedArmSim(
+          hoodMotor,
+          ShooterConstants.HOOD_GEAR_RATIO,
+          hoodMOI,
+          ShooterConstants.HOOD_LENGTH_METERS,
+          Math.toRadians(ShooterConstants.HOOD_MIN_ANGLE),
+          Math.toRadians(ShooterConstants.HOOD_MAX_ANGLE),
+          true, 
+          Math.toRadians(30)
+      );
 
     private final Timer shotSpacingTimer = new Timer();
 
@@ -55,12 +61,6 @@ public class ShooterSim extends SubsystemBase{
              Units.MetersPerSecond.of(0),
              Units.Radians.of(0)
         );
-
-
-    @Override
-    public void periodic() {
-      hoodAngleDeg += Math.toDegrees(hoodSim.getAngularVelocityRadPerSec() * 0.02);
-    }
     
     public void updateFlywheel(double flywheelVoltage, double dt) {
         flywheelSim.setInputVoltage(flywheelVoltage);
@@ -69,7 +69,7 @@ public class ShooterSim extends SubsystemBase{
     
     public void updateHood(double hoodVoltage, double dt) {
         hoodSim.setInputVoltage(hoodVoltage);
-        flywheelSim.update(dt);
+        hoodSim.update(dt);
     }  
   
     public double getFlywheelRPM() {
@@ -77,18 +77,29 @@ public class ShooterSim extends SubsystemBase{
     }
   
     public double getHoodAngleDeg() {
-      return hoodAngleDeg;
+      return Math.toDegrees(hoodSim.getAngleRads());
     }
 
-    public void generateProjectile(Pose2d pose, ChassisSpeeds velocity) {
+    public void generateProjectile(Pose2d pose, ChassisSpeeds velocity, Rotation2d turretAngle) {
       shotSpacingTimer.reset();
       shotSpacingTimer.start();
+      // Calculate the combined shooting direction (robot + turret)
+      Rotation2d shootingDirection = pose.getRotation().plus(turretAngle);
+      
+      // Calculate turret position in field frame (same as TargetingCalculator)
+      Translation2d turretOffsetField = 
+          TurretConstants.ROBOT_TO_TURRET_2D.getTranslation()
+              .rotateBy(pose.getRotation());
+      
+      Translation2d turretFieldPosition = 
+          pose.getTranslation().plus(turretOffsetField);
+      
       fuelOnFly = new RebuiltFuelOnFly(
-            pose.getTranslation(),
-            new Translation2d(0.0, 0.0),
+            turretFieldPosition,
+            new Translation2d(),  // No offset needed - origin is at turret
             velocity,
-            pose.getRotation(),
-            Units.Meters.of(Constants.ShooterConstants.SHOOTER_HEIGHT_METERS),
+            shootingDirection,
+            Units.Meters.of(TurretConstants.ROBOT_TO_TURRET.getZ()),
             Units.MetersPerSecond.of(getFlywheelRPM() / 6900.0 * 20.0),
             Units.Radians.of(getHoodAngleDeg()/180.0 * Math.PI)
         );

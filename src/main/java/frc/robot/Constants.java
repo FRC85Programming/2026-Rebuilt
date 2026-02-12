@@ -8,6 +8,9 @@ import org.dyn4j.geometry.Rotation;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -78,11 +81,19 @@ public final class Constants
   public static class FieldConstants {
       public static final Translation3d blueHub = new Translation3d(4.620, 4.030, 1.829);
       public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
-
       public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
       public static final Translation3d redFeedPosition = new Translation3d(8.0, 0.7, 0);
   }
 
+  public static class TurretConstants {
+      public static final int TURRET_MOTOR_ID = 16;
+
+      public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
+      public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(-0.19685, 0.0, Rotation2d.kZero);
+
+      public static final double TURRET_GEAR_RATIO = 25.0;
+  }
+  
   public static class IntakeConstants {
     public static final int INTAKE_MOTOR_ID = 18;
   }
