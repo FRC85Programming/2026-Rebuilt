@@ -76,6 +76,7 @@ public final class Constants
     // Distance from robot center
     public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(0, 0);
     public static final double HOOD_HOME_ANGLE = 80;
+    public static final double HOOD_LENGTH_METERS = 0.1;
   }
 
   public static class FieldConstants {
@@ -86,12 +87,12 @@ public final class Constants
   }
 
   public static class TurretConstants {
-      public static final int TURRET_MOTOR_ID = 16;
+      public static final int TURRET_MOTOR_ID = 19;
 
       public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
       public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(-0.19685, 0.0, Rotation2d.kZero);
 
-      public static final double TURRET_GEAR_RATIO = 25.0;
+      public static final double TURRET_GEAR_RATIO = 135;
   }
   
   public static class IntakeConstants {

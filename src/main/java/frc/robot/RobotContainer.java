@@ -129,8 +129,6 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Shoot", new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
-    NamedCommands.registerCommand("DriveBy", new Shoot(drivebase, shooter, turret, () -> getTarget(), true));
     NamedCommands.registerCommand("Intake", new Intake(intake, () -> 0.7));
 
 
@@ -148,7 +146,7 @@ public class RobotContainer
     SmartDashboard.putData("Auto Selector", autoChooser);
     
     // Passive trajectory calculation - TargetingCalculator handles turret offset internally
-    turret.setAutoAngleSupplier(() -> {
+    /**turret.setAutoAngleSupplier(() -> {
       var solution = TargetingCalculator.calculateShot(
         getTarget(),
         drivebase.getPose(),
@@ -165,7 +163,7 @@ public class RobotContainer
       );
       return solution.turretAngleDegrees;
     });
-    SmartDashboard.putNumber("Intake Speed", 0.7);
+    SmartDashboard.putNumber("Intake Speed", 0.7);*/
   }
 
   /**
@@ -223,7 +221,7 @@ public class RobotContainer
       /*driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
-      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget(), false));
+      driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
       driverXbox.button(2).onTrue(new InstantCommand(() -> turret.setAngle(180)));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
@@ -254,6 +252,12 @@ public class RobotContainer
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightTrigger().whileTrue(new TuneShot(drivebase, shooter, () -> getTarget()));
       driverXbox.leftTrigger().whileTrue(new Intake(intake, () -> SmartDashboard.getNumber("Intake Speed", 0.8)));
+      driverXbox.pov(90).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(-0.5)));
+      driverXbox.pov(90).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
+      driverXbox.pov(270).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(0.5)));
+      driverXbox.pov(270).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
+      driverXbox.pov(0).onFalse(new InstantCommand(() -> turret.setAngle(0)));
+      driverXbox.pov(180).onFalse(new InstantCommand(() -> turret.setAngle(180)));
     }
   }
 

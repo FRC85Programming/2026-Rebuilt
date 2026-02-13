@@ -111,7 +111,6 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.6) + 80);
         
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
-        SmartDashboard.putNumber("Hood Measured Angle", hoodAngleMeasured);
         SmartDashboard.putNumber("Hood PID Out", hoodPIDOut);
         SmartDashboard.putNumber("Hood Out", hoodOut);
         
@@ -119,7 +118,6 @@ public class ShooterSubsystem extends SubsystemBase{
         Logger.recordOutput("Shooter/FlywheelMeasuredRPM", flywheelRpmMeasured);
         Logger.recordOutput("Shooter/FlywheelOut", flywheelOut);
         Logger.recordOutput("Shooter/HoodGoalAngle", goalAngle);
-        Logger.recordOutput("Shooter/HoodMeasuredAngle", hoodAngleMeasured);
         Logger.recordOutput("Shooter/HoodOut", hoodOut);
     }
 
@@ -217,6 +215,8 @@ public class ShooterSubsystem extends SubsystemBase{
                 0
             );
             ShotSolution shotSolution = solution.get();
+        }
+    }
 
     public void setFeedSpeed(double speed) {
         feedMotor.set(speed);

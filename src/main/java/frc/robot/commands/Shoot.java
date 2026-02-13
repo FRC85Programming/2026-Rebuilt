@@ -147,7 +147,7 @@ public class Shoot extends Command{
 
         if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.1)) {
                 if (shooter.generateProjectileIsReady()) {
-                    shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
+                    //shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
             }
         }
     }

@@ -3,11 +3,19 @@ package frc.robot.subsystems.turret;
 import java.util.function.Supplier;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +27,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final SparkFlex turretMotor =
         new SparkFlex(TurretConstants.TURRET_MOTOR_ID, MotorType.kBrushless);
 
-    private final AbsoluteEncoder turretEncoder = turretMotor.getAbsoluteEncoder();
+    private final DutyCycleEncoder turretEncoder = new DutyCycleEncoder(1);
 
     private final TurretSim turretSim = new TurretSim();
 
@@ -36,30 +44,64 @@ public class TurretSubsystem extends SubsystemBase {
 
     private double goalAngleDeg = 0.0;
     private final boolean isSim;
+    double absEncoderHome = 0.14046377851159447;
     
     private Supplier<Double> autoAngleSupplier = null;
+
+    SparkClosedLoopController closedLoopController;
+
+    SparkMaxConfig turretConfig = new SparkMaxConfig();
 
     public TurretSubsystem() {
         isSim = Robot.isSimulation();
 
+        closedLoopController = turretMotor.getClosedLoopController();
+
+        turretConfig.closedLoop
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                // Set PID values for position control. We don't need to pass a closed loop
+                // slot, as it will default to slot 0.
+                .p(0.01)
+                .i(0)
+                .d(0)
+                .outputRange(0, 135)
+                .feedForward.kV(12.0 / 6784);
+
+        turretConfig.closedLoop.positionWrappingEnabled(true);
+
+        turretMotor.configure(turretConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+
         angleController.setTolerance(2.0);
+        angleController.enableContinuousInput(-180, 180);
+
+        //turretMotor.getEncoder().setPosition(((turretEncoder.get() - absEncoderHome)) * TurretConstants.TURRET_GEAR_RATIO);
+        turretMotor.getEncoder().setPosition(0);
+        SmartDashboard.putNumber("Turret P", 1);
+        SmartDashboard.putNumber("Setpoint", 0);
     }
 
     @Override
     public void periodic() {
-        if (autoAngleSupplier != null) {
+        goalAngleDeg = SmartDashboard.getNumber("Setpoint", 0);
+
+        /*if (autoAngleSupplier != null) {
             Double suppliedAngle = autoAngleSupplier.get();
             if (suppliedAngle != null) {
                 goalAngleDeg = normalizeAngle(suppliedAngle);
             }
-        }
+        }*/
         
         double turretAngleDeg =
             isSim
                 ? Math.toDegrees(turretSim.getTurretAngleRads())
-                : Math.toDegrees(getTurretAngleRads());
+                : Math.toDegrees(Math.toDegrees(getTurretAngleRads()));
 
-        double mappedGoalDeg =
+        closedLoopController.setSetpoint((goalAngleDeg/360) * 135, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+
+        SmartDashboard.putNumber("Motor Setpoint", closedLoopController.getSetpoint());
+
+        /*double mappedGoalDeg =
             chooseGoalAvoidingLimits(turretAngleDeg, goalAngleDeg);
         
         boolean takingLongPath =
@@ -73,9 +115,9 @@ public class TurretSubsystem extends SubsystemBase {
             angleController.setConstraints(
                 new TrapezoidProfile.Constraints(500.0, 720.0)
             );
-        }
+        }*/
 
-        double pidOut = angleController.calculate(turretAngleDeg, mappedGoalDeg);
+        double pidOut = angleController.calculate(turretAngleDeg, goalAngleDeg);
 
         double turretOut = Math.max(-1.0, Math.min(1.0, pidOut));
 
@@ -86,11 +128,12 @@ public class TurretSubsystem extends SubsystemBase {
             turretOut = 0;
         }
 
-        turretMotor.set(turretOut);
+        //turretMotor.set(turretOut);
+
 
         SmartDashboard.putNumber("Turret Angle Measured (deg)", turretAngleDeg);
         SmartDashboard.putNumber("Turret Goal (deg)", goalAngleDeg);
-        SmartDashboard.putNumber("Turret Mapped Goal (deg)", mappedGoalDeg);
+        //SmartDashboard.putNumber("Turret Mapped Goal (deg)", mappedGoalDeg);
         SmartDashboard.putNumber(
             "Turret Setpoint (deg)",
             angleController.getSetpoint().position
@@ -103,6 +146,14 @@ public class TurretSubsystem extends SubsystemBase {
             "Turret Vel Read",
             turretSim.getTurretSpeed()
         );
+        SmartDashboard.putNumber("Turret ABS Encoder Value", turretEncoder.get());
+
+        SmartDashboard.putNumber("Turret Motor Encoder", turretMotor.getEncoder().getPosition());
+
+        SmartDashboard.putNumber("Turret RAD", getTurretAngleRads());
+        SmartDashboard.putNumber("Turret DEG", Math.toDegrees(getTurretAngleRads()));
+
+        SmartDashboard.putNumber("Turret Goal Angle", goalAngleDeg);
 
         AlphaMechanism3d.setTurretAngle(
             isSim ? turretSim.getTurretAngleRads() : getTurretAngleRads()
@@ -125,7 +176,7 @@ public class TurretSubsystem extends SubsystemBase {
         if (RobotBase.isSimulation()) {
             return turretSim.getTurretAngleRads();
         }
-        return turretEncoder.getPosition();
+        return (turretMotor.getEncoder().getPosition() / TurretConstants.TURRET_GEAR_RATIO) * (Math.PI*2);
     }
     
     public void setAutoAngleSupplier(Supplier<Double> angleSupplier) {
@@ -175,4 +226,7 @@ public class TurretSubsystem extends SubsystemBase {
         return shortHitsLimit ? longGoal : shortGoal;
     }
 
+    public void setTurretSpeed(double speed) {
+        turretMotor.set(speed);
+    }
 }
