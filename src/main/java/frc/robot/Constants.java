@@ -62,6 +62,7 @@ public final class Constants
     public static final int FLYWHEEL_MOTOR_ID = 14;
     public static final int HOOD_MOTOR_ID = 15;
     public static final int FEED_MOTOR_ID = 16;
+    public static final int BELT_MOTOR_ID = 24;
 
 
     public static final double FLYWHEEL_GEAR_RATIO = 1.0;
@@ -74,7 +75,8 @@ public final class Constants
     public static final double SHOOTER_HEIGHT_METERS = 0.305;
 
     // Distance from robot center
-    public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(0, 0);
+    public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(0, Units.feetToMeters(1));
+
     public static final double HOOD_HOME_ANGLE = 80;
     public static final double HOOD_LENGTH_METERS = 0.1;
   }
@@ -89,8 +91,8 @@ public final class Constants
   public static class TurretConstants {
       public static final int TURRET_MOTOR_ID = 19;
 
-      public static final Transform3d ROBOT_TO_TURRET = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
-      public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(-0.19685, 0.0, Rotation2d.kZero);
+      public static final Transform3d ROBOT_TO_TURRET = new Transform3d(Units.feetToMeters(0.5), 0, Units.feetToMeters(2.5), Rotation3d.kZero);
+      public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(Units.feetToMeters(0.5), 0.0, Rotation2d.kZero);
 
       public static final double TURRET_GEAR_RATIO = 135;
   }

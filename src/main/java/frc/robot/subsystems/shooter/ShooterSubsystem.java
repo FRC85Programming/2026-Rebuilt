@@ -1,8 +1,16 @@
 package frc.robot.subsystems.shooter;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -38,11 +46,13 @@ public class ShooterSubsystem extends SubsystemBase{
     private final SparkFlex feedMotor =
         new SparkFlex(ShooterConstants.FEED_MOTOR_ID, MotorType.kBrushless);
 
+    private final SparkFlex beltMotor =
+        new SparkFlex(ShooterConstants.BELT_MOTOR_ID, MotorType.kBrushless);
+
     private final ShooterSim shooterSim = new ShooterSim();
 
     private final DutyCycleEncoder hoodEncoder = new DutyCycleEncoder(0);
 
-    private final PIDController flywheelPID = new PIDController(0.00007, 0.000166, 0.000004);
     private final PIDController hoodPID = new PIDController(0.035, 0, 0);
 
     double goalRpm = 0.0;
@@ -52,39 +62,51 @@ public class ShooterSubsystem extends SubsystemBase{
 
     boolean isSim;
 
-    double hoodHome = 0.890926322273158;
+    double hoodHome = 0.8942098723552468;
+
+    SparkClosedLoopController leftController;
+
+    SparkClosedLoopController rightController;
+
+    SparkFlexConfig flywheelConfig = new SparkFlexConfig();
 
     public ShooterSubsystem() {
         isSim = Robot.isSimulation();
 
-        SmartDashboard.putNumber("Flywheel P Value", 0.00007);
-        SmartDashboard.putNumber("Flywheel I Value", 0.000166);
-        SmartDashboard.putNumber("Flywheel D Value", 0.000004);
+        leftController = flywheelMotorLeft.getClosedLoopController();
+        rightController = flywheelMotorRight.getClosedLoopController();
+
+        flywheelConfig.closedLoop
+               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                // Set PID values for position control. We don't need to pass a closed loop
+                // slot, as it will default to slot 0.
+                .p(0.00000005)
+                .i(0)
+                .d(0)
+                .outputRange(-1, 1)
+                // Set PID values for velocity control in slot 1
+                .p(0.0004, ClosedLoopSlot.kSlot1)
+                .i(0, ClosedLoopSlot.kSlot1)
+                .d(0, ClosedLoopSlot.kSlot1)
+                .outputRange(-1, 1, ClosedLoopSlot.kSlot1)
+                .feedForward
+                // kV is now in Volts, so we multiply by the nominal voltage (12V)
+                .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
+        
+        flywheelConfig.idleMode(IdleMode.kCoast);
+
+        flywheelMotorLeft.configure(flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        flywheelMotorRight.configure(flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SmartDashboard.putNumber("TUNE Shot RPM", 0);
         SmartDashboard.putNumber("TUNE Shot Angle", 80);
         SmartDashboard.putNumber("Set Hood Angle", 69);
+
         hoodMotor.getEncoder().setPosition((hoodEncoder.get() - hoodHome)*9);
     }
 
     @Override
     public void periodic() {
-        flywheelPID.setP(SmartDashboard.getNumber("Flywheel P Value", 0.00007));
-        flywheelPID.setI(SmartDashboard.getNumber("Flywheel I Value", 0.000166));
-        flywheelPID.setD(SmartDashboard.getNumber("Flywheel D Value", 0.000004));
-
-
-        final double flywheelRpmMeasured = getFlywheelRPM();
-        final double flywheelPIDOut = flywheelPID.calculate(flywheelRpmMeasured, goalRpm);
-        double flywheelOut = flywheelPIDOut;
-        flywheelOut = Math.max(-1.0, Math.min(1.0, flywheelOut));
-
-        if (goalRpm != 0) {
-            setFlywheelSpeed(flywheelOut);
-        } else {
-            setFlywheelSpeed(0);
-        }
-
         final double hoodAngle = getHoodAngle();
         final double hoodPIDOut = hoodPID.calculate(hoodAngle, goalAngle);
         double hoodOut = hoodPIDOut;
@@ -93,32 +115,22 @@ public class ShooterSubsystem extends SubsystemBase{
         hoodMotor.set(hoodOut);
 
         if (isSim) {
-            shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
+            //shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
             shooterSim.updateHood(hoodOut * 12.0, 0.02);
+            AlphaMechanism3d.setHoodAngle(getHoodAngle());
         }
 
-        AlphaMechanism3d.setHoodAngle(getHoodAngle());
-
         SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
-        SmartDashboard.putNumber("Flywheel Measured RPM", flywheelRpmMeasured);
+        SmartDashboard.putNumber("Flywheel Measured RPM", getFlywheelRPM());
         SmartDashboard.putNumber("Sim Flywheel Speed", shooterSim.getFlywheelRPM());
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
-        SmartDashboard.putNumber("Flywheel PID Out", flywheelPIDOut);
-        SmartDashboard.putNumber("Flywheel Out", flywheelOut);
         SmartDashboard.putNumber("Hood Encoder ABS", hoodEncoder.get());
         SmartDashboard.putNumber("Hood Encoder", hoodMotor.getEncoder().getPosition()*360);
         SmartDashboard.putNumber("Hood Encoder Converted", hoodMotor.getEncoder().getPosition()*360/9);
         SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.6) + 80);
-        
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
         SmartDashboard.putNumber("Hood PID Out", hoodPIDOut);
         SmartDashboard.putNumber("Hood Out", hoodOut);
-        
-        Logger.recordOutput("Shooter/FlywheelGoalRPM", goalRpm);
-        Logger.recordOutput("Shooter/FlywheelMeasuredRPM", flywheelRpmMeasured);
-        Logger.recordOutput("Shooter/FlywheelOut", flywheelOut);
-        Logger.recordOutput("Shooter/HoodGoalAngle", goalAngle);
-        Logger.recordOutput("Shooter/HoodOut", hoodOut);
     }
 
     private double convertFlywheelVelocity(double velocity) {
@@ -126,12 +138,13 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public void setFlywheelRPM(double rpm) {
-        goalRpm = rpm;
+        leftController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        rightController.setSetpoint(-rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
     }
 
     public void stopFlywheel() {
-        flywheelMotorLeft.stopMotor();
-        flywheelMotorRight.stopMotor();
+        flywheelMotorLeft.set(0);
+        flywheelMotorRight.set(0);
     }
 
     public double getFlywheelRPM() {
@@ -220,6 +233,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
     public void setFeedSpeed(double speed) {
         feedMotor.set(speed);
+        beltMotor.set(-speed);
     }
 }
 

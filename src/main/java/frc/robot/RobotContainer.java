@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.commands.AimAtGoal;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TuneShot;
@@ -146,24 +147,28 @@ public class RobotContainer
     SmartDashboard.putData("Auto Selector", autoChooser);
     
     // Passive trajectory calculation - TargetingCalculator handles turret offset internally
-    /**turret.setAutoAngleSupplier(() -> {
-      var solution = TargetingCalculator.calculateShot(
-        getTarget(),
-        drivebase.getPose(),
-        drivebase.getFieldVelocity(),
-        turret.getTurretAngleRads(),
-        new TargetingCalculator.RpmConverter() {
-          public double rpmToMps(double rpm) {
-            return shooter.rpmToMps(rpm);
-          }
-          public double mpsToRpm(double mps) {
-            return shooter.mpsToRpm(mps);
-          }
-        }
-      );
-      return solution.turretAngleDegrees;
-    });
-    SmartDashboard.putNumber("Intake Speed", 0.7);*/
+
+    // Solution involving velocity and stuff
+    // turret.setAutoAngleSupplier(() -> {
+    //   var solution = TargetingCalculator.calculateShot(
+    //     getTarget(),
+    //     drivebase.getPose(),
+    //     drivebase.getFieldVelocity(),
+    //     turret.getTurretAngleRads(),
+    //     new TargetingCalculator.RpmConverter() {
+    //       public double rpmToMps(double rpm) {
+    //         return shooter.rpmToMps(rpm);
+    //       }
+    //       public double mpsToRpm(double mps) {
+    //         return shooter.mpsToRpm(mps);
+    //       }
+    //     }
+    //   );
+    //   return solution.turretAngleDegrees;
+    // });
+
+    // Raw angle to 
+  
   }
 
   /**
@@ -222,7 +227,7 @@ public class RobotContainer
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
       driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
-      driverXbox.button(2).onTrue(new InstantCommand(() -> turret.setAngle(180)));
+      driverXbox.button(2).onTrue(new InstantCommand(() -> turret.setTurretAngle(180)));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
 
@@ -251,13 +256,13 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightTrigger().whileTrue(new TuneShot(drivebase, shooter, () -> getTarget()));
-      driverXbox.leftTrigger().whileTrue(new Intake(intake, () -> SmartDashboard.getNumber("Intake Speed", 0.8)));
+      driverXbox.leftTrigger().whileTrue(new AimAtGoal(drivebase, turret, () -> getTarget()));
       driverXbox.pov(90).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(-0.5)));
       driverXbox.pov(90).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
       driverXbox.pov(270).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(0.5)));
       driverXbox.pov(270).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
-      driverXbox.pov(0).onFalse(new InstantCommand(() -> turret.setAngle(0)));
-      driverXbox.pov(180).onFalse(new InstantCommand(() -> turret.setAngle(180)));
+      driverXbox.pov(0).onFalse(new InstantCommand(() -> turret.setTurretAngle(0)));
+      driverXbox.pov(180).onFalse(new InstantCommand(() -> turret.setTurretAngle(180)));
     }
   }
 

@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,16 +38,23 @@ public class TuneShot extends Command{
         this.target = target;
 
         SmartDashboard.putBoolean("Feed", false);
-        SmartDashboard.putNumber("Feed Speed", -0.8);
+        SmartDashboard.putNumber("Feed Speed", 0.8);
     }
 
     private void calculateSolution() {
         targetTranslation = target.get();
 
         // Distance from SHOOTER to hub
+        Pose2d robotPose = swerve.getPose();
+
+        Translation2d shooterFieldPosition =
+            robotPose.getTranslation().plus(
+                ShooterConstants.SHOOTER_TRANSLATION.rotateBy(robotPose.getRotation())
+            );
+
         Translation2d toTarget2d =
-            targetTranslation.toTranslation2d()
-                .minus(swerve.getPose().getTranslation().plus(ShooterConstants.SHOOTER_TRANSLATION));
+            targetTranslation.toTranslation2d().minus(shooterFieldPosition);
+
 
         double distance = toTarget2d.getNorm();
 
@@ -58,9 +66,14 @@ public class TuneShot extends Command{
         }
 
             
-        goalRPM = SmartDashboard.getNumber("TUNE Shot RPM", 0);
-        goalAngle = SmartDashboard.getNumber("TUNE Shot Angle", 80);
+        /**goalRPM = SmartDashboard.getNumber("TUNE Shot RPM", 0);
+        goalAngle = SmartDashboard.getNumber("TUNE Shot Angle", 80);*/
 
+        goalRPM = ShooterTable.getSetpoint(distance).flywheelRPM();
+        goalAngle = ShooterTable.getSetpoint(distance).hoodAngle().getDegrees();
+
+        SmartDashboard.putNumber("Selected Angle", goalAngle);
+        SmartDashboard.putNumber("Selected RPM", goalRPM);
 
         swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0, false);
     }
@@ -79,7 +92,7 @@ public class TuneShot extends Command{
         );
 
         if (SmartDashboard.getBoolean("Feed", false)) {
-            shooter.setFeedSpeed(SmartDashboard.getNumber("Feed Speed", -0.8));
+            shooter.setFeedSpeed(SmartDashboard.getNumber("Feed Speed", 0.8));
         }
     }
 
@@ -93,6 +106,6 @@ public class TuneShot extends Command{
     public void end(boolean interrupted) {
         swerve.drive(new ChassisSpeeds(0, 0, 0));
         shooter.setFeedSpeed(0);
-        shooter.setFlywheelRPM(0);
+        shooter.stopFlywheel();
     }
 }

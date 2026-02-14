@@ -15,19 +15,32 @@ public class ShooterTable {
   static {
     // This is data is calculated based off of basic physics math and should be tuned (meters, radians, RPM)
     // These were calculated with a drop angle of 65 degrees
-    hoodAngleMap.put(2.0, Rotation2d.fromDegrees(75.0));
-    hoodAngleMap.put(3.0, Rotation2d.fromDegrees(72.5));
-    hoodAngleMap.put(4.0, Rotation2d.fromDegrees(71.25));
-    hoodAngleMap.put(5.0, Rotation2d.fromDegrees(70.25));
-    hoodAngleMap.put(6.0, Rotation2d.fromDegrees(69.5));
+    hoodAngleMap.put(1.468, Rotation2d.fromDegrees(78));
+    hoodAngleMap.put(2.109, Rotation2d.fromDegrees(75));
+    hoodAngleMap.put(2.436, Rotation2d.fromDegrees(73));
+    hoodAngleMap.put(3.017, Rotation2d.fromDegrees(70));
+    hoodAngleMap.put(3.396, Rotation2d.fromDegrees(68));
+    hoodAngleMap.put(3.765, Rotation2d.fromDegrees(67));
+    hoodAngleMap.put(4.003, Rotation2d.fromDegrees(66));
+    hoodAngleMap.put(4.34, Rotation2d.fromDegrees(65));
+    hoodAngleMap.put(4.784, Rotation2d.fromDegrees(65));
+    hoodAngleMap.put(5.166, Rotation2d.fromDegrees(64));
+
+    flywheelSpeedMap.put(1.468, -3500.0); 
+    flywheelSpeedMap.put(2.109, -3600.0); 
+    flywheelSpeedMap.put(2.436, -3700.0); 
+    flywheelSpeedMap.put(3.017, -3800.0); 
+    flywheelSpeedMap.put(3.396, -3733.0); 
+    flywheelSpeedMap.put(3.765, -4100.0); 
+    flywheelSpeedMap.put(4.003, -4200.0); 
+    flywheelSpeedMap.put(4.34, -4250.0); 
+    flywheelSpeedMap.put(4.784, -4500.0); 
+    flywheelSpeedMap.put(5.166, -4800.0); 
 
 
 
-    flywheelSpeedMap.put(2.0, 2633.0); 
-    flywheelSpeedMap.put(3.0, 2931.0); 
-    flywheelSpeedMap.put(4.0, 3226.0); 
-    flywheelSpeedMap.put(5.0, 3489.0); 
-    flywheelSpeedMap.put(6.0, 3733.0); 
+
+
 
 
   }
