@@ -94,6 +94,8 @@ public class TuneShot extends Command{
         if (SmartDashboard.getBoolean("Feed", false)) {
             shooter.setFeedSpeed(SmartDashboard.getNumber("Feed Speed", 0.8));
         }
+
+        SmartDashboard.putNumber("Ball Exit Speed", shooter.rpmToMps(goalRPM));
     }
 
     @Override

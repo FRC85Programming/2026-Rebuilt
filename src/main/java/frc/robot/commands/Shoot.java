@@ -72,8 +72,11 @@ public class Shoot extends Command{
         goalRPM = ShooterTable.getSetpoint(distance).flywheelRPM();
         goalAngle = ShooterTable.getSetpoint(distance).hoodAngle().getRadians();
 
+        SmartDashboard.putNumber("Selected Angle", Math.toDegrees(goalAngle));
+        SmartDashboard.putNumber("Selected RPM", goalRPM);
+
         // Calculate new speeds based of robot velocity (this should be commented out on first real robot test)
-        double shotSpeed = shooter.rpmToMps(goalRPM);
+        double shotSpeed = -shooter.rpmToMps(goalRPM);
         double timeOfFlight = distance / shotSpeed;
         double compensatedShotSpeed = shotSpeed - robotVx;
         goalRPM = shooter.mpsToRpm(compensatedShotSpeed);
@@ -88,7 +91,7 @@ public class Shoot extends Command{
 
         double lead = robotVy * timeOfFlight;
 
-        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), -lead, isPathPlanner);
+        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0, isPathPlanner);
 
         // Create trajectories for sim visulization (could be wrapped in a sim check if the code runs slow) - this does not affect the shots at all
         var shooterRelativeTrajectory =
@@ -141,14 +144,19 @@ public class Shoot extends Command{
         shooter.setHoodAngle(
             Math.toDegrees(goalAngle)
         );
-        SmartDashboard.putBoolean("Flywheel at speed", shooter.flywheelAtSpeed(200));
-        SmartDashboard.putBoolean("Hood at angle", shooter.hoodAtAngle(3));
 
+        SmartDashboard.putBoolean("Flywheel Ready", shooter.flywheelAtSpeed(500));
+        SmartDashboard.putBoolean("Hood Ready", shooter.hoodAtAngle(0.5));
+        SmartDashboard.putBoolean("Swerve Ready", swerve.isAimedAtPosition(0.1));
 
-        if (shooter.flywheelAtSpeed(200) && shooter.hoodAtAngle(3) && swerve.isAimedAtPosition(0.1)) {
+        if (shooter.flywheelAtSpeed(500) && shooter.hoodAtAngle(0.5) && swerve.isAimedAtPosition(0.1)) {
                 if (shooter.generateProjectileIsReady()) {
                     //shooter.simulatedShot(swerve.getPose(), swerve.getFieldVelocity());
-            }
+                }
+                SmartDashboard.putBoolean("AIMED", true);
+                shooter.setFeedSpeed(0.8);
+        } else {
+            SmartDashboard.putBoolean("AIMED", false);
         }
     }
 
@@ -161,7 +169,8 @@ public class Shoot extends Command{
     @Override
     public void end(boolean interrupted) {
         swerve.drive(new ChassisSpeeds(0, 0, 0));
-
+        shooter.stopFlywheel();
+        shooter.setFeedSpeed(0);
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
         swerve.resetPathPlannerRotOverride();
     }

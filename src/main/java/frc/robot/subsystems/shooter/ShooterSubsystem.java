@@ -62,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
     boolean isSim;
 
-    double hoodHome = 0.8942098723552468;
+    double hoodHome = 0.9173053229326331;
 
     SparkClosedLoopController leftController;
 
@@ -85,8 +85,8 @@ public class ShooterSubsystem extends SubsystemBase{
                 .d(0)
                 .outputRange(-1, 1)
                 // Set PID values for velocity control in slot 1
-                .p(0.0004, ClosedLoopSlot.kSlot1)
-                .i(0, ClosedLoopSlot.kSlot1)
+                .p(0.00006, ClosedLoopSlot.kSlot1)
+                .i(0.0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
                 .outputRange(-1, 1, ClosedLoopSlot.kSlot1)
                 .feedForward
@@ -138,8 +138,8 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public void setFlywheelRPM(double rpm) {
-        leftController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-        rightController.setSetpoint(-rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        leftController.setSetpoint(-rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        rightController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
     }
 
     public void stopFlywheel() {
@@ -192,11 +192,11 @@ public class ShooterSubsystem extends SubsystemBase{
 
     public double mpsToRpm(double speed) {
         // Assume 16m/s = 6000 RPM as a placeholder
-        return speed * 375.0;
+        return speed / 0.00532;
     }
 
     public double rpmToMps(double rpm) {
-        return rpm / 375.0;
+        return rpm * 0.00532;
     }
 
     public void simulatedShot(Pose2d pose, ChassisSpeeds velocity, Rotation2d turretAngle) {
