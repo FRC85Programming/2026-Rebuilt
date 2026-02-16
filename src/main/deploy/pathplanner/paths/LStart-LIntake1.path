@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6767760342368048,
-        "y": 7.405520684736091
+        "x": 4.362524964336661,
+        "y": 7.431398002853067
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.26273158979236,
-        "y": 7.434754018069424
+        "x": 7.948480519892216,
+        "y": 7.4606313361864
       },
       "isLocked": false,
       "linkedName": "LStart"
@@ -96,7 +96,7 @@
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Left",
+  "folder": "Left+Depot",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

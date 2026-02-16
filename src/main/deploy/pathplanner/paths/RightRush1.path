@@ -3,40 +3,40 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5524,
-        "y": 0.5659777777777777
+        "x": 4.323708987161198,
+        "y": 0.6256633380884444
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7254111111111117,
-        "y": 1.9204555555555545
+        "x": 7.5066191155492135,
+        "y": 0.7032952924393738
       },
       "isLocked": false,
-      "linkedName": "ROutpost"
+      "linkedName": "RightRushStart"
     },
     {
       "anchor": {
-        "x": 2.423333333333334,
-        "y": 3.8206222222222213
+        "x": 8.27,
+        "y": 3.653309557774608
       },
       "prevControl": {
-        "x": 2.286911111111112,
-        "y": 3.450333333333333
+        "x": 8.127674750356633,
+        "y": 2.0618544935805994
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "RightRushIntake"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.2647286821705469,
+      "minWaypointRelativePos": 0.4304511278195463,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 1.0,
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -47,15 +47,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "DriveBy",
-      "waypointRelativePos": 0.2740310077519405,
+      "name": "Intake",
+      "waypointRelativePos": 0.36278195488722065,
       "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "DriveBy"
-        }
-      }
+      "command": null
     }
   ],
   "globalConstraints": {
@@ -68,10 +63,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
-  "folder": "Depot+Outpost",
+  "folder": "Right Rush",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

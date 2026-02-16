@@ -7,25 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LStart-LIntake1"
+            "pathName": "RightRush1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LIntake1-LShoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LShoot-LIntake2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LIntake2-LShoot"
+            "pathName": "RightRush2"
           }
         }
       ]

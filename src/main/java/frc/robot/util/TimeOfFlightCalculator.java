@@ -4,8 +4,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class TimeOfFlightCalculator {
-    private static final double GRAVITY = 9.80665; 
-    private static final int MAX_ITERS = 15;
 
     /**
      * Computes time of flight for a shot using iterative projectile math.
@@ -16,37 +14,28 @@ public class TimeOfFlightCalculator {
      * @param exitSpeedMetersPerSec Ball exit speed
      * @param shooterAngleRadians Hood angle
      */
-    public static double solveTimeOfFlight(
-        Translation2d shooterPos,
-        Translation2d targetPos,
-        ChassisSpeeds robotVelocity,
-        double exitSpeedMetersPerSec,
-        double shooterAngleRadians) {
+    public static double calculateTimeOfFlight(
+        double velocity,
+        double angle,
+        double shooterHeight,
+        double targetHeight
+    ) {
+        double g = 9.81;
 
-        Translation2d delta = targetPos.minus(shooterPos);
-        double horizontalDistance = delta.getNorm();
+        double a = 0.5 * g;
+        double b = -velocity * Math.sin(angle);
+        double c = targetHeight - shooterHeight;
 
-        // Initial guess (flat shot)
-        double time = horizontalDistance / exitSpeedMetersPerSec;
+        double discriminant = b*b - 4*a*c;
 
-        for (int i = 0; i < MAX_ITERS; i++) {
-        double vx =
-            exitSpeedMetersPerSec * Math.cos(shooterAngleRadians)
-                + robotVelocity.vxMetersPerSecond;
-
-        double vy =
-            exitSpeedMetersPerSec * Math.sin(shooterAngleRadians)
-                + robotVelocity.vyMetersPerSecond;
-
-        double x = vx * time;
-        double y = vy * time - 0.5 * GRAVITY * time * time;
-
-        double error = horizontalDistance - Math.hypot(x, y);
-
-        // Simple Newton-style correction
-        time += error / Math.max(exitSpeedMetersPerSec, 0.1);
+        if (discriminant < 0) {
+            return 0.0; // no solution
         }
 
-        return Math.max(time, 0.0);
+        double t1 = (-b + Math.sqrt(discriminant)) / (2*a);
+        double t2 = (-b - Math.sqrt(discriminant)) / (2*a);
+
+        return Math.max(t1, t2); // use positive root
     }
+
 }

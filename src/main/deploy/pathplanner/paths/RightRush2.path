@@ -1,0 +1,83 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.27,
+        "y": 3.653309557774608
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.920656205420826,
+        "y": 3.148701854493581
+      },
+      "isLocked": false,
+      "linkedName": "RightRushIntake"
+    },
+    {
+      "anchor": {
+        "x": 5.630513552068472,
+        "y": 0.6774179743223976
+      },
+      "prevControl": {
+        "x": 6.885563480741797,
+        "y": 0.7421112696148362
+      },
+      "nextControl": {
+        "x": 4.854792712977943,
+        "y": 0.6374323640599997
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.210984308131241,
+        "y": 0.6774179743223976
+      },
+      "prevControl": {
+        "x": 3.6120827389443653,
+        "y": 0.7032952924393738
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "SpinUp",
+      "waypointRelativePos": 0.5601503759398546,
+      "endWaypointRelativePos": 1.56,
+      "command": null
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 1.5576441102756788,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "reversed": false,
+  "folder": "Right Rush",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}

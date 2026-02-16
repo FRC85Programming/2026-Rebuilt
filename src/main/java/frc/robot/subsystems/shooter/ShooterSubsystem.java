@@ -138,11 +138,13 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public void setFlywheelRPM(double rpm) {
+        goalRpm = rpm;
         leftController.setSetpoint(-rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
         rightController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
     }
 
     public void stopFlywheel() {
+        goalRpm = 0;
         flywheelMotorLeft.set(0);
         flywheelMotorRight.set(0);
     }

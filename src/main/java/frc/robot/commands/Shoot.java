@@ -13,12 +13,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.util.BallisticTrajectory;
 import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.ShooterTable;
 import frc.robot.util.ShotSolver;
+import frc.robot.util.TimeOfFlightCalculator;
 import frc.robot.util.ShotSolver.ShotSolution;
 import frc.robot.util.TrajectoryTransform3d;
 
@@ -77,9 +79,16 @@ public class Shoot extends Command{
 
         // Calculate new speeds based of robot velocity (this should be commented out on first real robot test)
         double shotSpeed = -shooter.rpmToMps(goalRPM);
-        double timeOfFlight = distance / shotSpeed;
+
+        double timeOfFlight = TimeOfFlightCalculator.calculateTimeOfFlight(
+            shotSpeed,
+            goalAngle,
+            ShooterConstants.SHOOTER_HEIGHT_METERS,   // shooter height
+            targetTranslation.getZ()      // goal height
+        );
+
         double compensatedShotSpeed = shotSpeed - robotVx;
-        goalRPM = shooter.mpsToRpm(compensatedShotSpeed);
+        goalRPM = -shooter.mpsToRpm(compensatedShotSpeed);
 
         double compensatedDistance = distance - robotVx * timeOfFlight;
         goalAngle = ShooterTable.getSetpoint(compensatedDistance).hoodAngle().getRadians();
@@ -89,7 +98,11 @@ public class Shoot extends Command{
             -robotVel.vxMetersPerSecond * toTargetUnit.getY()
             + robotVel.vyMetersPerSecond * toTargetUnit.getX();
 
-        double lead = robotVy * timeOfFlight;
+        // Lateral displacement during flight
+        double lateralDrift = robotVy * timeOfFlight;
+
+        // Convert to angular offset (radians)
+        double leadAngle = Math.atan2(lateralDrift, distance);
 
         swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0, isPathPlanner);
 

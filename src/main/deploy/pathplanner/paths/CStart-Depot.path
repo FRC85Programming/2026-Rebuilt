@@ -92,7 +92,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Center",
+  "folder": "Depot+Outpost",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -32.69946112100191
