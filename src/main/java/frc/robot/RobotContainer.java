@@ -5,13 +5,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -24,29 +20,17 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.TurretConstants;
 import frc.robot.commands.AimAtGoal;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TuneShot;
-import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
-import frc.robot.util.TargetingCalculator;
 
 import java.io.File;
 import java.util.Optional;
-
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
-import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation.GamePieceInfo;
-import org.ironmaple.simulation.seasonspecific.crescendo2024.CrescendoNoteOnField;
-import org.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnField;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
 
 import swervelib.SwerveInputStream;
 
@@ -255,7 +239,7 @@ public class RobotContainer
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightTrigger().whileTrue(new TuneShot(drivebase, shooter, () -> getTarget()));
+      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
       driverXbox.leftTrigger().whileTrue(new AimAtGoal(drivebase, turret, () -> getTarget()));
       driverXbox.pov(90).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(-0.5)));
       driverXbox.pov(90).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));

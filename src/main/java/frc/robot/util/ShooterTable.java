@@ -26,16 +26,16 @@ public class ShooterTable {
     hoodAngleMap.put(4.784, Rotation2d.fromDegrees(65));
     hoodAngleMap.put(5.166, Rotation2d.fromDegrees(64));
 
-    flywheelSpeedMap.put(1.468, -3500.0); 
-    flywheelSpeedMap.put(2.109, -3600.0); 
-    flywheelSpeedMap.put(2.436, -3700.0); 
-    flywheelSpeedMap.put(3.017, -3800.0); 
-    flywheelSpeedMap.put(3.396, -3733.0); 
-    flywheelSpeedMap.put(3.765, -4100.0); 
-    flywheelSpeedMap.put(4.003, -4200.0); 
-    flywheelSpeedMap.put(4.34, -4250.0); 
-    flywheelSpeedMap.put(4.784, -4500.0); 
-    flywheelSpeedMap.put(5.166, -4800.0); 
+    flywheelSpeedMap.put(1.468, 3500.0); 
+    flywheelSpeedMap.put(2.109, 3600.0); 
+    flywheelSpeedMap.put(2.436, 3700.0); 
+    flywheelSpeedMap.put(3.017, 3800.0); 
+    flywheelSpeedMap.put(3.396, 3733.0); 
+    flywheelSpeedMap.put(3.765, 4100.0); 
+    flywheelSpeedMap.put(4.003, 4200.0); 
+    flywheelSpeedMap.put(4.34, 4250.0); 
+    flywheelSpeedMap.put(4.784, 4500.0); 
+    flywheelSpeedMap.put(5.166, 4800.0); 
 
 
 

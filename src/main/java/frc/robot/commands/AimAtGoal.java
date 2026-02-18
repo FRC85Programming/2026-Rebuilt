@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -18,10 +19,10 @@ public class AimAtGoal extends Command{
     TurretSubsystem turret;
     Supplier<Translation3d> goalSupplier;
 
-    public AimAtGoal(SwerveSubsystem swerve, TurretSubsystem turret, Supplier<Translation3d> goal) {
+    public AimAtGoal(SwerveSubsystem swerve, TurretSubsystem turret, Supplier<Translation3d> goalSupplier) {
         this.swerve = swerve;
         this.turret = turret;
-        goal = goalSupplier;
+        this.goalSupplier = goalSupplier;
     }
 
     @Override
@@ -43,6 +44,8 @@ public class AimAtGoal extends Command{
 
         Rotation2d turretAngle =
             fieldAngle.minus(robotPose.getRotation());
+
+        SmartDashboard.putNumber("Calced Turret Angle", turretAngle.getDegrees());
 
         turret.setTurretAngle(turretAngle.getDegrees());
     }

@@ -75,7 +75,7 @@ public class TuneShot extends Command{
         SmartDashboard.putNumber("Selected Angle", goalAngle);
         SmartDashboard.putNumber("Selected RPM", goalRPM);
 
-        swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0, false);
+        //swerve.aimAtPositionWithLead(targetTranslation.toTranslation2d(), 0, false);
     }
 
     @Override

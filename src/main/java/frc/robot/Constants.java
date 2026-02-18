@@ -72,7 +72,7 @@ public final class Constants
     public static final double HOOD_MIN_ANGLE = 40;
     public static final double HOOD_MAX_ANGLE = 80;
 
-    public static final double SHOOTER_HEIGHT_METERS = 0.305;
+    public static final double SHOOTER_HEIGHT_METERS = 0.51;
 
     // Distance from robot center
     public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(0, Units.feetToMeters(1));
@@ -94,7 +94,7 @@ public final class Constants
       public static final Transform3d ROBOT_TO_TURRET = new Transform3d(Units.feetToMeters(0.5), 0, Units.feetToMeters(2.5), Rotation3d.kZero);
       public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(Units.feetToMeters(0.5), 0.0, Rotation2d.kZero);
 
-      public static final double TURRET_GEAR_RATIO = 135;
+      public static final double TURRET_GEAR_RATIO = 45;
   }
   
   public static class IntakeConstants {

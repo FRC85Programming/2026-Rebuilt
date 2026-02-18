@@ -62,13 +62,14 @@ public class ShooterSubsystem extends SubsystemBase{
 
     boolean isSim;
 
-    double hoodHome = 0.9173053229326331;
+    double hoodHome = 0.03707715092692877;
 
     SparkClosedLoopController leftController;
 
     SparkClosedLoopController rightController;
 
-    SparkFlexConfig flywheelConfig = new SparkFlexConfig();
+    SparkFlexConfig flywheelConfigRight = new SparkFlexConfig();
+    SparkFlexConfig flywheelConfigLeft = new SparkFlexConfig();
 
     public ShooterSubsystem() {
         isSim = Robot.isSimulation();
@@ -76,27 +77,46 @@ public class ShooterSubsystem extends SubsystemBase{
         leftController = flywheelMotorLeft.getClosedLoopController();
         rightController = flywheelMotorRight.getClosedLoopController();
 
-        flywheelConfig.closedLoop
+        flywheelConfigRight.closedLoop
                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control. We don't need to pass a closed loop
                 // slot, as it will default to slot 0.
                 .p(0.00000005)
                 .i(0)
                 .d(0)
-                .outputRange(-1, 1)
+                .outputRange(0, 1)
                 // Set PID values for velocity control in slot 1
                 .p(0.00006, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
-                .outputRange(-1, 1, ClosedLoopSlot.kSlot1)
+                .outputRange(0, 1, ClosedLoopSlot.kSlot1)
+                .feedForward
+                // kV is now in Volts, so we multiply by the nominal voltage (12V)
+                .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
+
+        flywheelConfigLeft.closedLoop
+               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                // Set PID values for position control. We don't need to pass a closed loop
+                // slot, as it will default to slot 0.
+                .p(0.00000005)
+                .i(0)
+                .d(0)
+                .outputRange(-1, 0)
+                // Set PID values for velocity control in slot 1
+                .p(0.00006, ClosedLoopSlot.kSlot1)
+                .i(0.0, ClosedLoopSlot.kSlot1)
+                .d(0, ClosedLoopSlot.kSlot1)
+                .outputRange(-1, 0, ClosedLoopSlot.kSlot1)
                 .feedForward
                 // kV is now in Volts, so we multiply by the nominal voltage (12V)
                 .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
         
-        flywheelConfig.idleMode(IdleMode.kCoast);
+        flywheelConfigRight.idleMode(IdleMode.kCoast);
+        flywheelConfigLeft.idleMode(IdleMode.kCoast);
 
-        flywheelMotorLeft.configure(flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        flywheelMotorRight.configure(flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        flywheelMotorLeft.configure(flywheelConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        flywheelMotorRight.configure(flywheelConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SmartDashboard.putNumber("TUNE Shot RPM", 0);
         SmartDashboard.putNumber("TUNE Shot Angle", 80);
@@ -189,11 +209,10 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public boolean flywheelAtSpeed(double tolerance) {
-        return Math.abs(getFlywheelRPM() - goalRpm) < tolerance;
+        return -getFlywheelRPM()/goalRpm > tolerance;
     }
 
     public double mpsToRpm(double speed) {
-        // Assume 16m/s = 6000 RPM as a placeholder
         return speed / 0.00532;
     }
 

@@ -51,7 +51,7 @@ public class TurretSubsystem extends SubsystemBase {
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control. We don't need to pass a closed loop
                 // slot, as it will default to slot 0.
-                .p(0.01)
+                .p(0.5)
                 .i(0)
                 .d(0)
                 .outputRange(-1, 1)
@@ -98,7 +98,7 @@ public class TurretSubsystem extends SubsystemBase {
         //     ControlType.kPosition,
         //     ClosedLoopSlot.kSlot0
         // );
-        closedLoopController.setSetpoint((angleDeg/360) * 135, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        closedLoopController.setSetpoint((angleDeg/360) * 45, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
         SmartDashboard.putNumber("Turret Goal Angle", angleDeg);
     }
