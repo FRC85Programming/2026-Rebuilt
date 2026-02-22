@@ -239,14 +239,14 @@ public class RobotContainer
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
+      //driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
       driverXbox.leftTrigger().whileTrue(new AimAtGoal(drivebase, turret, () -> getTarget()));
-      driverXbox.pov(90).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(-0.5)));
-      driverXbox.pov(90).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
-      driverXbox.pov(270).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(0.5)));
-      driverXbox.pov(270).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
-      driverXbox.pov(0).onFalse(new InstantCommand(() -> turret.setTurretAngle(0)));
-      driverXbox.pov(180).onFalse(new InstantCommand(() -> turret.setTurretAngle(180)));
+      //driverXbox.pov(90).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(-0.5)));
+      // driverXbox.pov(90).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
+      // driverXbox.pov(270).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(0.5)));
+      // driverXbox.pov(270).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
+      driverXbox.pov(0).onTrue(new InstantCommand(() -> turret.setTurretAngle(0)));
+      driverXbox.pov(180).onTrue(new InstantCommand(() -> turret.setTurretAngle(180)));
     }
   }
 

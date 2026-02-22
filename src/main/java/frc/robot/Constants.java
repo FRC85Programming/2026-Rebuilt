@@ -91,10 +91,10 @@ public final class Constants
   public static class TurretConstants {
       public static final int TURRET_MOTOR_ID = 19;
 
-      public static final Transform3d ROBOT_TO_TURRET = new Transform3d(Units.feetToMeters(0.5), 0, Units.feetToMeters(2.5), Rotation3d.kZero);
-      public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(Units.feetToMeters(0.5), 0.0, Rotation2d.kZero);
+      public static final Transform3d ROBOT_TO_TURRET = new Transform3d(0, Units.feetToMeters(1), Units.inchesToMeters(1), Rotation3d.kZero);
+      public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(0, Units.feetToMeters(1), Rotation2d.kZero);
 
-      public static final double TURRET_GEAR_RATIO = 45;
+      public static final double TURRET_GEAR_RATIO = 32;
   }
   
   public static class IntakeConstants {

@@ -51,14 +51,15 @@ public class TurretSubsystem extends SubsystemBase {
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control. We don't need to pass a closed loop
                 // slot, as it will default to slot 0.
-                .p(0.5)
+                .p(0.35)
                 .i(0)
                 .d(0)
-                .outputRange(-1, 1)
+                .outputRange(-0.5, 0.5)
                 .feedForward.kV(12.0 / 6784);
 
         turretConfig.idleMode(IdleMode.kBrake);
 
+        turretConfig.inverted(true);
 
         turretMotor.configure(turretConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
@@ -71,7 +72,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        updateLogging();
         if (RobotBase.isSimulation()) {
             // TODO: Sim still needs PID so figure out how to do that I guess
             //turretSim.update(turretOut * 12.0, 0.02);
@@ -88,8 +89,6 @@ public class TurretSubsystem extends SubsystemBase {
                 ? Math.toDegrees(turretSim.getTurretAngleRads())
                 : Math.toDegrees(Math.toDegrees(getTurretAngleRads()));
 
-        //double targetRotations = (goalAngleDeg / 360.0) * 135.0;
-
         // Clamp between 0 and 135 rotations
         // targetRotations = MathUtil.clamp(targetRotations, 0.0, 135.0);
 
@@ -98,7 +97,7 @@ public class TurretSubsystem extends SubsystemBase {
         //     ControlType.kPosition,
         //     ClosedLoopSlot.kSlot0
         // );
-        closedLoopController.setSetpoint((angleDeg/360) * 45, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        closedLoopController.setSetpoint((angleDeg/360) * 32, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
         SmartDashboard.putNumber("Turret Goal Angle", angleDeg);
     }

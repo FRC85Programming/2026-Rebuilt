@@ -34,7 +34,7 @@ public class AimAtGoal extends Command{
                 .plus(TurretConstants.ROBOT_TO_TURRET_2D.getTranslation().rotateBy(robotPose.getRotation()));
 
         Translation2d targetFieldPos =
-            goalSupplier.get().toTranslation2d();// or however you're extracting XY
+            goalSupplier.get().toTranslation2d();
 
         Translation2d turretToTarget =
             targetFieldPos.minus(turretFieldPos);
@@ -47,6 +47,6 @@ public class AimAtGoal extends Command{
 
         SmartDashboard.putNumber("Calced Turret Angle", turretAngle.getDegrees());
 
-        turret.setTurretAngle(turretAngle.getDegrees());
+        turret.setTurretAngle(turretAngle.getDegrees() -90);
     }
 }
