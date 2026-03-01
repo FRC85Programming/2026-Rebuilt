@@ -12,8 +12,12 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.RotationTarget;
+import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
@@ -39,13 +43,15 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.odometry.QuestResult;
-import frc.robot.subsystems.swervedrive.Vision.Cameras;
+//import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -81,7 +87,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * PhotonVision class to keep an accurate odometry.
    */
-  private       Vision      vision;
+  //private       Vision      vision;
 
   private QuestNavSubsystem questNav = new QuestNavSubsystem();
 
@@ -183,7 +189,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public void setupPhotonVision()
   {
-    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+    //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
   @Override
@@ -240,7 +246,7 @@ public class SwerveSubsystem extends SubsystemBase
             ChassisSpeeds modifiedSpeeds = new ChassisSpeeds(
                 speedsRobotRelative.vxMetersPerSecond,
                 speedsRobotRelative.vyMetersPerSecond,
-                -speedsRobotRelative.omegaRadiansPerSecond
+                speedsRobotRelative.omegaRadiansPerSecond
             );
             if (enableFeedforward)
             {
@@ -296,7 +302,7 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @return A {@link Command} which will run the alignment.
    */
-  public Command aimAtTarget(Cameras camera)
+  /*public Command aimAtTarget(Cameras camera)
   {
 
     return run(() -> {
@@ -313,7 +319,7 @@ public class SwerveSubsystem extends SubsystemBase
         }
       }
     });
-  }
+  }*/
 
   // Currently unused
   public void aimAtPositionWithLead(Translation2d position, double lead, boolean isPathPlanner) {
@@ -890,5 +896,61 @@ public class SwerveSubsystem extends SubsystemBase
   public SwerveDrive getSwerveDrive()
   {
     return swerveDrive;
+  }
+
+  public Command driveTranslation2dPath(Translation2d[] path) {
+    // Prepend the robot's current position so the path starts from where we are
+    Translation2d[] fullPath = new Translation2d[path.length + 1];
+    fullPath[0] = getPose().getTranslation();
+    System.arraycopy(path, 0, fullPath, 1, path.length);
+
+    Pose2d[] poses = new Pose2d[fullPath.length];
+    for (int i = 0; i < fullPath.length; i++) {
+      Translation2d delta = (i < fullPath.length - 1)
+          ? fullPath[i + 1].minus(fullPath[i])
+          : fullPath[i].minus(fullPath[i - 1]);
+      poses[i] = new Pose2d(fullPath[i], new Rotation2d(delta.getX(), delta.getY()));
+    }
+
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(poses);
+
+    // Build holonomic rotation targets so the robot body faces toward the next point
+    List<RotationTarget> rotationTargets = new ArrayList<>();
+    for (int i = 0; i < fullPath.length - 1; i++) {
+      Translation2d delta = fullPath[i + 1].minus(fullPath[i]);
+      rotationTargets.add(new RotationTarget(i, new Rotation2d(delta.getX(), delta.getY())));
+    }
+
+    // Goal rotation faces the direction of the final segment
+    Translation2d lastDelta = fullPath[fullPath.length - 1].minus(fullPath[fullPath.length - 2]);
+    Rotation2d goalRotation = new Rotation2d(lastDelta.getX(), lastDelta.getY());
+
+    PathConstraints constraints = new PathConstraints(
+        swerveDrive.getMaximumChassisVelocity(), 4.0,
+        swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+    PathPlannerPath ppPath = new PathPlannerPath(
+        waypoints, rotationTargets, List.of(), List.of(), List.of(),
+        constraints, null,
+        new GoalEndState(0.0, goalRotation), false);
+    ppPath.preventFlipping = true;
+    return AutoBuilder.followPath(ppPath);
+  }
+
+  /**
+   * Pathfinds from the robot's current pose to the start of a named PathPlanner path,
+   * then follows that path. Use this instead of a bare path step when the robot's
+   * position at the start of the path is not guaranteed (e.g. after a dynamic intake pass).
+   */
+  public Command pathfindThenFollow(String pathName) {
+    try {
+      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+      PathConstraints constraints = new PathConstraints(
+          swerveDrive.getMaximumChassisVelocity(), 4.0,
+          swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+      return AutoBuilder.pathfindThenFollowPath(path, constraints);
+    } catch (Exception e) {
+      System.err.println("[SwerveSubsystem] pathfindThenFollow: could not load path '" + pathName + "': " + e.getMessage());
+      return Commands.none();
+    }
   }
 }

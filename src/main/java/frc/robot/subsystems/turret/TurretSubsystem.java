@@ -42,6 +42,8 @@ public class TurretSubsystem extends SubsystemBase {
 
     SparkMaxConfig turretConfig = new SparkMaxConfig();
 
+    private double goalAngle = 0;
+
     public TurretSubsystem() {
         isSim = Robot.isSimulation();
 
@@ -54,7 +56,8 @@ public class TurretSubsystem extends SubsystemBase {
                 .p(0.35)
                 .i(0)
                 .d(0)
-                .outputRange(-0.5, 0.5)
+                .outputRange(-0.25, 0.25)
+                .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
         turretConfig.idleMode(IdleMode.kBrake);
@@ -84,20 +87,18 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setTurretAngle(double angleDeg) {
-        double turretAngleDeg =
-            isSim
-                ? Math.toDegrees(turretSim.getTurretAngleRads())
-                : Math.toDegrees(Math.toDegrees(getTurretAngleRads()));
+        angleDeg = MathUtil.inputModulus(angleDeg, -180.0, 180.0);
 
-        // Clamp between 0 and 135 rotations
-        // targetRotations = MathUtil.clamp(targetRotations, 0.0, 135.0);
+        if (angleDeg > TurretConstants.TURRET_UPPER_LIMIT_DEG) {
+            angleDeg -= 360.0;
+        } else if (angleDeg < TurretConstants.TURRET_LOWER_LIMIT_DEG) {
+            angleDeg += 360.0;
+        }
 
-        // closedLoopController.setSetpoint(
-        //     targetRotations,
-        //     ControlType.kPosition,
-        //     ClosedLoopSlot.kSlot0
-        // );
-        closedLoopController.setSetpoint((angleDeg/360) * 32, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        angleDeg = MathUtil.clamp(angleDeg, TurretConstants.TURRET_LOWER_LIMIT_DEG, TurretConstants.TURRET_UPPER_LIMIT_DEG);
+
+        goalAngle = (angleDeg / 360.0) * TurretConstants.TURRET_GEAR_RATIO;
+        closedLoopController.setSetpoint(goalAngle, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
         SmartDashboard.putNumber("Turret Goal Angle", angleDeg);
     }
@@ -128,5 +129,11 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Turret Motor Encoder", turretMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Turret RAD", getTurretAngleRads());
         SmartDashboard.putNumber("Turret DEG", Math.toDegrees(getTurretAngleRads()));
+    }
+
+    public boolean turretAtAngle(double tolerance) {
+        double currentDeg = Math.toDegrees(getTurretAngleRads());
+        double goalDeg = (goalAngle / TurretConstants.TURRET_GEAR_RATIO) * 360.0;
+        return Math.abs(currentDeg - goalDeg) < tolerance;
     }
 }

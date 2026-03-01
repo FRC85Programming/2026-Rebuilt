@@ -82,7 +82,7 @@ public final class Constants
   }
 
   public static class FieldConstants {
-      public static final Translation3d blueHub = new Translation3d(4.620, 4.030, 1.829);
+      public static final Translation3d blueHub = new Translation3d(4.620, 4.055, 1.829);
       public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
       public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
       public static final Translation3d redFeedPosition = new Translation3d(8.0, 0.7, 0);
@@ -95,6 +95,12 @@ public final class Constants
       public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(0, Units.feetToMeters(1), Rotation2d.kZero);
 
       public static final double TURRET_GEAR_RATIO = 32;
+
+      public static final double MOUNTING_OFFSET = 90;
+
+      public static final double TURRET_LOWER_LIMIT_DEG = -180;
+
+      public static final double TURRET_UPPER_LIMIT_DEG = 180;
   }
   
   public static class IntakeConstants {

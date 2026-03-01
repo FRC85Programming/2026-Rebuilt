@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftRush1Smart"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SmartIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PathPlanToLeftRush2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftRush2Smart"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

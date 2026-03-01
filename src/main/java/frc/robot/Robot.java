@@ -49,7 +49,7 @@ public class Robot extends LoggedRobot
   @Override
   public void robotInit()
   {
-    //configureAdvantageKit();
+    configureAdvantageKit();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -199,8 +199,8 @@ public class Robot extends LoggedRobot
     if (isReal())
     {
       // Log to file on the roboRIO and publish live data to NT for AdvantageScope.
-      // Logger.addDataReceiver(new WPILOGWriter());
-      // Logger.addDataReceiver(new NT4Publisher());
+      Logger.addDataReceiver(new WPILOGWriter());
+      Logger.addDataReceiver(new NT4Publisher());
     } else if (isSimulation())
     {
       // Log locally and publish to NT for AdvantageScope while simulating.
@@ -215,6 +215,6 @@ public class Robot extends LoggedRobot
       Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
     }
 
-    // Logger.start();
+    Logger.start();
   }
 }

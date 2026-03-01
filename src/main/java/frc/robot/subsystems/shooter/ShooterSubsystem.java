@@ -51,9 +51,6 @@ public class ShooterSubsystem extends SubsystemBase{
 
     private final ShooterSim shooterSim = new ShooterSim();
 
-    private final DutyCycleEncoder hoodEncoder = new DutyCycleEncoder(0);
-
-    private final PIDController hoodPID = new PIDController(0.035, 0, 0);
 
     double goalRpm = 0.0;
     double goalAngle = 69;
@@ -62,7 +59,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
     boolean isSim;
 
-    double hoodHome = 0.03707715092692877;
+    double hoodHome = 0.830276608467102;
 
     SparkClosedLoopController leftController;
 
@@ -70,6 +67,7 @@ public class ShooterSubsystem extends SubsystemBase{
 
     SparkFlexConfig flywheelConfigRight = new SparkFlexConfig();
     SparkFlexConfig flywheelConfigLeft = new SparkFlexConfig();
+    SparkFlexConfig hoodConfig = new SparkFlexConfig();
 
     public ShooterSubsystem() {
         isSim = Robot.isSimulation();
@@ -84,12 +82,12 @@ public class ShooterSubsystem extends SubsystemBase{
                 .p(0.00000005)
                 .i(0)
                 .d(0)
-                .outputRange(0, 1)
+                .outputRange(-1, 0)
                 // Set PID values for velocity control in slot 1
-                .p(0.00006, ClosedLoopSlot.kSlot1)
+                .p(0.0004, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
-                .outputRange(0, 1, ClosedLoopSlot.kSlot1)
+                .outputRange(-1, 0, ClosedLoopSlot.kSlot1)
                 .feedForward
                 // kV is now in Volts, so we multiply by the nominal voltage (12V)
                 .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
@@ -101,42 +99,48 @@ public class ShooterSubsystem extends SubsystemBase{
                 .p(0.00000005)
                 .i(0)
                 .d(0)
-                .outputRange(-1, 0)
+                .outputRange(0, 1)
                 // Set PID values for velocity control in slot 1
-                .p(0.00006, ClosedLoopSlot.kSlot1)
+                .p(0.0004, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
-                .outputRange(-1, 0, ClosedLoopSlot.kSlot1)
+                .outputRange(0, 1, ClosedLoopSlot.kSlot1)
                 .feedForward
                 // kV is now in Volts, so we multiply by the nominal voltage (12V)
                 .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
+
+        hoodConfig.closedLoop
+               .feedbackSensor(FeedbackSensor.kDetachedAbsoluteEncoder)
+                .p(0.35)
+                .i(0)
+                .d(0)
+                .outputRange(-0.5, 0.5)
+                .feedForward.kV(12.0 / 6784);
         
         flywheelConfigRight.idleMode(IdleMode.kCoast);
         flywheelConfigLeft.idleMode(IdleMode.kCoast);
 
+        hoodConfig.inverted(true);
 
         flywheelMotorLeft.configure(flywheelConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         flywheelMotorRight.configure(flywheelConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         SmartDashboard.putNumber("TUNE Shot RPM", 0);
-        SmartDashboard.putNumber("TUNE Shot Angle", 80);
+        SmartDashboard.putNumber("TUNE Shot Angle", 75);
         SmartDashboard.putNumber("Set Hood Angle", 69);
 
-        hoodMotor.getEncoder().setPosition((hoodEncoder.get() - hoodHome)*9);
+        hoodMotor.getEncoder().setPosition((hoodMotor.getAbsoluteEncoder().getPosition() - hoodHome)*10.96);
     }
 
     @Override
     public void periodic() {
         final double hoodAngle = getHoodAngle();
-        final double hoodPIDOut = hoodPID.calculate(hoodAngle, goalAngle);
-        double hoodOut = hoodPIDOut;
-        hoodOut = Math.max(-1.0, Math.min(1.0, hoodOut));
-
-        hoodMotor.set(hoodOut);
 
         if (isSim) {
             //shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
-            shooterSim.updateHood(hoodOut * 12.0, 0.02);
+            //shooterSim.updateHood(hoodOut * 12.0, 0.02);
             AlphaMechanism3d.setHoodAngle(getHoodAngle());
         }
 
@@ -144,13 +148,11 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Flywheel Measured RPM", getFlywheelRPM());
         SmartDashboard.putNumber("Sim Flywheel Speed", shooterSim.getFlywheelRPM());
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
-        SmartDashboard.putNumber("Hood Encoder ABS", hoodEncoder.get());
+        SmartDashboard.putNumber("Hood Encoder ABS", hoodMotor.getAbsoluteEncoder().getPosition());
         SmartDashboard.putNumber("Hood Encoder", hoodMotor.getEncoder().getPosition()*360);
         SmartDashboard.putNumber("Hood Encoder Converted", hoodMotor.getEncoder().getPosition()*360/9);
-        SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.6) + 80);
+        SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.96) + 75);
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
-        SmartDashboard.putNumber("Hood PID Out", hoodPIDOut);
-        SmartDashboard.putNumber("Hood Out", hoodOut);
     }
 
     private double convertFlywheelVelocity(double velocity) {
@@ -159,8 +161,8 @@ public class ShooterSubsystem extends SubsystemBase{
 
     public void setFlywheelRPM(double rpm) {
         goalRpm = rpm;
-        leftController.setSetpoint(-rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-        rightController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        leftController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        rightController.setSetpoint(-rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
     }
 
     public void stopFlywheel() {
@@ -185,8 +187,7 @@ public class ShooterSubsystem extends SubsystemBase{
         if (isSim) {
             return getSimHoodAngle();
         } else {
-            // Assume encoder is in rotations?
-            return (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.6) + 80;
+            return (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.96) + 75;
         }
     }
 
@@ -199,17 +200,16 @@ public class ShooterSubsystem extends SubsystemBase{
         angle = Math.max(
             ShooterConstants.HOOD_MIN_ANGLE,
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
-           
         goalAngle = angle;
+        hoodMotor.getClosedLoopController().setSetpoint(((angle - 75) / 360) * 9 * 10.96, ControlType.kPosition, ClosedLoopSlot.kSlot0);    
     }
 
-    // TODO: These should be changed to come directly from the PID controller
     public boolean hoodAtAngle(double tolerance) {
         return Math.abs(getHoodAngle() - goalAngle) < tolerance;
     }
 
     public boolean flywheelAtSpeed(double tolerance) {
-        return -getFlywheelRPM()/goalRpm > tolerance;
+        return getFlywheelRPM()/goalRpm > tolerance;
     }
 
     public double mpsToRpm(double speed) {

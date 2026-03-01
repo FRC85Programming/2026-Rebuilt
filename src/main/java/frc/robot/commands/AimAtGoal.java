@@ -47,6 +47,6 @@ public class AimAtGoal extends Command{
 
         SmartDashboard.putNumber("Calced Turret Angle", turretAngle.getDegrees());
 
-        turret.setTurretAngle(turretAngle.getDegrees() -90);
+        turret.setTurretAngle(turretAngle.getDegrees() + 90);
     }
 }
