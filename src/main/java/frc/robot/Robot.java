@@ -147,6 +147,7 @@ public class Robot extends LoggedRobot
     {
       CommandScheduler.getInstance().cancelAll();
     }
+    m_robotContainer.teleopInit();
   }
 
   /**

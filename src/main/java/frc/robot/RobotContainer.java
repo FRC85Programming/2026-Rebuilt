@@ -291,6 +291,12 @@ public class RobotContainer
     drivebase.setMotorBrake(brake);
   }
 
+  public void teleopInit()
+  {
+    shooter.startAiming(drivebase, this::getTarget);
+    turret.startAiming(drivebase, this::getTarget);
+  }
+
   public Translation3d getTarget() {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     if (alliance.isPresent()) {

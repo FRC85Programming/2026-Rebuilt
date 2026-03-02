@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.Supplier;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -14,9 +16,13 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -26,19 +32,29 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AlphaMechanism3d;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.ShooterTable;
 import frc.robot.util.ShotSolver;
 import frc.robot.util.ShotSolver.ShotSolution;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.util.TimeOfFlightTable;
+import frc.robot.util.TrajectoryTransform3d;
 
-public class ShooterSubsystem extends SubsystemBase{
-     private final SparkFlex flywheelMotorLeft =
-      new SparkFlex(14, MotorType.kBrushless);
+public class ShooterSubsystem extends SubsystemBase {
+
+    public enum ShooterState {
+        IDLE,
+        AIMING
+    }
+
+    private final SparkFlex flywheelMotorLeft =
+        new SparkFlex(14, MotorType.kBrushless);
 
     private final SparkFlex flywheelMotorRight =
-      new SparkFlex(17, MotorType.kBrushless);
+        new SparkFlex(17, MotorType.kBrushless);
 
     private final SparkFlex hoodMotor =
         new SparkFlex(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless);
@@ -51,7 +67,6 @@ public class ShooterSubsystem extends SubsystemBase{
 
     private final ShooterSim shooterSim = new ShooterSim();
 
-
     double goalRpm = 0.0;
     double goalAngle = 69;
 
@@ -59,15 +74,19 @@ public class ShooterSubsystem extends SubsystemBase{
 
     boolean isSim;
 
-    double hoodHome = 0.830276608467102;
+    double hoodHome = 0.8204660415649414;
 
     SparkClosedLoopController leftController;
-
     SparkClosedLoopController rightController;
 
     SparkFlexConfig flywheelConfigRight = new SparkFlexConfig();
     SparkFlexConfig flywheelConfigLeft = new SparkFlexConfig();
     SparkFlexConfig hoodConfig = new SparkFlexConfig();
+
+    private ShooterState state = ShooterState.IDLE;
+    private SwerveSubsystem swerve = null;
+    private Supplier<Translation3d> aimTarget = null;
+    private double calculatedRPM = 0.0;
 
     public ShooterSubsystem() {
         isSim = Robot.isSimulation();
@@ -77,36 +96,28 @@ public class ShooterSubsystem extends SubsystemBase{
 
         flywheelConfigRight.closedLoop
                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                // Set PID values for position control. We don't need to pass a closed loop
-                // slot, as it will default to slot 0.
                 .p(0.00000005)
                 .i(0)
                 .d(0)
                 .outputRange(-1, 0)
-                // Set PID values for velocity control in slot 1
                 .p(0.0004, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
                 .outputRange(-1, 0, ClosedLoopSlot.kSlot1)
                 .feedForward
-                // kV is now in Volts, so we multiply by the nominal voltage (12V)
                 .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
 
         flywheelConfigLeft.closedLoop
                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                // Set PID values for position control. We don't need to pass a closed loop
-                // slot, as it will default to slot 0.
                 .p(0.00000005)
                 .i(0)
                 .d(0)
                 .outputRange(0, 1)
-                // Set PID values for velocity control in slot 1
                 .p(0.0004, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
                 .outputRange(0, 1, ClosedLoopSlot.kSlot1)
                 .feedForward
-                // kV is now in Volts, so we multiply by the nominal voltage (12V)
                 .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
 
         hoodConfig.closedLoop
@@ -116,7 +127,7 @@ public class ShooterSubsystem extends SubsystemBase{
                 .d(0)
                 .outputRange(-0.5, 0.5)
                 .feedForward.kV(12.0 / 6784);
-        
+
         flywheelConfigRight.idleMode(IdleMode.kCoast);
         flywheelConfigLeft.idleMode(IdleMode.kCoast);
 
@@ -131,14 +142,16 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("TUNE Shot Angle", 75);
         SmartDashboard.putNumber("Set Hood Angle", 69);
 
-        hoodMotor.getEncoder().setPosition((hoodMotor.getAbsoluteEncoder().getPosition() - hoodHome)*10.96);
+        hoodMotor.getEncoder().setPosition((hoodMotor.getAbsoluteEncoder().getPosition() - hoodHome) * 10.96);
     }
 
     @Override
     public void periodic() {
+        if (state == ShooterState.AIMING && swerve != null && aimTarget != null) {
+            updateAiming();
+        }
+
         if (isSim) {
-            //shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
-            //shooterSim.updateHood(hoodOut * 12.0, 0.02);
             AlphaMechanism3d.setHoodAngle(getHoodAngle());
         }
 
@@ -147,10 +160,99 @@ public class ShooterSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Sim Flywheel Speed", shooterSim.getFlywheelRPM());
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
         SmartDashboard.putNumber("Hood Encoder ABS", hoodMotor.getAbsoluteEncoder().getPosition());
-        SmartDashboard.putNumber("Hood Encoder", hoodMotor.getEncoder().getPosition()*360);
-        SmartDashboard.putNumber("Hood Encoder Converted", hoodMotor.getEncoder().getPosition()*360/9);
-        SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.96) + 75);
+        SmartDashboard.putNumber("Hood Encoder", hoodMotor.getEncoder().getPosition() * 360);
+        SmartDashboard.putNumber("Hood Encoder Converted", hoodMotor.getEncoder().getPosition() * 360 / 9);
+        SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition() * 360) / 9) / 10.96) + 75);
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
+        SmartDashboard.putString("Shooter State", state.toString());
+    }
+
+    private void updateAiming() {
+        Translation3d targetTranslation = aimTarget.get();
+        ChassisSpeeds robotVel = swerve.getFieldVelocity();
+        Pose2d robotPose = swerve.getPose();
+        ChassisSpeeds robotRelVel = swerve.getRobotVelocity();
+
+        final double PHASE_DELAY = 0.03;
+        robotPose = robotPose.exp(new Twist2d(
+            robotRelVel.vxMetersPerSecond * PHASE_DELAY,
+            robotRelVel.vyMetersPerSecond * PHASE_DELAY,
+            robotRelVel.omegaRadiansPerSecond * PHASE_DELAY
+        ));
+
+        Translation2d turretFieldPos2d =
+            robotPose.getTranslation()
+                .plus(TurretConstants.ROBOT_TO_TURRET.getTranslation().toTranslation2d().rotateBy(robotPose.getRotation()));
+
+        Translation2d toTarget = targetTranslation.toTranslation2d().minus(turretFieldPos2d);
+        double distance = toTarget.getNorm();
+
+        if (distance < 1e-6) return;
+
+        Translation2d toTargetDir = toTarget.div(distance);
+
+        // Radial velocity: positive = moving toward target (reduces effective distance)
+        double radialVel =  robotVel.vxMetersPerSecond * toTargetDir.getX()
+                          + robotVel.vyMetersPerSecond * toTargetDir.getY();
+
+        // Iterate to find effective distance accounting for radial velocity
+        double effectiveDistance = distance;
+        double timeOfFlight = 0;
+        for (int i = 0; i < 3; i++) {
+            timeOfFlight = TimeOfFlightTable.getTimeOfFlight(Math.max(effectiveDistance, 0.1));
+            effectiveDistance = distance - (radialVel * timeOfFlight);
+        }
+
+        SmartDashboard.putNumber("CALCULATED TIME OF FLIGHT", timeOfFlight);
+
+        double clampedEffectiveDistance = Math.max(effectiveDistance, 0.1);
+        var setpoint = ShooterTable.getSetpoint(clampedEffectiveDistance);
+
+        calculatedRPM = Math.abs(setpoint.flywheelRPM());
+        double hoodAngleRad = setpoint.hoodAngle().getRadians();
+
+        setHoodAngle(Math.toDegrees(hoodAngleRad));
+
+        // Trajectory visualization
+        Pose3d[] poses = TrajectoryTransform3d.toFieldRelative(
+            robotPose.getTranslation(),
+            robotPose.getRotation(),
+            BallisticTrajectory3d.generate(rpmToMps(calculatedRPM), hoodAngleRad, 0.305, 3.0, 0.02)
+        ).stream()
+            .map(p -> new Pose3d(p, new Rotation3d()))
+            .toArray(Pose3d[]::new);
+
+        Logger.recordOutput("Shot/Trajectory3d", poses);
+        SmartDashboard.putNumber("Calculated Shot Angle (deg)", Math.toDegrees(hoodAngleRad));
+        SmartDashboard.putNumber("Calculated Shot Speed (rpm)", calculatedRPM);
+    }
+
+    /** Enter AIMING state: periodic will automatically compute and track the hood angle each loop. */
+    public void startAiming(SwerveSubsystem swerve, Supplier<Translation3d> target) {
+        this.swerve = swerve;
+        this.aimTarget = target;
+        this.state = ShooterState.AIMING;
+    }
+
+    /** Return to IDLE state and stop auto-tracking. Clears trajectory visualization. */
+    public void stopAiming() {
+        this.state = ShooterState.IDLE;
+        this.aimTarget = null;
+        this.swerve = null;
+        this.calculatedRPM = 0.0;
+        Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
+    }
+
+    public ShooterState getState() {
+        return state;
+    }
+
+    /**
+     * Returns the flywheel RPM calculated during the last AIMING periodic update.
+     * Use this in the Shoot command to spin up the flywheel to the correct speed.
+     */
+    public double getCalculatedRPM() {
+        return calculatedRPM;
     }
 
     private double convertFlywheelVelocity(double velocity) {
@@ -185,7 +287,7 @@ public class ShooterSubsystem extends SubsystemBase{
         if (isSim) {
             return getSimHoodAngle();
         } else {
-            return (((hoodMotor.getEncoder().getPosition()*360) /9) / 10.96) + 75;
+            return (((hoodMotor.getEncoder().getPosition() * 360) / 9) / 10.96) + 75;
         }
     }
 
@@ -199,7 +301,7 @@ public class ShooterSubsystem extends SubsystemBase{
             ShooterConstants.HOOD_MIN_ANGLE,
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
         goalAngle = angle;
-        hoodMotor.getClosedLoopController().setSetpoint(((angle - 75) / 360) * 9 * 10.96, ControlType.kPosition, ClosedLoopSlot.kSlot0);    
+        hoodMotor.getClosedLoopController().setSetpoint(((angle - 75) / 360) * 9 * 10.96, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     public boolean hoodAtAngle(double tolerance) {
@@ -207,7 +309,7 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public boolean flywheelAtSpeed(double tolerance) {
-        return getFlywheelRPM()/goalRpm > tolerance;
+        return getFlywheelRPM() / goalRpm > tolerance;
     }
 
     public double mpsToRpm(double speed) {
@@ -234,9 +336,9 @@ public class ShooterSubsystem extends SubsystemBase{
         flywheelMotorLeft.set(speed);
         flywheelMotorRight.set(-speed);
     }
+
     public void calculateLookupTable() {
-        // Calculate a placeholder table based on perfect physics
-        for (var i=2; i <= 6.0; i+=0.5) {
+        for (var i = 2; i <= 6.0; i += 0.5) {
             var solution = ShotSolver.solve(
                 i,
                 0.305,
@@ -255,4 +357,3 @@ public class ShooterSubsystem extends SubsystemBase{
         beltMotor.set(-speed);
     }
 }
-
