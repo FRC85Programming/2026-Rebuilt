@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,6 +21,7 @@ import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.ShooterTable;
 import frc.robot.util.TimeOfFlightCalculator;
+import frc.robot.util.TimeOfFlightTable;
 import frc.robot.util.TrajectoryTransform3d;
 
 
@@ -51,12 +53,21 @@ public class Shoot extends Command {
         ChassisSpeeds robotVel = swerve.getFieldVelocity();
         Pose2d robotPose = swerve.getPose();
 
+        ChassisSpeeds robotRelVel = swerve.getRobotVelocity();
+        final double PHASE_DELAY = 0.03;
+        robotPose = robotPose.exp(new Twist2d(
+            robotRelVel.vxMetersPerSecond * PHASE_DELAY,
+            robotRelVel.vyMetersPerSecond * PHASE_DELAY,
+            robotRelVel.omegaRadiansPerSecond * PHASE_DELAY
+        ));
+
         // Find where the turret pivot actually is in field space (2D and 3D)
         Translation2d turretFieldPos2d =
             robotPose.getTranslation()
                 .plus(TurretConstants.ROBOT_TO_TURRET.getTranslation().toTranslation2d().rotateBy(robotPose.getRotation()));
 
         Translation2d toTarget = targetTranslation.toTranslation2d().minus(turretFieldPos2d);
+
         double distance = toTarget.getNorm();
 
         // Prevent using super small numbers - distance should physically never be less than half of the hub's length/width
@@ -76,23 +87,29 @@ public class Shoot extends Command {
         double shooterHeightMeters = ShooterConstants.SHOOTER_HEIGHT_METERS
             + TurretConstants.ROBOT_TO_TURRET.getTranslation().getZ();
 
+
         double effectiveDistance = distance;
         double timeOfFlight = 0;
 
         // TODO: Three iterations should work, but it's worth trying more to see if it makes a noticeable difference, although this will cost compute time
         for (int i = 0; i < 3; i++) {
             double clampedDistance = Math.max(effectiveDistance, 0.1);
-            var setpoint = ShooterTable.getSetpoint(clampedDistance);
-            // TODO: Make a TOF lookup table
-            timeOfFlight = TimeOfFlightCalculator.calculateTimeOfFlight(
+            //var setpoint = ShooterTable.getSetpoint(clampedDistance);
+
+            // This table has like no variation. This can totally be replaced by a constant of 1.31
+            timeOfFlight = TimeOfFlightTable.getTimeOfFlight(clampedDistance);
+            
+            /**timeOfFlight = TimeOfFlightCalculator.calculateTimeOfFlight(
                 shooter.rpmToMps(setpoint.flywheelRPM()),
                 setpoint.hoodAngle().getRadians(),
                 radialVel,
                 shooterHeightMeters,
                 targetTranslation.getZ()
-            );
+            );*/
             effectiveDistance = distance - (radialVel * timeOfFlight);
         }
+
+        SmartDashboard.putNumber("CALCULATED TIME OF FLIGHT", timeOfFlight);
 
         // Clamp so that the shooter table can't get weird values
         double clampedEffectiveDistance = Math.max(effectiveDistance, 0.1);

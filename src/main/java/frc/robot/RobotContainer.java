@@ -236,7 +236,7 @@ public class RobotContainer
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
       // driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
       driverXbox.button(1).onTrue(new PathPlanToBalls(drivebase, vision, 1));
-      driverXbox.button(2).onTrue(new InstantCommand(() -> turret.setTurretAngle(180)));
+      driverXbox.button(2).onTrue(new Shoot(drivebase, shooter, turret, () -> getTarget()));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
 

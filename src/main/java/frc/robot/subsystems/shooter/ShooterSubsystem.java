@@ -136,8 +136,6 @@ public class ShooterSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        final double hoodAngle = getHoodAngle();
-
         if (isSim) {
             //shooterSim.updateFlywheel(flywheelOut * 12.0, 0.02);
             //shooterSim.updateHood(hoodOut * 12.0, 0.02);
@@ -213,11 +211,11 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public double mpsToRpm(double speed) {
-        return speed / 0.00532;
+        return speed / 0.0023;
     }
 
     public double rpmToMps(double rpm) {
-        return rpm * 0.00532;
+        return rpm * 0.0023;
     }
 
     public void simulatedShot(Pose2d pose, ChassisSpeeds velocity, Rotation2d turretAngle) {
