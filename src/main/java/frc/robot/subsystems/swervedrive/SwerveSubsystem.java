@@ -246,7 +246,7 @@ public class SwerveSubsystem extends SubsystemBase
             ChassisSpeeds modifiedSpeeds = new ChassisSpeeds(
                 speedsRobotRelative.vxMetersPerSecond,
                 speedsRobotRelative.vyMetersPerSecond,
-                speedsRobotRelative.omegaRadiansPerSecond
+                -speedsRobotRelative.omegaRadiansPerSecond
             );
             if (enableFeedforward)
             {
@@ -926,7 +926,7 @@ public class SwerveSubsystem extends SubsystemBase
     Rotation2d goalRotation = new Rotation2d(lastDelta.getX(), lastDelta.getY());
 
     PathConstraints constraints = new PathConstraints(
-        swerveDrive.getMaximumChassisVelocity(), 4.0,
+        swerveDrive.getMaximumChassisVelocity()/2, 2.0,
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
     PathPlannerPath ppPath = new PathPlannerPath(
         waypoints, rotationTargets, List.of(), List.of(), List.of(),

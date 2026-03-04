@@ -16,6 +16,7 @@ import java.util.List;
  *
  * Usage:
  *   Translation2d[] balls = ...; // ball poses relative to field
+ * 
  *   Translation2d robotPose = new Translation2d(3.0, 1.0); // robot start
  *   BallPathCalculator finder = new BallPathCalculator(balls, robotPose, 1.0);
  *   Translation2d[] path = finder.getBestPath();
@@ -45,7 +46,7 @@ public class BallPathCalculator {
      *   max_lateral_speed (m/s) * time_per_row (s)
      * Example: 2.0 m/s lateral * 0.33s per row = ~0.66m
      */
-    private static final double MAX_X_SHIFT_PER_ROW = 0.2;
+    private static final double MAX_X_SHIFT_PER_ROW = 0.4;
 
     /**
      * Minimum number of balls a row must offer to bother shifting toward it.
@@ -84,6 +85,14 @@ public class BallPathCalculator {
      */
     private final double sweepDirection;
 
+    /**
+     * Hard Y boundary — the path will not extend past this value.
+     * For a +Y sweep: balls with Y > sweepYLimit are ignored.
+     * For a -Y sweep: balls with Y < sweepYLimit are ignored.
+     * Defaults to no limit (positive infinity / negative infinity).
+     */
+    private final double sweepYLimit;
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -94,9 +103,24 @@ public class BallPathCalculator {
      * @param sweepDirection +1.0 to sweep in the +Y direction, -1.0 for -Y.
      */
     public BallPathCalculator(Translation2d[] ballPoses, Translation2d robotStart, double sweepDirection) {
+        this(ballPoses, robotStart, sweepDirection,
+             Math.signum(sweepDirection) > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
+    }
+
+    /**
+     * @param ballPoses      Array of ball positions in field-relative coordinates.
+     * @param robotStart     The robot's starting position in field-relative coordinates.
+     * @param sweepDirection +1.0 to sweep in the +Y direction, -1.0 for -Y.
+     * @param sweepYLimit    Hard Y boundary — balls past this Y are ignored.
+     *                       For +Y sweep: balls with Y > sweepYLimit are excluded.
+     *                       For -Y sweep: balls with Y < sweepYLimit are excluded.
+     */
+    public BallPathCalculator(Translation2d[] ballPoses, Translation2d robotStart,
+                              double sweepDirection, double sweepYLimit) {
         this.ballPoses = ballPoses;
         this.robotStart = robotStart;
         this.sweepDirection = Math.signum(sweepDirection); // normalize to exactly +1 or -1
+        this.sweepYLimit = sweepYLimit;
     }
 
     // -------------------------------------------------------------------------
@@ -127,10 +151,11 @@ public class BallPathCalculator {
             return new Translation2d[0];
         }
 
-        double yStart = robotY; // Path always begins at the robot's Y
-        double yEnd   = yRange[1]; // Far edge of the ball field
+        double[] rowCenters = buildBallAwareRows(robotY);
 
-        double[] rowCenters = buildRowCenters(yStart, yEnd);
+        if (rowCenters.length == 0) {
+            return new Translation2d[0];
+        }
 
         // Step 2: Build candidate X positions from ball locations + robot start X
         double[] candidateXs = buildCandidateXs();
@@ -280,6 +305,9 @@ public class BallPathCalculator {
             // "Ahead" means further in the sweep direction than the robot
             if (sweepDirection > 0 && by < robotY) continue;
             if (sweepDirection < 0 && by > robotY) continue;
+            // Respect the hard Y limit
+            if (sweepDirection > 0 && by > sweepYLimit) continue;
+            if (sweepDirection < 0 && by < sweepYLimit) continue;
 
             yMin = Math.min(yMin, by);
             yMax = Math.max(yMax, by);
@@ -290,21 +318,97 @@ public class BallPathCalculator {
     }
 
     /**
-     * Builds the Y center positions of each row slice.
-     * yStart is the robot's Y (near end), yEnd is the far ball boundary.
-     * Rows are ordered in travel order (robot → far field).
+     * Maximum Y distance between two balls for them to be merged into the
+     * same cluster row. Tune alongside ball spacing on the field.
      */
-    private double[] buildRowCenters(double yStart, double yEnd) {
-        double rowHeight = Math.abs(yEnd - yStart) / NUM_ROWS;
-        double direction = sweepDirection; // +1 or -1
+    private static final double CLUSTER_EPSILON_METERS = 0.3;
 
-        double[] centers = new double[NUM_ROWS];
-        for (int i = 0; i < NUM_ROWS; i++) {
-            // Each center is offset from yStart in the sweep direction
-            centers[i] = yStart + direction * (i + 0.5) * rowHeight;
+    /**
+     * Builds row anchor Y positions by clustering ball Y coordinates.
+     *
+     * Steps:
+     *   1. Collect Y positions of all balls ahead of the robot.
+     *   2. Sort them in travel order (ascending for +Y sweep, descending for -Y).
+     *   3. Merge consecutive balls within CLUSTER_EPSILON_METERS into one cluster
+     *      and use the cluster's mean Y as the row anchor.
+     *   4. Prepend a "row 0" anchor just past the robot start so the DP always
+     *      has an initial scoring segment before the first ball cluster.
+     *
+     * Falls back to NUM_ROWS equal slices when fewer than 2 distinct clusters
+     * are found (e.g. all balls at the same Y).
+     *
+     * @param robotY  The robot's current Y position.
+     * @return Array of row anchor Y values in travel order (nearest → farthest).
+     */
+    private double[] buildBallAwareRows(double robotY) {
+        // --- 1. Collect relevant ball Y positions ---
+        List<Double> ballYs = new ArrayList<>();
+        for (Translation2d ball : ballPoses) {
+            double by = ball.getY();
+            if (sweepDirection > 0 && by < robotY) continue;
+            if (sweepDirection < 0 && by > robotY) continue;
+            if (sweepDirection > 0 && by > sweepYLimit) continue;
+            if (sweepDirection < 0 && by < sweepYLimit) continue;
+            ballYs.add(by);
         }
 
-        return centers;
+        if (ballYs.isEmpty()) {
+            // No balls ahead — caller already handles this, but return safe default
+            return new double[0];
+        }
+
+        // --- 2. Sort in travel order ---
+        if (sweepDirection > 0) {
+            ballYs.sort(Double::compareTo);          // ascending
+        } else {
+            ballYs.sort((a, b) -> Double.compare(b, a)); // descending
+        }
+
+        // --- 3. Cluster consecutive balls within CLUSTER_EPSILON_METERS ---
+        List<Double> clusterCenters = new ArrayList<>();
+        List<Double> currentCluster = new ArrayList<>();
+        currentCluster.add(ballYs.get(0));
+
+        for (int i = 1; i < ballYs.size(); i++) {
+            double prev = ballYs.get(i - 1);
+            double curr = ballYs.get(i);
+            if (Math.abs(curr - prev) <= CLUSTER_EPSILON_METERS) {
+                currentCluster.add(curr);
+            } else {
+                double mean = 0;
+                for (double v : currentCluster) mean += v;
+                clusterCenters.add(mean / currentCluster.size());
+                currentCluster.clear();
+                currentCluster.add(curr);
+            }
+        }
+        // Flush last cluster
+        double mean = 0;
+        for (double v : currentCluster) mean += v;
+        clusterCenters.add(mean / currentCluster.size());
+
+        // --- 4. Fall back to equal slices when there is only one cluster ---
+        if (clusterCenters.size() < 2) {
+            double yEnd = sweepDirection > 0 ? ballYs.get(ballYs.size() - 1) : ballYs.get(0);
+            double rowHeight = Math.abs(yEnd - robotY) / NUM_ROWS;
+            double[] fallback = new double[NUM_ROWS];
+            for (int i = 0; i < NUM_ROWS; i++) {
+                fallback[i] = robotY + sweepDirection * (i + 0.5) * rowHeight;
+            }
+            return fallback;
+        }
+
+        // Prepend a "pre-cluster" anchor halfway between the robot and the first cluster,
+        // so the approach segment from the robot's position is scored by the DP.
+        double firstCluster = clusterCenters.get(0);
+        double approachAnchor = (robotY + firstCluster) / 2.0;
+
+        double[] rows = new double[clusterCenters.size() + 1];
+        rows[0] = approachAnchor;
+        for (int i = 0; i < clusterCenters.size(); i++) {
+            rows[i + 1] = clusterCenters.get(i);
+        }
+        return rows;
     }
 
     /**
@@ -401,8 +505,8 @@ public class BallPathCalculator {
             double currX = path.get(i).getX();
             double nextX = path.get(i + 1).getX();
 
-            boolean xChangingNow  = Math.abs(currX - prevX) > 0.15;
-            boolean xChangingNext = Math.abs(nextX - currX) > 0.15;
+            boolean xChangingNow  = Math.abs(currX - prevX) > 0.05;
+            boolean xChangingNext = Math.abs(nextX - currX) > 0.05;
 
             if (xChangingNow || xChangingNext) {
                 simplified.add(path.get(i));

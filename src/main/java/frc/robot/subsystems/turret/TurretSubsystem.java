@@ -35,7 +35,8 @@ public class TurretSubsystem extends SubsystemBase {
 
     public enum TurretState {
         IDLE,
-        AIMING
+        AIMING,
+        FEEDING
     }
 
     private final SparkFlex turretMotor =
@@ -85,7 +86,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (state == TurretState.AIMING && swerve != null && aimTarget != null) {
+        if ((state == TurretState.AIMING || state == TurretState.FEEDING) && swerve != null && aimTarget != null) {
             updateAiming();
         }
 
@@ -156,6 +157,13 @@ public class TurretSubsystem extends SubsystemBase {
         this.swerve = swerve;
         this.aimTarget = target;
         this.state = TurretState.AIMING;
+    }
+
+    /** Enter FEEDING state: tracks the feed target using the same aiming logic. */
+    public void startFeeding(SwerveSubsystem swerve, Supplier<Translation3d> target) {
+        this.swerve = swerve;
+        this.aimTarget = target;
+        this.state = TurretState.FEEDING;
     }
 
     /** Return to IDLE state and stop auto-tracking. */

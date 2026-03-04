@@ -37,6 +37,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.util.BallisticTrajectory3d;
+import frc.robot.util.FeedingTable;
 import frc.robot.util.ShooterTable;
 import frc.robot.util.ShotSolver;
 import frc.robot.util.ShotSolver.ShotSolution;
@@ -47,7 +48,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public enum ShooterState {
         IDLE,
-        AIMING
+        AIMING,
+        FEEDING
     }
 
     private final SparkFlex flywheelMotorLeft =
@@ -147,7 +149,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (state == ShooterState.AIMING && swerve != null && aimTarget != null) {
+        if ((state == ShooterState.AIMING || state == ShooterState.FEEDING) && swerve != null && aimTarget != null) {
             updateAiming();
         }
 
@@ -206,7 +208,9 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("CALCULATED TIME OF FLIGHT", timeOfFlight);
 
         double clampedEffectiveDistance = Math.max(effectiveDistance, 0.1);
-        var setpoint = ShooterTable.getSetpoint(clampedEffectiveDistance);
+        var setpoint = (state == ShooterState.FEEDING)
+            ? FeedingTable.getSetpoint(clampedEffectiveDistance)
+            : ShooterTable.getSetpoint(clampedEffectiveDistance);
 
         calculatedRPM = Math.abs(setpoint.flywheelRPM());
         double hoodAngleRad = setpoint.hoodAngle().getRadians();
@@ -232,6 +236,13 @@ public class ShooterSubsystem extends SubsystemBase {
         this.swerve = swerve;
         this.aimTarget = target;
         this.state = ShooterState.AIMING;
+    }
+
+    /** Enter FEEDING state: same as AIMING but uses FeedingTable for setpoints. */
+    public void startFeeding(SwerveSubsystem swerve, Supplier<Translation3d> target) {
+        this.swerve = swerve;
+        this.aimTarget = target;
+        this.state = ShooterState.FEEDING;
     }
 
     /** Return to IDLE state and stop auto-tracking. Clears trajectory visualization. */

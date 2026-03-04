@@ -1,40 +1,29 @@
 package frc.robot.commands;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
+/**
+ * Spins the flywheel to the RPM calculated by the shooter subsystem's active state
+ * (AIMING or FEEDING) and releases the feed mechanism once all systems are on target.
+ * State management (which target and lookup table to use) is handled externally in
+ * RobotContainer via startAiming() / startFeeding() calls.
+ */
+public class FireCommand extends Command {
 
-public class Shoot extends Command {
     private final ShooterSubsystem shooter;
-    private final SwerveSubsystem swerve;
     private final TurretSubsystem turret;
-    private final Supplier<Translation3d> target;
 
-    public Shoot(SwerveSubsystem swerve, ShooterSubsystem shooter, TurretSubsystem turret, Supplier<Translation3d> target) {
+    public FireCommand(ShooterSubsystem shooter, TurretSubsystem turret) {
         this.shooter = shooter;
-        this.swerve = swerve;
-        this.target = target;
         this.turret = turret;
-
         addRequirements(shooter, turret);
     }
 
     @Override
-    public void initialize() {
-        shooter.startAiming(swerve, target);
-        turret.startAiming(swerve, target);
-    }
-
-    @Override
     public void execute() {
-        // Subsystems handle all aiming math in their own periodic().
-        // Here we only spin the flywheel to the speed the shooter subsystem calculated.
         shooter.setFlywheelRPM(shooter.getCalculatedRPM());
 
         boolean ready = shooter.flywheelAtSpeed(0.80) && shooter.hoodAtAngle(1) && turret.turretAtAngle(1);
@@ -43,11 +32,7 @@ public class Shoot extends Command {
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
         SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(1));
 
-        if (ready) {
-            shooter.setFeedSpeed(0.5);
-        } else {
-            shooter.setFeedSpeed(0);
-        }
+        shooter.setFeedSpeed(ready ? 0.5 : 0);
     }
 
     @Override

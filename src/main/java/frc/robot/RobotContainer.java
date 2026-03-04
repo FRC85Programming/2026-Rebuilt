@@ -20,10 +20,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimAtGoal;
+import frc.robot.commands.FireCommand;
 import frc.robot.commands.Intake;
-import frc.robot.commands.Shoot;
 import frc.robot.commands.TuneShot;
 import frc.robot.commands.swervedrive.auto.PathPlanToBalls;
 import frc.robot.commands.swervedrive.auto.PathPlanToPath;
@@ -145,6 +146,7 @@ public class RobotContainer
     autoChooser.addOption("Double Cycle", "24BallAutoLeft");
     autoChooser.addOption("Double Cycle", "24BallAutoLeft");
     autoChooser.addOption("Left Smart Auto", "LeftSmartAuto");
+    autoChooser.addOption("WORKING", "This Works Bruh");
 
     autoChooser.addOption("Test", "TestAuto");
 
@@ -235,8 +237,8 @@ public class RobotContainer
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
       // driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
-      driverXbox.button(1).onTrue(new PathPlanToBalls(drivebase, vision, 1));
-      driverXbox.button(2).onTrue(new Shoot(drivebase, shooter, turret, () -> getTarget()));
+      driverXbox.button(1).onTrue(new PathPlanToBalls(drivebase, vision, 1, getTestBalls()));
+      driverXbox.button(2).onTrue(new FireCommand(shooter, turret));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
 
@@ -264,8 +266,18 @@ public class RobotContainer
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightTrigger().whileTrue(new Shoot(drivebase, shooter, turret, () -> getTarget()));
-      driverXbox.leftTrigger().whileTrue(new TuneShot(drivebase, shooter, turret, () -> getTarget()));
+      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, turret));
+      driverXbox.leftTrigger()
+          .onTrue(Commands.runOnce(() -> {
+              shooter.startFeeding(drivebase, () -> FieldConstants.blueFeedPosition);
+              turret.startFeeding(drivebase, () -> FieldConstants.blueFeedPosition);
+          }))
+          .onFalse(Commands.runOnce(() -> {
+              shooter.startAiming(drivebase, this::getTarget);
+              turret.startAiming(drivebase, this::getTarget);
+          }))
+          .whileTrue(new FireCommand(shooter, turret));
+      driverXbox.a().onTrue(new PathPlanToBalls(drivebase, vision, -1));
       //driverXbox.pov(90).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(-0.5)));
       // driverXbox.pov(90).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
       // driverXbox.pov(270).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(0.5)));
