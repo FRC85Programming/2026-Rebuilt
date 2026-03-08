@@ -2,7 +2,6 @@ package frc.robot.subsystems.turret;
 
 import java.util.function.Supplier;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;

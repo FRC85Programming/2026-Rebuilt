@@ -7,8 +7,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
 
     public class TurretSim extends SubsystemBase{
-        private final DCMotor turretMotor = DCMotor.getNeoVortex(1);
-
         SingleJointedArmSim turretSim =
                 new SingleJointedArmSim(
                     DCMotor.getNeoVortex(2),  

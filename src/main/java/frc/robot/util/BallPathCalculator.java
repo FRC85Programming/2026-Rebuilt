@@ -201,6 +201,7 @@ public class BallPathCalculator {
 
     private static class Cluster {
         final double meanY;
+        @SuppressWarnings("unused")
         final List<Translation2d> balls;
 
         Cluster(double meanY, List<Translation2d> balls) {
