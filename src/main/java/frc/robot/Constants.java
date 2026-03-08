@@ -109,7 +109,12 @@ public final class Constants
   }
   
   public static class IntakeConstants {
-    public static final int INTAKE_MOTOR_ID = 18;
+    public static final int ROLLER_MOTOR_ID = 18;
+
+    public static final int PIVOT_MOTOR_ID = 19;
+
+    // The position (in motor rotations) in which the intake is in the down position
+    public static final double INTAKE_DOWN_POSITION = 1;
   }
 
   public static class ObstacleAlignmentConstants {

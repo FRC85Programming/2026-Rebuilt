@@ -1,32 +1,20 @@
 package frc.robot.commands;
 
-import java.util.List;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
-import frc.robot.util.BallisticTrajectory;
-import frc.robot.util.BallisticTrajectory3d;
-import frc.robot.util.ShooterTable;
-import frc.robot.util.ShotSolver;
-import frc.robot.util.ShotSolver.ShotSolution;
-import frc.robot.util.TrajectoryTransform3d;
 
 public class TuneShot extends Command{
     ShooterSubsystem shooter;

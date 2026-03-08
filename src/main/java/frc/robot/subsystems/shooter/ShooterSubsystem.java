@@ -39,8 +39,6 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.FeedingTable;
 import frc.robot.util.ShooterTable;
-import frc.robot.util.ShotSolver;
-import frc.robot.util.ShotSolver.ShotSolution;
 import frc.robot.util.TimeOfFlightTable;
 import frc.robot.util.TrajectoryTransform3d;
 
@@ -342,18 +340,4 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelMotorRight.set(-speed);
     }
 
-    public void calculateLookupTable() {
-        for (var i = 2; i <= 6.0; i += 0.5) {
-            var solution = ShotSolver.solve(
-                i,
-                0.305,
-                FieldConstants.blueHub.getZ(),
-                Math.toRadians(65),
-                Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
-                Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE),
-                0
-            );
-            ShotSolution shotSolution = solution.get();
-        }
-    }
 }

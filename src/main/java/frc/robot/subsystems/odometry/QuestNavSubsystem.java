@@ -15,8 +15,11 @@ import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
 
 public class QuestNavSubsystem extends SubsystemBase {
+
+    // Object to handle all communication with NT4
     private final QuestNav questNav = new QuestNav();
 
+    // The position of the quest relative to the robot's center
     private static final Transform3d ROBOT_TO_QUEST =
         new Transform3d(
             new Translation3d(
@@ -27,6 +30,7 @@ public class QuestNavSubsystem extends SubsystemBase {
             new Rotation3d(0.0, 0.0, 0.0)
         );
 
+    // Values that indicate how much to trust the quest
     private static final Matrix<N3, N1> QUESTNAV_STD_DEVS =
         VecBuilder.fill(
             0.02,
@@ -34,6 +38,11 @@ public class QuestNavSubsystem extends SubsystemBase {
             0.035
         );
 
+    /**
+     * Gets the latest data from the quest
+     * 
+     * @return QuestResult, The quest data
+     */
     public QuestResult getResult(PoseFrame questFrame) {
         if (!questFrame.isTracking()) {
             DriverStation.reportWarning("No valid Quest pose frames available!", false);
@@ -48,14 +57,25 @@ public class QuestNavSubsystem extends SubsystemBase {
         return new QuestResult(robotPose, timestamp);
     }
 
+    /**
+     * Gets unused data from the quest
+     */
     public PoseFrame[] getAllUnreadPoseFrames() {
         return questNav.getAllUnreadPoseFrames();
     }
 
+    /**
+     * @return Matrix, the quest std devs
+     */
     public Matrix<N3, N1> getStdDevs() {
         return QUESTNAV_STD_DEVS;
     }
 
+    /**
+     * Sets the position of the quest
+     * 
+     * @param robotPose The ROBOT POSITION that the quest will be set at
+     */
     public void setPose(Pose3d robotPose) {
         Pose3d questPose = robotPose.transformBy(ROBOT_TO_QUEST);
 
