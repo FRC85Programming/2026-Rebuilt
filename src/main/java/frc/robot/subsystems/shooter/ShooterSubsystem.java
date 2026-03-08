@@ -61,12 +61,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private final SparkFlex hoodMotor =
         new SparkFlex(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless);
 
-    private final SparkFlex feedMotor =
-        new SparkFlex(ShooterConstants.FEED_MOTOR_ID, MotorType.kBrushless);
-
-    private final SparkFlex beltMotor =
-        new SparkFlex(ShooterConstants.BELT_MOTOR_ID, MotorType.kBrushless);
-
     private final ShooterSim shooterSim = new ShooterSim();
 
     double goalRpm = 0.0;
@@ -239,7 +233,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /** Enter FEEDING state: same as AIMING but uses FeedingTable for setpoints. */
-    public void startFeeding(SwerveSubsystem swerve, Supplier<Translation3d> target) {
+    public void startIndexing(SwerveSubsystem swerve, Supplier<Translation3d> target) {
         this.swerve = swerve;
         this.aimTarget = target;
         this.state = ShooterState.FEEDING;
@@ -361,10 +355,5 @@ public class ShooterSubsystem extends SubsystemBase {
             );
             ShotSolution shotSolution = solution.get();
         }
-    }
-
-    public void setFeedSpeed(double speed) {
-        feedMotor.set(speed);
-        beltMotor.set(-speed);
     }
 }

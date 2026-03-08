@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -35,8 +36,9 @@ public class TuneShot extends Command{
     double goalAngle = 0;
     Translation3d targetTranslation;
     TurretSubsystem turret;
+    IndexerSubsystem indexer;
 
-    public TuneShot(SwerveSubsystem swerve, ShooterSubsystem shooter, TurretSubsystem turret, Supplier<Translation3d> target) {
+    public TuneShot(SwerveSubsystem swerve, ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret, Supplier<Translation3d> target) {
         this.shooter = shooter;
         this.swerve = swerve;
         this.target = target;
@@ -112,7 +114,7 @@ public class TuneShot extends Command{
         );
 
         if (SmartDashboard.getBoolean("Feed", false)) {
-            shooter.setFeedSpeed(SmartDashboard.getNumber("Feed Speed", 0.8));
+            indexer.startIndexing();
         }
 
         SmartDashboard.putNumber("Ball Exit Speed", shooter.rpmToMps(goalRPM));
@@ -127,7 +129,7 @@ public class TuneShot extends Command{
     @Override
     public void end(boolean interrupted) {
         swerve.drive(new ChassisSpeeds(0, 0, 0));
-        shooter.setFeedSpeed(0);
+        indexer.stopIndexing();
         shooter.stopFlywheel();
         turret.setTurretAngle(0);
     }

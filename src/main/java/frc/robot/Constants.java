@@ -137,4 +137,8 @@ public final class Constants
     public static final double Y_KI = 0.0;
     public static final double Y_KD = 0.05;
   }
+
+  public static class IndexerConstants {
+    public static final int INDEXER_MOTOR_ID = 33;
+  }
 }
