@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.953980028530669,
-        "y": 7.41845934379458
+        "x": 5.125905848787446,
+        "y": 7.405520684736091
       },
       "isLocked": false,
       "linkedName": "LeftRushStart"
     },
     {
       "anchor": {
-        "x": 7.105520684736091,
-        "y": 7.2890727532097
+        "x": 6.833808844507845,
+        "y": 7.392582025677603
       },
       "prevControl": {
-        "x": 6.497403708987162,
-        "y": 7.431398002853067
+        "x": 6.406833095577744,
+        "y": 7.366704707560627
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 2.0,
-    "rotation": -59.50664159752436
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": "Left Rush",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

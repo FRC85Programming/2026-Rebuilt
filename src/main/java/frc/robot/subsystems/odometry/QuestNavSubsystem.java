@@ -35,7 +35,6 @@ public class QuestNavSubsystem extends SubsystemBase {
         );
 
     public QuestResult getResult(PoseFrame questFrame) {
-
         if (!questFrame.isTracking()) {
             DriverStation.reportWarning("No valid Quest pose frames available!", false);
             return new QuestResult(new Pose3d(), 0.0);

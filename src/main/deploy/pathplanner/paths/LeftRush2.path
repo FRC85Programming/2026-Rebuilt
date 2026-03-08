@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.114736091298145,
-        "y": 4.507261055634808
+        "x": 7.610128388017117,
+        "y": 5.374151212553495
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.830085592011411,
-        "y": 6.0081455064194005
+        "x": 7.325477888730383,
+        "y": 6.875035663338088
       },
       "isLocked": false,
       "linkedName": "LeftRushIntake"
@@ -32,24 +32,19 @@
     },
     {
       "anchor": {
-        "x": 3.3274322396576315,
-        "y": 7.405520684736091
+        "x": 3.625,
+        "y": 7.406
       },
       "prevControl": {
-        "x": 3.7285306704707555,
-        "y": 7.405520684736091
+        "x": 4.6471540656205415,
+        "y": 7.406
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.661978905072828,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -63,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": "Left Rush",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -75.0
   },
   "useDefaultConstraints": true
 }

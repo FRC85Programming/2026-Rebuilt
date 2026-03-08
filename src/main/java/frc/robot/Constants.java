@@ -51,9 +51,9 @@ public final class Constants
   {
 
     // Joystick Deadband
-    public static final double DEADBAND        = 0.1;
-    public static final double LEFT_Y_DEADBAND = 0.1;
-    public static final double RIGHT_X_DEADBAND = 0.1;
+    public static final double DEADBAND        = 0.03;
+    public static final double LEFT_Y_DEADBAND = 0.03;
+    public static final double RIGHT_X_DEADBAND = 0.03;
     public static final double TURN_CONSTANT    = 6;
   }
 
@@ -86,6 +86,11 @@ public final class Constants
       public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
       public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
       public static final Translation3d redFeedPosition = new Translation3d(8.0, 0.7, 0);
+
+      // Saftey poses
+      public static final Translation2d blueLeftEnterAllianceZonePose = new Translation2d(5.825, 7.500);
+      public static final Translation2d blueRightEnterAllianceZonePose = new Translation2d(5.825, 0.600);
+
   }
 
   public static class TurretConstants {
@@ -105,5 +110,31 @@ public final class Constants
   
   public static class IntakeConstants {
     public static final int INTAKE_MOTOR_ID = 18;
+  }
+
+  public static class ObstacleAlignmentConstants {
+
+    /** How close (meters, measured in X) the robot must be to an obstacle before corrections begin. */
+    public static final double DETECTION_RANGE = 1.5;
+
+    // --- Trench boxes ---
+    public static final double TRENCH1_X_MIN  = 4.0;
+    public static final double TRENCH1_X_MAX  = 5.2;
+    public static final double TRENCH1_Y_MIN  = 6.5;
+    public static final double TRENCH1_Y_MAX  = 8.1;
+    /** Configurable center Y the robot tries to hold while traversing Trench 1. */
+    public static final double TRENCH1_TARGET_Y = 7.4;
+
+    public static final double TRENCH2_X_MIN  = 4.0;
+    public static final double TRENCH2_X_MAX  = 5.2;
+    public static final double TRENCH2_Y_MIN  = 0.0;
+    public static final double TRENCH2_Y_MAX  = 1.5;
+    /** Configurable center Y the robot tries to hold while traversing Trench 2. */
+    public static final double TRENCH2_TARGET_Y = 0.65;
+
+    // --- Y-centering PID ---
+    public static final double Y_KP = 3.0;
+    public static final double Y_KI = 0.0;
+    public static final double Y_KD = 0.05;
   }
 }

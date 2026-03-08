@@ -3,77 +3,74 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.817146932952923,
-        "y": 5.011868758915835
+        "x": 7.610128388017117,
+        "y": 5.374151212553495
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.860733333333334,
-        "y": 7.192200000000001
+        "x": 7.053766048502139,
+        "y": 7.5996005706134095
       },
       "isLocked": false,
-      "linkedName": "LIntake1"
+      "linkedName": "LeftRushIntake"
     },
     {
       "anchor": {
-        "x": 4.802439372325249,
-        "y": 7.431398002853067
+        "x": 4.039058487874465,
+        "y": 7.41845934379458
       },
       "prevControl": {
-        "x": 7.090922222222224,
-        "y": 7.377344444444444
+        "x": 5.364302932311986,
+        "y": 7.5256482326826735
       },
       "nextControl": {
-        "x": 3.3393484003936758,
-        "y": 7.465955951719493
+        "x": 2.6387372701662706,
+        "y": 7.305198068833136
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.693437945791726,
-        "y": 6.732710413694722
+        "x": 0.36725555555555556,
+        "y": 5.9643999999999995
       },
       "prevControl": {
-        "x": 2.8597953426484435,
-        "y": 6.9406571597656175
-      },
-      "nextControl": {
-        "x": 2.53726418390312,
-        "y": 6.537493211333965
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.033566333808844,
-        "y": 5.270641940085593
-      },
-      "prevControl": {
-        "x": 2.227646219686162,
-        "y": 6.163409415121254
+        "x": 1.7704555555486343,
+        "y": 5.720788888888093
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "DriveByLeft"
+      "linkedName": "Depot"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.047212456052235,
-      "rotationDegrees": -90.0
+      "waypointRelativePos": 0.7162426614481393,
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.2410071942446144,
-      "maxWaypointRelativePos": 2.9676258992805753,
+      "minWaypointRelativePos": 1.0212962962963028,
+      "maxWaypointRelativePos": 1.7879629629629625,
       "constraints": {
-        "maxVelocity": 1.5,
+        "maxVelocity": 1.2,
         "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.5902255639097764,
+      "maxWaypointRelativePos": 1.02,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -84,13 +81,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "DriveBy",
-      "waypointRelativePos": 1.3041666666666607,
+      "name": "SpinUp",
+      "waypointRelativePos": 0.5953703703703783,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "DriveBy"
+          "name": "SpinUp"
         }
       }
     }
@@ -104,14 +101,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -25.986325611470246
+    "velocity": 0.0,
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Left+Depot",
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": -90.0
+    "velocity": 0.0,
+    "rotation": -75.0
   },
   "useDefaultConstraints": true
 }

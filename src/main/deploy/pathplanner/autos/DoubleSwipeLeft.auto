@@ -7,6 +7,18 @@
         {
           "type": "path",
           "data": {
+            "pathName": "LeftRush1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftRush2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
             "pathName": "LeftRush1Smart"
           }
         },

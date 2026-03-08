@@ -11,15 +11,15 @@
       "style": "0",
       "userScale": "2",
       "width": "1280",
-      "xpos": "338",
-      "ypos": "847"
+      "xpos": "445",
+      "ypos": "726"
     }
   },
   "Window": {
     "###/FMSInfo": {
       "Collapsed": "0",
       "Pos": "60,60",
-      "Size": "217,194"
+      "Size": "202,194"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
@@ -29,7 +29,7 @@
     "###FMS": {
       "Collapsed": "0",
       "Pos": "4,414",
-      "Size": "202,214"
+      "Size": "336,158"
     },
     "###Joysticks": {
       "Collapsed": "0",

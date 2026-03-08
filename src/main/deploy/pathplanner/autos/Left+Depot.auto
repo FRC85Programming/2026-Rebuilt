@@ -7,31 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LStart-LIntake1"
+            "pathName": "Left+Depot1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LIntake1-DriveBy"
+            "pathName": "Left+Depot2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DriveBy-Depot"
+            "pathName": "Left+Depot3"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Depot-Approach"
+            "name": "SmartIntakeBlueLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToBlueLeftShoot"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

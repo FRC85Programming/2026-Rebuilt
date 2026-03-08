@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.util.FieldObstacleAligner;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.odometry.QuestResult;
 //import frc.robot.subsystems.swervedrive.Vision.Cameras;
@@ -111,6 +112,9 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private double speedMultiplier = 1.0;
 
+  /** Passive trench Y-centering helper. */
+  private final FieldObstacleAligner obstacleAligner = new FieldObstacleAligner(() -> questFrames != null);
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -165,8 +169,11 @@ public class SwerveSubsystem extends SubsystemBase
         );
 
     aimController.enableContinuousInput(-Math.PI, Math.PI);
-    aimController.setTolerance(0.02, 0.1);
-    
+    aimController.setTolerance(0.08, 0.4);
+
+    SmartDashboard.putNumber("AimController P", 5);
+    SmartDashboard.putNumber("AimController D", 0);
+
   }
 
   /**
@@ -195,6 +202,8 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    aimController.setP(SmartDashboard.getNumber("AimController P", 5));
+    aimController.setD(SmartDashboard.getNumber("AimController D", 0));
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
@@ -263,9 +272,9 @@ public class SwerveSubsystem extends SubsystemBase
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(6.35, 0.1, 0.05),
+              new PIDConstants(5.0, 0.0, 0.1),
               // Translation PID constants
-              new PIDConstants(3.0, 0.0, 0.0)
+              new PIDConstants(6.0, 0.0, 0.0)
               // Rotation PID constants
           ),
           config,
@@ -386,7 +395,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        swerveDrive.getMaximumChassisVelocity(), 4.0,
+        swerveDrive.getMaximumChassisVelocity()*0.75, 3.0,
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
@@ -614,6 +623,8 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(() -> {
       ChassisSpeeds vel = velocity.get();
+      // Apply passive obstacle alignment (trench centering + angle snapping)
+      vel = obstacleAligner.apply(getPose(), vel);
       // Apply speed multiplier
       ChassisSpeeds scaledVelocity = new ChassisSpeeds(
         vel.vxMetersPerSecond * speedMultiplier,
@@ -898,10 +909,10 @@ public class SwerveSubsystem extends SubsystemBase
     return swerveDrive;
   }
 
-  public Command driveTranslation2dPath(Translation2d[] path) {
-    // Prepend the robot's current position so the path starts from where we are
+  public Command driveTranslation2dPath(Translation2d[] path, Translation2d startPos) {
+    // Prepend the caller-supplied starting position (same pose the path calculator used)
     Translation2d[] fullPath = new Translation2d[path.length + 1];
-    fullPath[0] = getPose().getTranslation();
+    fullPath[0] = startPos;
     System.arraycopy(path, 0, fullPath, 1, path.length);
 
     Pose2d[] poses = new Pose2d[fullPath.length];
@@ -914,14 +925,12 @@ public class SwerveSubsystem extends SubsystemBase
 
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(poses);
 
-    // Build holonomic rotation targets so the robot body faces toward the next point
     List<RotationTarget> rotationTargets = new ArrayList<>();
     for (int i = 0; i < fullPath.length - 1; i++) {
       Translation2d delta = fullPath[i + 1].minus(fullPath[i]);
       rotationTargets.add(new RotationTarget(i, new Rotation2d(delta.getX(), delta.getY())));
     }
 
-    // Goal rotation faces the direction of the final segment
     Translation2d lastDelta = fullPath[fullPath.length - 1].minus(fullPath[fullPath.length - 2]);
     Rotation2d goalRotation = new Rotation2d(lastDelta.getX(), lastDelta.getY());
 

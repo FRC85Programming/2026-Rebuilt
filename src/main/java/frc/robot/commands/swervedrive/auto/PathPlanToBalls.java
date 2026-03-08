@@ -1,8 +1,11 @@
 package frc.robot.commands.swervedrive.auto;
 
+import java.util.Arrays;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Vision.VisionSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -11,83 +14,93 @@ import frc.robot.util.BallPathCalculator;
 
 public class PathPlanToBalls extends Command
 {
-    private enum Phase { CALCULATING, FOLLOWING }
-
     private final SwerveSubsystem swerve;
     private final VisionSubsystem vision;
-    private BallPathCalculator finder;
-    private Translation2d[] path;
-    private Command followCommand;
-    private Phase phase;
-    private Translation2d[] balls;
-    private double direction;
-
-    /**
-     * Y sweep limits, each 1 m past the field centre line (4.04 m).
-     *   direction = +1 → upper cap  (don't sweep above SWEEP_LIMIT_NORTH going north)
-     *   direction = -1 → lower cap  (don't sweep below SWEEP_LIMIT_SOUTH going south)
-     */
-    private static final double SWEEP_LIMIT_NORTH = 5.04; // field centre + 1 m
-    private static final double SWEEP_LIMIT_SOUTH = 3.04; // field centre - 1 m
-
-    /** The pre-baked ball list to use instead of querying vision (may be null). */
     private final Translation2d[] preloadedBalls;
+    private final double xMin, xMax, yMin, yMax;
 
-    public PathPlanToBalls(SwerveSubsystem swerve, VisionSubsystem vision, double direction) {
-        this(swerve, vision, direction, null);
+    private Command followCommand;
+
+    public PathPlanToBalls(SwerveSubsystem swerve, VisionSubsystem vision) {
+        this(swerve, vision, null,
+             Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
+             Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
-    /**
-     * @param preloadedBalls If non-null, these balls are used instead of calling vision.
-     *                       Pass {@code RobotContainer.getTestBalls()} in simulation.
-     */
     public PathPlanToBalls(SwerveSubsystem swerve, VisionSubsystem vision,
-                           double direction, Translation2d[] preloadedBalls) {
+                           Translation2d[] preloadedBalls) {
+        this(swerve, vision, preloadedBalls,
+             Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
+             Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+    }
+
+    public PathPlanToBalls(SwerveSubsystem swerve, VisionSubsystem vision,
+                           double xMin, double xMax, double yMin, double yMax) {
+        this(swerve, vision, null, xMin, xMax, yMin, yMax);
+    }
+
+
+    public PathPlanToBalls(SwerveSubsystem swerve, VisionSubsystem vision,
+                           Translation2d[] preloadedBalls,
+                           double xMin, double xMax, double yMin, double yMax) {
         this.swerve = swerve;
         this.vision = vision;
-        finder = null;
-        this.direction = direction;
         this.preloadedBalls = preloadedBalls;
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.yMin = yMin;
+        this.yMax = yMax;
 
         addRequirements(swerve);
     }
 
     @Override
     public void initialize() {
-        phase = Phase.CALCULATING;
-        balls = vision.getAllBallFieldTranslations()
-                          .stream()
-                          .map(t -> new Translation2d(t.getX(), t.getY()))
-                          .toArray(Translation2d[]::new);
-        path = null;
         followCommand = null;
-        double sweepYLimit = direction > 0 ? SWEEP_LIMIT_NORTH : SWEEP_LIMIT_SOUTH;
-        finder = new BallPathCalculator(balls, swerve.getPose().getTranslation(), direction, sweepYLimit);
+
+        if (vision.getAllBallFieldTranslations().isEmpty()) return;
+
+        Translation2d[] rawBalls = fetchBalls();
+
+        Translation2d robotPos = swerve.getPose().getTranslation();
+
+        Translation2d[] balls = Arrays.stream(rawBalls)
+            .filter(b -> b.getX() >= xMin && b.getX() <= xMax)
+            .filter(b -> b.getY() >= yMin && b.getY() <= yMax)
+            .toArray(Translation2d[]::new);
+
+        if (balls.length == 0) return;
+
+        double direction = calcDirection(robotPos, balls);
+
+        Translation2d[] path = new BallPathCalculator(balls, robotPos, direction).getBestPath();
+        Logger.recordOutput("FieldSimulation/calculatedPath", path);
+
+        if (path.length >= 1 && pathLength(robotPos, path) >= 0.4) {
+            followCommand = swerve.driveTranslation2dPath(path, robotPos);
+            followCommand.initialize();
+        }
+    }
+
+    /** Total arc length of the full path including the robot-start-to-first-waypoint segment. */
+    private static double pathLength(Translation2d start, Translation2d[] path) {
+        double length = start.getDistance(path[0]);
+        for (int i = 0; i < path.length - 1; i++) {
+            length += path[i].getDistance(path[i + 1]);
+        }
+        return length;
     }
 
     @Override
     public void execute() {
-
-        if (phase == Phase.CALCULATING) {
-            path = finder.getBestPath();
-            Logger.recordOutput("FieldSimulation/calcualtedPath", path);
-            if (path != null && path.length > 1) {
-                followCommand = swerve.driveTranslation2dPath(path);
-                followCommand.initialize();
-                phase = Phase.FOLLOWING;
-            }
-        } else if (phase == Phase.FOLLOWING) {
+        if (followCommand != null) {
             followCommand.execute();
         }
     }
 
     @Override
     public boolean isFinished() {
-        if (phase == Phase.CALCULATING) {
-            // End early only if path computation produced no usable path.
-            return path != null && path.length <= 1;
-        }
-        return followCommand != null && followCommand.isFinished();
+        return followCommand == null || followCommand.isFinished();
     }
 
     @Override
@@ -95,5 +108,19 @@ public class PathPlanToBalls extends Command
         if (followCommand != null) {
             followCommand.end(interrupted);
         }
+    }
+
+    private Translation2d[] fetchBalls() {
+        if (preloadedBalls != null) return preloadedBalls;
+        return vision.getAllBallFieldTranslations()
+                     .stream()
+                     .map(Translation3d::toTranslation2d)
+                     .toArray(Translation2d[]::new);
+    }
+
+    private static double calcDirection(Translation2d robot, Translation2d[] balls) {
+        long north = Arrays.stream(balls).filter(b -> b.getY() > robot.getY()).count();
+        long south = balls.length - north;
+        return north >= south ? 1.0 : -1.0;
     }
 }

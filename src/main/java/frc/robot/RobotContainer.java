@@ -134,19 +134,14 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
     NamedCommands.registerCommand("Intake", new Intake(intake, () -> 0.7));
-    NamedCommands.registerCommand("SmartIntake", new PathPlanToBalls(drivebase, vision, 1));
-    NamedCommands.registerCommand("PathPlanToLeftRush2", new PathPlanToPath(drivebase, "LeftRush2Smart"));
+    NamedCommands.registerCommand("SmartIntakeBlueLeft", new PathPlanToBalls(drivebase, vision, 5.64, 8.43, 4, 7.5));
+    NamedCommands.registerCommand("DriveToBlueLeftShoot", drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.toRadians(180)))));
 
 
-    autoChooser.setDefaultOption("Left Auto", "Left");
-    autoChooser.addOption("Depot+Outpost Auto", "Depot+Outpost");
-    autoChooser.addOption("Left+Depot Auto", "Left+Depot");
-    autoChooser.addOption("Bump Auto", "Bump");
-    autoChooser.addOption("Test Auto", "Test");
-    autoChooser.addOption("Double Cycle", "24BallAutoLeft");
-    autoChooser.addOption("Double Cycle", "24BallAutoLeft");
+    autoChooser.addOption("LeftRush", "LeftRush");
+    autoChooser.addOption("Double Swipe Left", "DoubleSwipeLeft");
+    autoChooser.addOption("Left+Depot", "Left+Depot");
     autoChooser.addOption("Left Smart Auto", "LeftSmartAuto");
-    autoChooser.addOption("WORKING", "This Works Bruh");
 
     autoChooser.addOption("Test", "TestAuto");
 
@@ -237,7 +232,7 @@ public class RobotContainer
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
       // driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
-      driverXbox.button(1).onTrue(new PathPlanToBalls(drivebase, vision, 1, getTestBalls()));
+      driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
       driverXbox.button(2).onTrue(new FireCommand(shooter, turret));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
@@ -277,7 +272,8 @@ public class RobotContainer
               turret.startAiming(drivebase, this::getTarget);
           }))
           .whileTrue(new FireCommand(shooter, turret));
-      driverXbox.a().onTrue(new PathPlanToBalls(drivebase, vision, -1));
+      driverXbox.a().onTrue(new PathPlanToBalls(drivebase, vision, 5.2, 8.43, 3.2, 7.5));
+      driverXbox.b().onTrue(drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.PI/2))));
       //driverXbox.pov(90).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(-0.5)));
       // driverXbox.pov(90).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
       // driverXbox.pov(270).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(0.5)));

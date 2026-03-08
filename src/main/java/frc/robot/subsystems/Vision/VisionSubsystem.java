@@ -17,20 +17,20 @@ import java.util.stream.Collectors;
 
 public class VisionSubsystem extends SubsystemBase {
 
-    private static final String DETECTION_CAMERA_NAME = "Balls";
+    private static final String DETECTION_CAMERA_NAME = "Balls1";
 
     private static final Transform3d ROBOT_TO_DETECTION_CAM =
         new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(11.5),
+                Units.inchesToMeters(13.75),
                 0.0,
-                Units.inchesToMeters(21.75)
+                Units.inchesToMeters(19.5)
             ),
-            new Rotation3d(0.0, Units.degreesToRadians(13.0), 0.0)
+            new Rotation3d(0.0, Units.degreesToRadians(15.0), 0.0)
         );
 
-    private static final double DETECTION_CAM_HEIGHT_METERS = Units.inchesToMeters(21.75);
-    private static final double DETECTION_CAM_PITCH_DEGREES = 13.0;
+    private static final double DETECTION_CAM_HEIGHT_METERS = Units.inchesToMeters(19.5);
+    private static final double DETECTION_CAM_PITCH_DEGREES = 15.0;
     private static final double BALL_HEIGHT_METERS = 0.075;
     private static final int FUEL_CLASS_ID = 0;
     private static final double MIN_DETECTION_CONFIDENCE = 0.3;
