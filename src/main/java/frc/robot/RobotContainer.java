@@ -148,7 +148,7 @@ public class RobotContainer
     SmartDashboard.putData("Auto Selector", autoChooser);
 
     for (var i = 0; i < getTestBalls().length; i++) {
-      //SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(getTestBalls()[i]));
+      SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(getTestBalls()[i]));
     }
     
     // Passive trajectory calculation - TargetingCalculator handles turret offset internally

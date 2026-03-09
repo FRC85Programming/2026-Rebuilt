@@ -255,7 +255,7 @@ public class SwerveSubsystem extends SubsystemBase
             ChassisSpeeds modifiedSpeeds = new ChassisSpeeds(
                 speedsRobotRelative.vxMetersPerSecond,
                 speedsRobotRelative.vyMetersPerSecond,
-                -speedsRobotRelative.omegaRadiansPerSecond
+                speedsRobotRelative.omegaRadiansPerSecond
             );
             if (enableFeedforward)
             {
