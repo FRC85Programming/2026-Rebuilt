@@ -3,7 +3,6 @@ package frc.robot.subsystems.shooter;
 import java.util.function.Supplier;
 
 import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
@@ -24,23 +23,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AlphaMechanism3d;
-import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.FeedingTable;
 import frc.robot.util.ShooterTable;
-import frc.robot.util.ShotSolver;
-import frc.robot.util.ShotSolver.ShotSolution;
 import frc.robot.util.TimeOfFlightTable;
 import frc.robot.util.TrajectoryTransform3d;
 
@@ -60,12 +52,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private final SparkFlex hoodMotor =
         new SparkFlex(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless);
-
-    private final SparkFlex feedMotor =
-        new SparkFlex(ShooterConstants.FEED_MOTOR_ID, MotorType.kBrushless);
-
-    private final SparkFlex beltMotor =
-        new SparkFlex(ShooterConstants.BELT_MOTOR_ID, MotorType.kBrushless);
 
     private final ShooterSim shooterSim = new ShooterSim();
 
@@ -239,7 +225,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /** Enter FEEDING state: same as AIMING but uses FeedingTable for setpoints. */
-    public void startFeeding(SwerveSubsystem swerve, Supplier<Translation3d> target) {
+    public void startIndexing(SwerveSubsystem swerve, Supplier<Translation3d> target) {
         this.swerve = swerve;
         this.aimTarget = target;
         this.state = ShooterState.FEEDING;
@@ -348,23 +334,4 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelMotorRight.set(-speed);
     }
 
-    public void calculateLookupTable() {
-        for (var i = 2; i <= 6.0; i += 0.5) {
-            var solution = ShotSolver.solve(
-                i,
-                0.305,
-                FieldConstants.blueHub.getZ(),
-                Math.toRadians(65),
-                Math.toRadians(Constants.ShooterConstants.HOOD_MIN_ANGLE),
-                Math.toRadians(Constants.ShooterConstants.HOOD_MAX_ANGLE),
-                0
-            );
-            ShotSolution shotSolution = solution.get();
-        }
-    }
-
-    public void setFeedSpeed(double speed) {
-        feedMotor.set(speed);
-        beltMotor.set(-speed);
-    }
 }

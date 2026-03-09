@@ -2,7 +2,6 @@ package frc.robot.subsystems.turret;
 
 import java.util.function.Supplier;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -160,7 +159,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     /** Enter FEEDING state: tracks the feed target using the same aiming logic. */
-    public void startFeeding(SwerveSubsystem swerve, Supplier<Translation3d> target) {
+    public void startIndexing(SwerveSubsystem swerve, Supplier<Translation3d> target) {
         this.swerve = swerve;
         this.aimTarget = target;
         this.state = TurretState.FEEDING;

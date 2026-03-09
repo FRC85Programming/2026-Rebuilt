@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
@@ -9,16 +10,18 @@ import frc.robot.subsystems.turret.TurretSubsystem;
  * Spins the flywheel to the RPM calculated by the shooter subsystem's active state
  * (AIMING or FEEDING) and releases the feed mechanism once all systems are on target.
  * State management (which target and lookup table to use) is handled externally in
- * RobotContainer via startAiming() / startFeeding() calls.
+ * RobotContainer via startAiming() / startIndexing() calls.
  */
 public class FireCommand extends Command {
 
     private final ShooterSubsystem shooter;
     private final TurretSubsystem turret;
+    private final IndexerSubsystem indexer;
 
-    public FireCommand(ShooterSubsystem shooter, TurretSubsystem turret) {
+    public FireCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret) {
         this.shooter = shooter;
         this.turret = turret;
+        this.indexer = indexer;
         addRequirements(shooter, turret);
     }
 
@@ -32,7 +35,12 @@ public class FireCommand extends Command {
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
         SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(1));
 
-        shooter.setFeedSpeed(ready ? 0.5 : 0);
+        if (ready) {
+            indexer.startIndexing();
+        } else {
+            indexer.stopIndexing();
+        }
+        
     }
 
     @Override
@@ -43,6 +51,6 @@ public class FireCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         shooter.stopFlywheel();
-        shooter.setFeedSpeed(0);
+        indexer.stopIndexing();
     }
 }

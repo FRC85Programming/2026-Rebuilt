@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import org.dyn4j.geometry.Rotation;
-
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -141,5 +138,9 @@ public final class Constants
     public static final double Y_KP = 3.0;
     public static final double Y_KI = 0.0;
     public static final double Y_KD = 0.05;
+  }
+
+  public static class IndexerConstants {
+    public static final int INDEXER_MOTOR_ID = 33;
   }
 }

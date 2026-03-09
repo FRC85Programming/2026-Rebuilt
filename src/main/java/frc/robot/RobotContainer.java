@@ -20,16 +20,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.AimAtGoal;
 import frc.robot.commands.FireCommand;
 import frc.robot.commands.Intake;
-import frc.robot.commands.TuneShot;
 import frc.robot.commands.swervedrive.auto.PathPlanToBalls;
-import frc.robot.commands.swervedrive.auto.PathPlanToPath;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -37,9 +34,6 @@ import frc.robot.util.BallFieldGenerator;
 
 import java.io.File;
 import java.util.Optional;
-
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 
 import swervelib.SwerveInputStream;
 
@@ -57,11 +51,15 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/neo"));
   private final ShooterSubsystem shooter = new ShooterSubsystem();
+
   private final IntakeSubsystem intake = new IntakeSubsystem();
+
+  private final IndexerSubsystem indexer = new IndexerSubsystem();
 
   private final TurretSubsystem turret = new TurretSubsystem();
 
   private final VisionSubsystem vision = new VisionSubsystem();
+
 
   BallFieldGenerator gen = new BallFieldGenerator();
 
@@ -133,7 +131,7 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Intake", new Intake(intake, () -> 0.7));
+    NamedCommands.registerCommand("Intake", new Intake(intake));
     NamedCommands.registerCommand("SmartIntakeBlueLeft", new PathPlanToBalls(drivebase, vision, 5.64, 8.43, 4, 7.5));
     NamedCommands.registerCommand("DriveToBlueLeftShoot", drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.toRadians(180)))));
 
@@ -150,30 +148,6 @@ public class RobotContainer
     for (var i = 0; i < getTestBalls().length; i++) {
       SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(getTestBalls()[i]));
     }
-    
-    // Passive trajectory calculation - TargetingCalculator handles turret offset internally
-
-    // Solution involving velocity and stuff
-    // turret.setAutoAngleSupplier(() -> {
-    //   var solution = TargetingCalculator.calculateShot(
-    //     getTarget(),
-    //     drivebase.getPose(),
-    //     drivebase.getFieldVelocity(),
-    //     turret.getTurretAngleRads(),
-    //     new TargetingCalculator.RpmConverter() {
-    //       public double rpmToMps(double rpm) {
-    //         return shooter.rpmToMps(rpm);
-    //       }
-    //       public double mpsToRpm(double mps) {
-    //         return shooter.mpsToRpm(mps);
-    //       }
-    //     }
-    //   );
-    //   return solution.turretAngleDegrees;
-    // });
-
-    // Raw angle to 
-  
   }
 
   /**
@@ -185,20 +159,11 @@ public class RobotContainer
    */
   private void configureBindings()
   {
-    Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
-    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
-    Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
-        driveDirectAngle);
-    Command driveFieldOrientedDirectAngleKeyboard      = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
-    Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
-    Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(
-        driveDirectAngleKeyboard);
-    Command runFlywheel = new InstantCommand(() -> shooter.setFlywheelRPM(3000));
-    Command stopFlywheel = new InstantCommand(() -> shooter.setFlywheelRPM(0));
-    Command angleHoodUp = new InstantCommand(() -> shooter.setHoodAngle(50.0));
-    Command angleHoodDown = new InstantCommand(() -> shooter.setHoodAngle(20.0));
+    // Maybe try this at some point?
+    // Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
 
+    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
 
     if (RobotBase.isSimulation())
     {
@@ -213,36 +178,10 @@ public class RobotContainer
 
     if (Robot.isSimulation())
     {
-      /*Pose2d target = new Pose2d(new Translation2d(1, 4),
-                                 Rotation2d.fromDegrees(90));
-      //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
-      driveDirectAngleKeyboard.driveToPose(() -> target,
-                                           new ProfiledPIDController(5,
-                                                                     0,
-                                                                     0,
-                                                                     new Constraints(5, 2)),
-                                           new ProfiledPIDController(5,
-                                                                     0,
-                                                                     0,
-                                                                     new Constraints(Units.degreesToRadians(360),
-                                                                                     Units.degreesToRadians(180))
-                                           ));
-      //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d(0)))));
-      /*driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-                                                     () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));*/
-      // driverXbox.button(1).whileTrue(new Shoot(drivebase, shooter, () -> getTarget(), false));
       driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
-      driverXbox.button(2).onTrue(new FireCommand(shooter, turret));
+      driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
-
-
-//      driverXbox.b().whileTrue(
-//          drivebase.driveToPose(
-//              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-//                              );
-
     }
     if (DriverStation.isTest())
     {
@@ -256,28 +195,29 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
-      //driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      //driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      // TODO: Configure this pose to a better position/use apriltags
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
-      driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, turret));
-      driverXbox.leftTrigger()
-          .onTrue(Commands.runOnce(() -> {
-              shooter.startFeeding(drivebase, () -> FieldConstants.blueFeedPosition);
-              turret.startFeeding(drivebase, () -> FieldConstants.blueFeedPosition);
-          }))
-          .onFalse(Commands.runOnce(() -> {
-              shooter.startAiming(drivebase, this::getTarget);
-              turret.startAiming(drivebase, this::getTarget);
-          }))
-          .whileTrue(new FireCommand(shooter, turret));
-      driverXbox.a().onTrue(new PathPlanToBalls(drivebase, vision, 5.2, 8.43, 3.2, 7.5));
-      driverXbox.b().onTrue(drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.PI/2))));
-      //driverXbox.pov(90).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(-0.5)));
-      // driverXbox.pov(90).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
-      // driverXbox.pov(270).whileTrue(new InstantCommand(() -> turret.setTurretSpeed(0.5)));
-      // driverXbox.pov(270).onFalse(new InstantCommand(() -> turret.setTurretSpeed(0)));
+
+      // Right Trigger - Shoot based on current mode
+      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret));
+
+      // Left Trigger - Intake
+      driverXbox.rightTrigger().whileTrue(new Intake(intake));
+
+      // X - Switch shooter to idle mode
+      driverXbox.x().onTrue(Commands.runOnce(() -> {
+              shooter.stopAiming();
+              turret.stopAiming();
+          }));
+
+      // B - Start aiming in case of failure to auto init
+      driverXbox.b().onTrue(Commands.runOnce(() -> {
+              shooter.startAiming(drivebase, () -> getTarget());
+              turret.startAiming(drivebase, () -> getTarget());
+          }));
+
+      // Quick inputs for spinning turret - TEST ONLY
       driverXbox.pov(0).onTrue(new InstantCommand(() -> turret.setTurretAngle(0)));
       driverXbox.pov(180).onTrue(new InstantCommand(() -> turret.setTurretAngle(180)));
     }

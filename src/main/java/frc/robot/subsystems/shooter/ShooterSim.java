@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 
@@ -27,8 +26,7 @@ public class ShooterSim extends SubsystemBase{
     private final DCMotor flywheelMotor = DCMotor.getNeoVortex(1);
     private final double gearRatioFlywheel = ShooterConstants.FLYWHEEL_GEAR_RATIO;
 
-     private final DCMotor hoodMotor = DCMotor.getNeoVortex(1);
-    private final double gearRatioHood = ShooterConstants.HOOD_GEAR_RATIO;
+    private final DCMotor hoodMotor = DCMotor.getNeoVortex(1);
 
     private final double flywheelMOI = 0.003;
     private final double hoodMOI = 0.0025;
