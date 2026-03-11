@@ -56,13 +56,10 @@ public final class Constants
 
   public static class ShooterConstants
   {
-    public static final int FLYWHEEL_MOTOR_ID = 14;
     public static final int HOOD_MOTOR_ID = 15;
-    public static final int FEED_MOTOR_ID = 16;
-    public static final int BELT_MOTOR_ID = 24;
 
 
-    public static final double FLYWHEEL_GEAR_RATIO = 1.0;
+    public static final double FLYWHEEL_GEAR_RATIO = 1.23;
     public static final double HOOD_GEAR_RATIO = 265/25;
 
     // Hood limits - degrees
@@ -108,10 +105,10 @@ public final class Constants
   public static class IntakeConstants {
     public static final int ROLLER_MOTOR_ID = 18;
 
-    public static final int PIVOT_MOTOR_ID = 19;
+    public static final int PIVOT_MOTOR_ID = 25;
 
     // The position (in motor rotations) in which the intake is in the down position
-    public static final double INTAKE_DOWN_POSITION = 1;
+    public static final double INTAKE_DOWN_POSITION = -4.27;
   }
 
   public static class ObstacleAlignmentConstants {
@@ -141,6 +138,7 @@ public final class Constants
   }
 
   public static class IndexerConstants {
-    public static final int INDEXER_MOTOR_ID = 33;
+    public static final int INDEXER_MOTOR_ID = 16;
+    public static final int BELT_MOTOR_ID = 24;
   }
 }

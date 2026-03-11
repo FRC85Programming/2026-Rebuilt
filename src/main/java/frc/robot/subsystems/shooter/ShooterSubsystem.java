@@ -109,7 +109,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
 
         hoodConfig.closedLoop
-               .feedbackSensor(FeedbackSensor.kDetachedAbsoluteEncoder)
+               .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(0.35)
                 .i(0)
                 .d(0)
@@ -119,7 +119,36 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelConfigRight.idleMode(IdleMode.kCoast);
         flywheelConfigLeft.idleMode(IdleMode.kCoast);
 
+        flywheelConfigLeft.signals
+            .primaryEncoderVelocityPeriodMs(20)
+            .primaryEncoderPositionPeriodMs(500)
+            .appliedOutputPeriodMs(100)
+            .busVoltagePeriodMs(500)
+            .outputCurrentPeriodMs(500)
+            .motorTemperaturePeriodMs(1000)
+            .faultsPeriodMs(500);
+
+        flywheelConfigRight.signals
+            .primaryEncoderVelocityPeriodMs(20)
+            .primaryEncoderPositionPeriodMs(500)
+            .appliedOutputPeriodMs(100)
+            .busVoltagePeriodMs(500)
+            .outputCurrentPeriodMs(500)
+            .motorTemperaturePeriodMs(1000)
+            .faultsPeriodMs(500);
+
         hoodConfig.inverted(true);
+
+        hoodConfig.signals
+            .primaryEncoderPositionPeriodMs(20)
+            .primaryEncoderVelocityPeriodMs(500)
+            .absoluteEncoderPositionPeriodMs(500)
+            .absoluteEncoderVelocityPeriodMs(500)
+            .appliedOutputPeriodMs(100)
+            .busVoltagePeriodMs(500)
+            .outputCurrentPeriodMs(500)
+            .motorTemperaturePeriodMs(1000)
+            .faultsPeriodMs(500);
 
         flywheelMotorLeft.configure(flywheelConfigLeft, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         flywheelMotorRight.configure(flywheelConfigRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -143,14 +172,17 @@ public class ShooterSubsystem extends SubsystemBase {
             AlphaMechanism3d.setHoodAngle(getHoodAngle());
         }
 
+        double encoderPos = hoodMotor.getEncoder().getPosition();
+        double hoodAngle = (((encoderPos * 360) / 9) / 10.96) + 75;
+
         SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
         SmartDashboard.putNumber("Flywheel Measured RPM", getFlywheelRPM());
         SmartDashboard.putNumber("Sim Flywheel Speed", shooterSim.getFlywheelRPM());
         SmartDashboard.putNumber("Sim Hood Angle", shooterSim.getHoodAngleDeg());
         SmartDashboard.putNumber("Hood Encoder ABS", hoodMotor.getAbsoluteEncoder().getPosition());
-        SmartDashboard.putNumber("Hood Encoder", hoodMotor.getEncoder().getPosition() * 360);
-        SmartDashboard.putNumber("Hood Encoder Converted", hoodMotor.getEncoder().getPosition() * 360 / 9);
-        SmartDashboard.putNumber("Hood Angle", (((hoodMotor.getEncoder().getPosition() * 360) / 9) / 10.96) + 75);
+        SmartDashboard.putNumber("Hood Encoder", encoderPos * 360);
+        SmartDashboard.putNumber("Hood Encoder Converted", encoderPos * 360 / 9);
+        SmartDashboard.putNumber("Hood Angle", hoodAngle);
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
         SmartDashboard.putString("Shooter State", state.toString());
     }
@@ -258,14 +290,16 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setFlywheelRPM(double rpm) {
         goalRpm = rpm;
-        leftController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-        rightController.setSetpoint(-rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        // TODO: Change back
+        /*leftController.setSetpoint(rpm*ShooterConstants.FLYWHEEL_GEAR_RATIO, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        rightController.setSetpoint(-rpm*ShooterConstants.FLYWHEEL_GEAR_RATIO, ControlType.kVelocity, ClosedLoopSlot.kSlot1);*/
     }
 
     public void stopFlywheel() {
         goalRpm = 0;
-        flywheelMotorLeft.set(0);
-        flywheelMotorRight.set(0);
+        // TODO: Change back
+        //flywheelMotorLeft.set(0);
+        //flywheelMotorRight.set(0);
     }
 
     public double getFlywheelRPM() {
@@ -298,7 +332,7 @@ public class ShooterSubsystem extends SubsystemBase {
             ShooterConstants.HOOD_MIN_ANGLE,
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
         goalAngle = angle;
-        hoodMotor.getClosedLoopController().setSetpoint(((angle - 75) / 360) * 9 * 10.96, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        //hoodMotor.getClosedLoopController().setSetpoint(((angle - 75) / 360) * 9 * 10.96, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     public boolean hoodAtAngle(double tolerance) {

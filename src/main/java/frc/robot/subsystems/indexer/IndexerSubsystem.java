@@ -1,31 +1,49 @@
 package frc.robot.subsystems.indexer;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.ShooterConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
 
-    // Indexer - The spinny thing in the center of the robot
     private final SparkFlex indexerMotor = 
         new SparkFlex(IndexerConstants.INDEXER_MOTOR_ID, MotorType.kBrushless);
 
-    // Feed - The green compliant wheel that kicks the ball upwards
-    private final SparkFlex feederMotor =
-        new SparkFlex(ShooterConstants.FEED_MOTOR_ID, MotorType.kBrushless);
-
-    // Belt - The belt that feeds the ball into the feeder
     private final SparkFlex beltMotor =
-        new SparkFlex(ShooterConstants.BELT_MOTOR_ID, MotorType.kBrushless);
+        new SparkFlex(IndexerConstants.BELT_MOTOR_ID, MotorType.kBrushless);
 
-    // TODO: Tune these values
-    // Speeds that each system runs to create an ideal path. These should all be positive
     private double indexSpeed = 0.5;
     private double beltSpeed = 0.5;
-    private double feederSpeed = 0.5;
+
+    public IndexerSubsystem() {
+        SparkFlexConfig indexerConfig = new SparkFlexConfig();
+        indexerConfig.signals
+            .primaryEncoderPositionPeriodMs(500)
+            .primaryEncoderVelocityPeriodMs(500)
+            .appliedOutputPeriodMs(500)
+            .busVoltagePeriodMs(500)
+            .outputCurrentPeriodMs(500)
+            .motorTemperaturePeriodMs(1000)
+            .faultsPeriodMs(500);
+
+        SparkFlexConfig beltConfig = new SparkFlexConfig();
+        beltConfig.signals
+            .primaryEncoderPositionPeriodMs(500)
+            .primaryEncoderVelocityPeriodMs(500)
+            .appliedOutputPeriodMs(500)
+            .busVoltagePeriodMs(500)
+            .outputCurrentPeriodMs(500)
+            .motorTemperaturePeriodMs(1000)
+            .faultsPeriodMs(500);
+
+        indexerMotor.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        beltMotor.configure(beltConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
 
 
     /**
@@ -37,17 +55,6 @@ public class IndexerSubsystem extends SubsystemBase {
     public void setIndexerSpeed(double speed) {
         // TODO: Figure out what speed feeds inwards
         indexerMotor.set(speed);
-    }
-
-    /**
-     * Sets the speed of the feeder. This WILL NOT feed balls all the way through the system. This only sets the speed of 
-     * the roller part of the indexer.
-     * 
-     * @param speed The speed the feeder roller runs at. Positive speed feeds the ball towards the shooter
-     */
-    public void setFeederSpeed(double speed) {
-        // TODO: Figure out what speed feeds inwards
-        feederMotor.set(speed);
     }
 
     /**
@@ -64,17 +71,17 @@ public class IndexerSubsystem extends SubsystemBase {
      * Starts all the parts of the indexer at their tuned speeds
      */
     public void startIndexing() {
-        setIndexerSpeed(indexSpeed);
-        setBeltSpeed(beltSpeed);
-        setFeederSpeed(feederSpeed);
+                // TODO: Change back
+
+        // setIndexerSpeed(indexSpeed);
+        // setBeltSpeed(beltSpeed);
     }
 
     /**
      * Stops all parts of the indexer
      */
     public void stopIndexing() {
-        setIndexerSpeed(0);
-        setBeltSpeed(0);
-        setFeederSpeed(0);
+        // setIndexerSpeed(0);
+        // setBeltSpeed(0);
     }
 }
