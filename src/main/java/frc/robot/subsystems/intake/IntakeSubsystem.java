@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
@@ -25,17 +26,17 @@ public class IntakeSubsystem extends SubsystemBase{
 
     private SparkClosedLoopController pivotController;
 
-    private double rollerSpeed = 0.5;
+    private double rollerSpeed = -0.6;
 
     public IntakeSubsystem() {
         pivotController = pivotMotor.getClosedLoopController();
 
         pivotConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(0.01)
+                .p(0.35)
                 .i(0)
                 .d(0)
-                .outputRange(-0.25, 0.25)
+                .outputRange(-0.15, 0.4)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
@@ -48,7 +49,8 @@ public class IntakeSubsystem extends SubsystemBase{
             .busVoltagePeriodMs(500)
             .outputCurrentPeriodMs(500)
             .motorTemperaturePeriodMs(1000)
-            .faultsPeriodMs(500);
+            .faultsPeriodMs(500
+            );
 
         rollerConfig.signals
             .primaryEncoderPositionPeriodMs(500)
@@ -72,14 +74,14 @@ public class IntakeSubsystem extends SubsystemBase{
      */
     public void runRollers() {
         // TODO: Change back
-        //rollerMotor.set(rollerSpeed);
+        rollerMotor.set(rollerSpeed);
     }
 
     /**
      * Stops the intake rollers
      */
     public void stopRollers() {
-        //rollerMotor.set(0);
+        rollerMotor.set(0);
     }
 
     /**
@@ -94,6 +96,6 @@ public class IntakeSubsystem extends SubsystemBase{
      */
     public void retractIntake() {
         // Setpoint is 0 as a home position
-        pivotController.setSetpoint(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        //pivotController.setSetpoint(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 }

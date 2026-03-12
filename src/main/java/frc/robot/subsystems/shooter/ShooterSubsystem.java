@@ -62,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     boolean isSim;
 
-    double hoodHome = 0.8204660415649414;
+    double hoodHome = 0.5219196081161499;
 
     SparkClosedLoopController leftController;
     SparkClosedLoopController rightController;
@@ -269,6 +269,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.aimTarget = null;
         this.swerve = null;
         this.calculatedRPM = 0.0;
+        setHoodAngle(ShooterConstants.HOOD_HOME_ANGLE);
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
     }
 
@@ -290,16 +291,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setFlywheelRPM(double rpm) {
         goalRpm = rpm;
-        // TODO: Change back
-        /*leftController.setSetpoint(rpm*ShooterConstants.FLYWHEEL_GEAR_RATIO, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-        rightController.setSetpoint(-rpm*ShooterConstants.FLYWHEEL_GEAR_RATIO, ControlType.kVelocity, ClosedLoopSlot.kSlot1);*/
+        leftController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+        rightController.setSetpoint(-rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
     }
 
     public void stopFlywheel() {
         goalRpm = 0;
-        // TODO: Change back
-        //flywheelMotorLeft.set(0);
-        //flywheelMotorRight.set(0);
+        flywheelMotorLeft.set(0);
+        flywheelMotorRight.set(0);
     }
 
     public double getFlywheelRPM() {
@@ -332,7 +331,7 @@ public class ShooterSubsystem extends SubsystemBase {
             ShooterConstants.HOOD_MIN_ANGLE,
             Math.min(angle, ShooterConstants.HOOD_MAX_ANGLE));
         goalAngle = angle;
-        //hoodMotor.getClosedLoopController().setSetpoint(((angle - 75) / 360) * 9 * 10.96, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        hoodMotor.getClosedLoopController().setSetpoint(((angle - 75) / 360) * 9 * 10.96, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     public boolean hoodAtAngle(double tolerance) {

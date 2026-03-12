@@ -196,14 +196,22 @@ public class RobotContainer
     } else
     {
       // TODO: Configure this pose to a better position/use apriltags
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(0))))));
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(Math.toRadians(180))))));
+      //driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
       // Right Trigger - Shoot based on current mode
       driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret));
 
       // Left Trigger - Intake
       driverXbox.leftTrigger().whileTrue(new Intake(intake));
+
+      driverXbox.leftBumper().whileTrue(new InstantCommand(() -> indexer.startIndexing()));
+      driverXbox.leftBumper().onTrue(new InstantCommand(() -> shooter.setFlywheelRPM(6000)));
+      driverXbox.leftBumper().onTrue(new InstantCommand(() -> shooter.setHoodAngle(60)));
+
+      driverXbox.leftBumper().onFalse(new InstantCommand(() -> indexer.stopIndexing()));
+      driverXbox.leftBumper().onFalse(new InstantCommand(() -> shooter.setFlywheelRPM(0)));
+      driverXbox.leftBumper().onFalse(new InstantCommand(() -> shooter.setHoodAngle(75)));
 
       // X - Switch shooter to idle mode
       driverXbox.x().onTrue(Commands.runOnce(() -> {
@@ -241,8 +249,8 @@ public class RobotContainer
 
   public void teleopInit()
   {
-    shooter.startAiming(drivebase, this::getTarget);
-    turret.startAiming(drivebase, this::getTarget);
+    /*shooter.startAiming (drivebase, this::getTarget);
+    turret.startAiming(drivebase, this::getTarget);*/
   }
 
   public Translation3d getTarget() {

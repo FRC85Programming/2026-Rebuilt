@@ -18,7 +18,7 @@ public class Intake extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        intake.retractIntake();
-        intake.stopRollers();;
+        //intake.retractIntake();
+        intake.stopRollers();
     }
 }

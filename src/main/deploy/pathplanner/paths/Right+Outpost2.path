@@ -3,65 +3,61 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.36725555555555556,
-        "y": 5.9643999999999995
+        "x": 7.519557774607703,
+        "y": 3.6015549215406564
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.99457777777778,
-        "y": 5.944911111111111
+        "x": 7.0667047075582134,
+        "y": 0.5739087018569524
       },
       "isLocked": false,
-      "linkedName": "Depot"
+      "linkedName": "RightIntake"
     },
     {
       "anchor": {
-        "x": 4.294266666666667,
-        "y": 7.426066666666667
+        "x": 4.414279600568199,
+        "y": 0.6256633380909034
       },
       "prevControl": {
-        "x": 1.789944444444445,
-        "y": 7.445555555555555
+        "x": 5.413409506054867,
+        "y": 0.6256633380909034
       },
       "nextControl": {
-        "x": 4.859428643846774,
-        "y": 7.421668518984332
+        "x": 3.430941512123121,
+        "y": 0.6256633380909035
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.613444444444444,
-        "y": 7.192200000000001
+        "x": 0.4421112696148356,
+        "y": 0.6256633380909034
       },
       "prevControl": {
-        "x": 5.872866666666665,
-        "y": 7.435811111111113
+        "x": 1.1407988587731808,
+        "y": 0.6256633380909034
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Outpost"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.15577299412915616,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": 0.0
-    },
-    {
-      "waypointRelativePos": 0.838356164383564,
-      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.18055555555555391,
-      "maxWaypointRelativePos": 0.9509259259259306,
+      "minWaypointRelativePos": 1.1365914786967328,
+      "maxWaypointRelativePos": 2.0,
       "constraints": {
         "maxVelocity": 1.2,
-        "maxAcceleration": 2.0,
+        "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -80,14 +76,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -89.27477570094076
-  },
-  "reversed": false,
-  "folder": "Left+Depot",
-  "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Right+Outpost",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 75.0
   },
   "useDefaultConstraints": true
 }

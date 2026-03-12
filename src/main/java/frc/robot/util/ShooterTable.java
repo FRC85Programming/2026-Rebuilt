@@ -36,7 +36,7 @@ public class ShooterTable {
   public static ShooterSetpoint getSetpoint(double distanceMeters) {
     return new ShooterSetpoint(
         hoodAngleMap.get(distanceMeters),
-        flywheelSpeedMap.get(distanceMeters));
+        flywheelSpeedMap.get(distanceMeters)/1.2);
   }
 
   public record ShooterSetpoint(

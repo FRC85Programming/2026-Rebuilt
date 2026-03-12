@@ -46,7 +46,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final TurretSim turretSim = new TurretSim();
 
     private final boolean isSim;
-    double absEncoderHome = 0.16193757951259613;
+    double turretHome = 0;
 
     SparkClosedLoopController closedLoopController;
 
@@ -64,11 +64,11 @@ public class TurretSubsystem extends SubsystemBase {
         closedLoopController = turretMotor.getClosedLoopController();
 
         turretConfig.closedLoop
-                .feedbackSensor(FeedbackSensor.kDetachedAbsoluteEncoder)
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(0.35)
                 .i(0)
                 .d(0)
-                .outputRange(-0.3, 0.3)
+                .outputRange(-0.6, 0.6)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
@@ -88,6 +88,8 @@ public class TurretSubsystem extends SubsystemBase {
         turretMotor.configure(turretConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         turretMotor.getEncoder().setPosition(0);
+        //turretMotor.getEncoder().setPosition((turretMotor.getAbsoluteEncoder().getPosition() - turretHome) * TurretConstants.TURRET_GEAR_RATIO);
+        
         SmartDashboard.putNumber("Turret P", 1);
         SmartDashboard.putNumber("Setpoint", 0);
     }
@@ -198,7 +200,6 @@ public class TurretSubsystem extends SubsystemBase {
         angleDeg = MathUtil.clamp(angleDeg, TurretConstants.TURRET_LOWER_LIMIT_DEG, TurretConstants.TURRET_UPPER_LIMIT_DEG);
 
         goalAngle = (angleDeg / 360.0) * TurretConstants.TURRET_GEAR_RATIO;
-        // TODO: Change this back lol
         //closedLoopController.setSetpoint(goalAngle, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
         SmartDashboard.putNumber("Turret Goal Angle", angleDeg);
@@ -217,14 +218,12 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void updateLogging() {
         double motorPosition = turretMotor.getEncoder().getPosition();
-        double turretAngleRads = RobotBase.isSimulation()
-            ? turretSim.getTurretAngleRads()
-            : (motorPosition / TurretConstants.TURRET_GEAR_RATIO) * (Math.PI * 2);
+        double turretAngleRads = getTurretAngleRads();
         double turretAngleDeg = Math.toDegrees(turretAngleRads);
 
         SmartDashboard.putNumber("Motor Setpoint", closedLoopController.getSetpoint());
         SmartDashboard.putNumber("Turret Angle Measured (deg)", turretAngleDeg);
-        SmartDashboard.putNumber("Turret ABS Encoder Value", turretEncoder.get());
+        SmartDashboard.putNumber("Turret ABS Encoder Value", turretMotor.getAbsoluteEncoder().getPosition());
         SmartDashboard.putNumber("Turret Motor Encoder", motorPosition);
         SmartDashboard.putNumber("Turret RAD", turretAngleRads);
         SmartDashboard.putNumber("Turret DEG", turretAngleDeg);

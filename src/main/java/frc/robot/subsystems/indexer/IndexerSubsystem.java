@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexerConstants;
 
@@ -17,8 +18,8 @@ public class IndexerSubsystem extends SubsystemBase {
     private final SparkFlex beltMotor =
         new SparkFlex(IndexerConstants.BELT_MOTOR_ID, MotorType.kBrushless);
 
-    private double indexSpeed = 0.5;
-    private double beltSpeed = 0.5;
+    private double indexSpeed = -0.1;
+    private double beltSpeed = -0.5;
 
     public IndexerSubsystem() {
         SparkFlexConfig indexerConfig = new SparkFlexConfig();
@@ -43,6 +44,14 @@ public class IndexerSubsystem extends SubsystemBase {
 
         indexerMotor.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         beltMotor.configure(beltConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        SmartDashboard.putNumber("Index Speed", indexSpeed);
+        SmartDashboard.putNumber("Belt Speed", beltSpeed);
+    }
+
+    public void periodic() {
+        indexSpeed = SmartDashboard.getNumber("Index Speed", indexSpeed);
+        beltSpeed = SmartDashboard.getNumber("Belt Speed", beltSpeed);
     }
 
 
@@ -73,15 +82,15 @@ public class IndexerSubsystem extends SubsystemBase {
     public void startIndexing() {
                 // TODO: Change back
 
-        // setIndexerSpeed(indexSpeed);
-        // setBeltSpeed(beltSpeed);
+         setIndexerSpeed(indexSpeed);
+         setBeltSpeed(beltSpeed);
     }
 
     /**
      * Stops all parts of the indexer
      */
     public void stopIndexing() {
-        // setIndexerSpeed(0);
-        // setBeltSpeed(0);
+         setIndexerSpeed(0);
+         setBeltSpeed(0);
     }
 }
