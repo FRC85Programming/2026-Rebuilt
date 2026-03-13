@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.433077777777778,
-        "y": 2.4661444444444443
+        "x": 0.4679885877318113,
+        "y": 0.5609700427960058
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3064,
-        "y": 2.0178999999999996
+        "x": 0.6361911554921535,
+        "y": 0.8197432239657632
       },
       "isLocked": false,
-      "linkedName": "DriveByLeft2"
+      "linkedName": "AngledOutpost"
     },
     {
       "anchor": {
-        "x": 1.9166222222222222,
-        "y": 1.0142222222222221
+        "x": 1.0372895863052778,
+        "y": 2.915805991440799
       },
       "prevControl": {
-        "x": 2.1486166170837,
-        "y": 1.189401663240073
-      },
-      "nextControl": {
-        "x": 1.4391444444444446,
-        "y": 0.6536777777777774
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 0.5524,
-        "y": 0.5659777777777777
-      },
-      "prevControl": {
-        "x": 0.9714111111111114,
-        "y": 0.575722222222222
+        "x": 0.9208416547788869,
+        "y": 2.17830242510699
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "ROutpost"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -49,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 1.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -64,7 +48,7 @@
   "folder": "Depot+Outpost",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 39.2205141748441
+    "rotation": 46.817613095594524
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

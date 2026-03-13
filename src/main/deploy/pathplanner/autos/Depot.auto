@@ -13,13 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Depot+Outpost2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Depot+Outpost3"
+            "pathName": "Depot2"
           }
         }
       ]

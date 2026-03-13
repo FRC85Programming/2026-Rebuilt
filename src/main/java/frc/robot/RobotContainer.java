@@ -50,13 +50,13 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/neo"));
-  private final ShooterSubsystem shooter = new ShooterSubsystem();
+  //private final ShooterSubsystem shooter = new ShooterSubsystem();
 
-  private final IntakeSubsystem intake = new IntakeSubsystem();
+  //private final IntakeSubsystem intake = new IntakeSubsystem();
 
-  private final IndexerSubsystem indexer = new IndexerSubsystem();
+  //private final IndexerSubsystem indexer = new IndexerSubsystem();
 
-  private final TurretSubsystem turret = new TurretSubsystem();
+  //private final TurretSubsystem turret = new TurretSubsystem();
 
   private final VisionSubsystem vision = new VisionSubsystem();
 
@@ -131,7 +131,7 @@ public class RobotContainer
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST")); 
-    NamedCommands.registerCommand("Intake", new Intake(intake));
+    //NamedCommands.registerCommand("Intake", new Intake(intake));
     NamedCommands.registerCommand("SmartIntakeBlueLeft", new PathPlanToBalls(drivebase, vision, 5.64, 8.43, 4, 7.5));
     NamedCommands.registerCommand("DriveToBlueLeftShoot", drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.toRadians(180)))));
 
@@ -139,7 +139,10 @@ public class RobotContainer
     autoChooser.addOption("LeftRush", "LeftRush");
     autoChooser.addOption("Double Swipe Left", "DoubleSwipeLeft");
     autoChooser.addOption("Left+Depot", "Left+Depot");
+    autoChooser.addOption("Depot", "Depot");
+    autoChooser.addOption("Depot+Outpost", "Depot+Outpost");
     autoChooser.addOption("Left Smart Auto", "LeftSmartAuto");
+    autoChooser.addOption("Loop", "Loop");
 
     autoChooser.addOption("Test", "TestAuto");
 
@@ -159,11 +162,10 @@ public class RobotContainer
    */
   private void configureBindings()
   {
-    // Maybe try this at some point?
-    // Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
 
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
     Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+    
 
     if (RobotBase.isSimulation())
     {
@@ -179,9 +181,9 @@ public class RobotContainer
     if (Robot.isSimulation())
     {
       driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
-      driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret));
+      //driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
-      driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
+      //driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
     }
     if (DriverStation.isTest())
     {
@@ -200,26 +202,27 @@ public class RobotContainer
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
       // Right Trigger - Shoot based on current mode
-      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret));
+      //driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret));
 
       // Left Trigger - Intake
-      driverXbox.rightTrigger().whileTrue(new Intake(intake));
+      //driverXbox.rightTrigger().whileTrue(new Intake(intake));
+      driverXbox.leftBumper().onTrue(drivebase.sysIdDriveMotorCommand());
 
       // X - Switch shooter to idle mode
       driverXbox.x().onTrue(Commands.runOnce(() -> {
-              shooter.stopAiming();
-              turret.stopAiming();
+              //shooter.stopAiming();
+              //turret.stopAiming();
           }));
 
       // B - Start aiming in case of failure to auto init
       driverXbox.b().onTrue(Commands.runOnce(() -> {
-              shooter.startAiming(drivebase, () -> getTarget());
-              turret.startAiming(drivebase, () -> getTarget());
+              //shooter.startAiming(drivebase, () -> getTarget());
+              //turret.startAiming(drivebase, () -> getTarget());
           }));
 
       // Quick inputs for spinning turret - TEST ONLY
-      driverXbox.pov(0).onTrue(new InstantCommand(() -> turret.setTurretAngle(0)));
-      driverXbox.pov(180).onTrue(new InstantCommand(() -> turret.setTurretAngle(180)));
+      //driverXbox.pov(0).onTrue(new InstantCommand(() -> turret.setTurretAngle(0)));
+      //driverXbox.pov(180).onTrue(new InstantCommand(() -> turret.setTurretAngle(180)));
     }
   }
 
@@ -241,8 +244,8 @@ public class RobotContainer
 
   public void teleopInit()
   {
-    shooter.startAiming(drivebase, this::getTarget);
-    turret.startAiming(drivebase, this::getTarget);
+    //shooter.startAiming(drivebase, this::getTarget);
+    //turret.startAiming(drivebase, this::getTarget);
   }
 
   public Translation3d getTarget() {

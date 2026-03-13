@@ -96,7 +96,7 @@ public class FieldObstacleAligner {
             ObstacleAlignmentConstants.TRENCH2_TARGET_Y)
     };
 
-    SmartDashboard.putBoolean(SMARTDASHBOARD_KEY, true);
+    SmartDashboard.putBoolean(SMARTDASHBOARD_KEY, false);
   }
 
   /**
@@ -113,7 +113,7 @@ public class FieldObstacleAligner {
       return driverInput;
     }
 
-    if (!SmartDashboard.getBoolean(SMARTDASHBOARD_KEY, true)) {
+    if (!SmartDashboard.getBoolean(SMARTDASHBOARD_KEY, false)) {
       SmartDashboard.putString("Obstacle Alignment", "Disabled");
       return driverInput;
     }

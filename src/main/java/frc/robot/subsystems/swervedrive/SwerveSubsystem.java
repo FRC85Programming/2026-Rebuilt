@@ -180,6 +180,9 @@ public class SwerveSubsystem extends SubsystemBase
                                   Constants.MAX_SPEED,
                                   new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
                                              Rotation2d.fromDegrees(0)));
+
+    // Calculated with SysID and averaged between modules
+    replaceSwerveModuleFeedforward(0.1046795, 2.21215, 0.1471075);
   }
 
   /**
@@ -263,9 +266,9 @@ public class SwerveSubsystem extends SubsystemBase
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.1),
+              new PIDConstants(5.0, 0.0, 0.0),
               // Translation PID constants
-              new PIDConstants(6.0, 0.0, 0.0)
+              new PIDConstants(5.0, 0.0, 0.0)
               // Rotation PID constants
           ),
           config,
