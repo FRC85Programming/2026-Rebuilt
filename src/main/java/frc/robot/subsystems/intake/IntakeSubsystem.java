@@ -26,7 +26,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
     private SparkClosedLoopController pivotController;
 
-    private double rollerSpeed = -0.6;
+    private double rollerSpeed = -0.5;
 
     public IntakeSubsystem() {
         pivotController = pivotMotor.getClosedLoopController();
@@ -36,7 +36,7 @@ public class IntakeSubsystem extends SubsystemBase{
                 .p(0.35)
                 .i(0)
                 .d(0)
-                .outputRange(-0.15, 0.4)
+                .outputRange(-0.15, 0.15)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
@@ -63,10 +63,16 @@ public class IntakeSubsystem extends SubsystemBase{
 
         pivotConfig.idleMode(IdleMode.kBrake);
 
+        rollerConfig.idleMode(IdleMode.kCoast);
+
         pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         pivotMotor.getEncoder().setPosition(0);
+    }
+
+    public void periodic() {
+        SmartDashboard.putNumber("Intake Position", pivotMotor.getEncoder().getPosition());
     }
 
     /**
@@ -88,7 +94,7 @@ public class IntakeSubsystem extends SubsystemBase{
      * Deploys the intake to the downwards position using closed loop control
      */
     public void deployIntake() {
-        //pivotController.setSetpoint(IntakeConstants.INTAKE_DOWN_POSITION, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        pivotController.setSetpoint(IntakeConstants.INTAKE_DOWN_POSITION, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     /**
@@ -96,6 +102,14 @@ public class IntakeSubsystem extends SubsystemBase{
      */
     public void retractIntake() {
         // Setpoint is 0 as a home position
-        //pivotController.setSetpoint(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        pivotController.setSetpoint(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    }
+
+    public void stowIntake() {
+        pivotController.setSetpoint(IntakeConstants.INTAKE_STOW_POSITION, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    }
+
+    public boolean isPivotAtSetpoint(double tolerance) {
+        return pivotController.isAtSetpoint();
     }
 }

@@ -59,24 +59,24 @@ public final class Constants
     public static final int HOOD_MOTOR_ID = 15;
 
 
-    public static final double FLYWHEEL_GEAR_RATIO = 1.23;
+    public static final double FLYWHEEL_GEAR_RATIO = 1;
     public static final double HOOD_GEAR_RATIO = 265/25;
 
     // Hood limits - degrees
     public static final double HOOD_MIN_ANGLE = 40;
-    public static final double HOOD_MAX_ANGLE = 80;
+    public static final double HOOD_MAX_ANGLE = 75;
 
     public static final double SHOOTER_HEIGHT_METERS = 0.51;
 
     // Distance from robot center
-    public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(0, Units.feetToMeters(1));
+    public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(Units.inchesToMeters(-5.5), 0);
 
     public static final double HOOD_HOME_ANGLE = 75;
     public static final double HOOD_LENGTH_METERS = 0.1;
   }
 
   public static class FieldConstants {
-      public static final Translation3d blueHub = new Translation3d(4.620, 4.055, 1.829);
+      public static final Translation3d blueHub = new Translation3d(4.6, 4.05, 1.829);
       public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
       public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
       public static final Translation3d redFeedPosition = new Translation3d(8.0, 0.7, 0);
@@ -90,14 +90,15 @@ public final class Constants
   public static class TurretConstants {
       public static final int TURRET_MOTOR_ID = 19;
 
-      public static final Transform3d ROBOT_TO_TURRET = new Transform3d(0, Units.feetToMeters(1), Units.inchesToMeters(1), Rotation3d.kZero);
-      public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(0, Units.feetToMeters(1), Rotation2d.kZero);
+      public static final Transform3d ROBOT_TO_TURRET = new Transform3d(Units.inchesToMeters(-5.5), 0, Units.inchesToMeters(1), Rotation3d.kZero);
+      public static final Transform2d ROBOT_TO_TURRET_2D = new Transform2d(Units.inchesToMeters(-5.5),0, Rotation2d.kZero);
 
       public static final double TURRET_GEAR_RATIO = 32;
 
-      public static final double MOUNTING_OFFSET = 0;
+      public static final double MOUNTING_OFFSET = -180;
 
       public static final double TURRET_LOWER_LIMIT_DEG = -285;
+
 
       public static final double TURRET_UPPER_LIMIT_DEG = 80;
   }
@@ -108,7 +109,9 @@ public final class Constants
     public static final int PIVOT_MOTOR_ID = 25;
 
     // The position (in motor rotations) in which the intake is in the down position
-    public static final double INTAKE_DOWN_POSITION = -4.27;
+    public static final double INTAKE_DOWN_POSITION = -9.4;
+
+    public static final double INTAKE_STOW_POSITION = -4;
   }
 
   public static class ObstacleAlignmentConstants {
@@ -140,5 +143,14 @@ public final class Constants
   public static class IndexerConstants {
     public static final int INDEXER_MOTOR_ID = 16;
     public static final int BELT_MOTOR_ID = 24;
+  }
+
+  public static class ClimberConstants {
+    public static final int CLIMB_MOTOR_ID = 50;
+
+    public static final double CLIMBER_UP_POSITION = 83.5;
+
+    public static final double CLIMBER_CLIMB_POSITION = 50;
+
   }
 }

@@ -18,7 +18,7 @@ public class IndexerSubsystem extends SubsystemBase {
     private final SparkFlex beltMotor =
         new SparkFlex(IndexerConstants.BELT_MOTOR_ID, MotorType.kBrushless);
 
-    private double indexSpeed = -0.1;
+    private double indexSpeed = -0.3;
     private double beltSpeed = -0.5;
 
     public IndexerSubsystem() {

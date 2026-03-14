@@ -29,11 +29,11 @@ public class FireCommand extends Command {
     public void execute() {
         shooter.setFlywheelRPM(shooter.getCalculatedRPM());
 
-        boolean ready = shooter.flywheelAtSpeed(0.80) && shooter.hoodAtAngle(1) && turret.turretAtAngle(1);
+        boolean ready = shooter.flywheelAtSpeed(0.80) && shooter.hoodAtAngle(1) && turret.turretAtAngle(3);
         SmartDashboard.putBoolean("AIMED", ready);
         SmartDashboard.putBoolean("READY FLYWHEEL", shooter.flywheelAtSpeed(0.80));
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
-        SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(1));
+        SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(2));
 
         if (ready) {
             indexer.startIndexing();

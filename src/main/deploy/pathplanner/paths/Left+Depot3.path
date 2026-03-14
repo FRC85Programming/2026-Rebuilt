@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.36725555555555556,
-        "y": 5.9643999999999995
+        "x": 0.4032952924393719,
+        "y": 5.969329529243937
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.99457777777778,
-        "y": 5.944911111111111
+        "x": 2.030617514661597,
+        "y": 5.949840640355048
       },
       "isLocked": false,
       "linkedName": "Depot"
@@ -47,11 +47,11 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.15577299412915616,
-      "rotationDegrees": 0.0
+      "rotationDegrees": 180.0
     },
     {
-      "waypointRelativePos": 0.838356164383564,
-      "rotationDegrees": -90.0
+      "waypointRelativePos": 1.3209442491210286,
+      "rotationDegrees": 180.0
     }
   ],
   "constraintZones": [
@@ -70,7 +70,14 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Start Intake",
+      "waypointRelativePos": 1.6027568922305073,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 2.7,
     "maxAcceleration": 3.0,
@@ -87,7 +94,7 @@
   "folder": "Left+Depot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

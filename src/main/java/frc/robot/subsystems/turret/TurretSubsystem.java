@@ -41,8 +41,6 @@ public class TurretSubsystem extends SubsystemBase {
     private final SparkFlex turretMotor =
         new SparkFlex(TurretConstants.TURRET_MOTOR_ID, MotorType.kBrushless);
 
-    private final DutyCycleEncoder turretEncoder = new DutyCycleEncoder(1);
-
     private final TurretSim turretSim = new TurretSim();
 
     private final boolean isSim;
@@ -68,7 +66,7 @@ public class TurretSubsystem extends SubsystemBase {
                 .p(0.35)
                 .i(0)
                 .d(0)
-                .outputRange(-0.6, 0.6)
+                .outputRange(-0.65, 0.65)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
@@ -149,7 +147,7 @@ public class TurretSubsystem extends SubsystemBase {
         // Lead-compensated target position
         Translation2d leadTargetFieldPos = targetTranslation.toTranslation2d()
             .plus(new Translation2d(
-                -lateralVel * timeOfFlight,
+                lateralVel * timeOfFlight,
                 toTarget.getAngle().plus(Rotation2d.fromDegrees(90))
             ));
 
@@ -200,7 +198,7 @@ public class TurretSubsystem extends SubsystemBase {
         angleDeg = MathUtil.clamp(angleDeg, TurretConstants.TURRET_LOWER_LIMIT_DEG, TurretConstants.TURRET_UPPER_LIMIT_DEG);
 
         goalAngle = (angleDeg / 360.0) * TurretConstants.TURRET_GEAR_RATIO;
-        //closedLoopController.setSetpoint(goalAngle, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        closedLoopController.setSetpoint(goalAngle, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
         SmartDashboard.putNumber("Turret Goal Angle", angleDeg);
     }

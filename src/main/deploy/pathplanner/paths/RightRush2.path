@@ -49,13 +49,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "SpinUp",
+      "name": "",
       "waypointRelativePos": 0.5601503759398546,
       "endWaypointRelativePos": 1.56,
       "command": null
     },
     {
-      "name": "Shoot",
+      "name": "",
       "waypointRelativePos": 1.5576441102756788,
       "endWaypointRelativePos": null,
       "command": null

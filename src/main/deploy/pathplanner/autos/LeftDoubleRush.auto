@@ -11,6 +11,43 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "LeftRush2"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Shooting"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 4.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Shooting"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftRush3"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Stop Intake"
@@ -19,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftRush2"
+            "pathName": "LeftRush4"
           }
         },
         {

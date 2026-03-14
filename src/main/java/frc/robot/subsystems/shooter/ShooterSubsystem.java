@@ -62,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     boolean isSim;
 
-    double hoodHome = 0.5219196081161499;
+    double hoodHome = 0.6361150741577148;
 
     SparkClosedLoopController leftController;
     SparkClosedLoopController rightController;
@@ -110,7 +110,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         hoodConfig.closedLoop
                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(0.35)
+                .p(0.5)
                 .i(0)
                 .d(0)
                 .outputRange(-0.5, 0.5)
@@ -220,7 +220,7 @@ public class ShooterSubsystem extends SubsystemBase {
         double timeOfFlight = 0;
         for (int i = 0; i < 3; i++) {
             timeOfFlight = TimeOfFlightTable.getTimeOfFlight(Math.max(effectiveDistance, 0.1));
-            effectiveDistance = distance - (radialVel * timeOfFlight);
+            effectiveDistance = distance - (-radialVel * timeOfFlight);
         }
 
         SmartDashboard.putNumber("CALCULATED TIME OF FLIGHT", timeOfFlight);
@@ -305,6 +305,7 @@ public class ShooterSubsystem extends SubsystemBase {
         if (isSim) {
             return convertFlywheelVelocity(shooterSim.getFlywheelRPM());
         } else {
+            // Using left motor results in a positive value
             return convertFlywheelVelocity(flywheelMotorLeft.getEncoder().getVelocity());
         }
     }

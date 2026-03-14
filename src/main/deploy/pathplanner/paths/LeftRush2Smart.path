@@ -12,7 +12,7 @@
         "y": 7.5
       },
       "isLocked": false,
-      "linkedName": "LeftTrenchEnter"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -33,13 +33,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "SpinUp",
+      "name": "",
       "waypointRelativePos": 0.282581453634091,
       "endWaypointRelativePos": 1.68,
       "command": null
     },
     {
-      "name": "Shoot",
+      "name": "",
       "waypointRelativePos": 0.85,
       "endWaypointRelativePos": null,
       "command": null

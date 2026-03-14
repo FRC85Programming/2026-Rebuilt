@@ -16,24 +16,19 @@
     },
     {
       "anchor": {
-        "x": 7.610128388017117,
-        "y": 5.374151212553495
+        "x": 8.231184022824536,
+        "y": 5.296519258202568
       },
       "prevControl": {
-        "x": 7.5126839435726716,
-        "y": 6.3291067681090505
+        "x": 8.13373957838009,
+        "y": 6.251474813758123
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "LeftRushIntake"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -75.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
@@ -50,7 +45,14 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Start Intake",
+      "waypointRelativePos": 0.46804511278194205,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 2.7,
     "maxAcceleration": 3.0,
@@ -61,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": -75.0
+    "rotation": -103.32453126189083
   },
   "reversed": false,
   "folder": "Left+Depot",

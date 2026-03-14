@@ -244,8 +244,8 @@ public class SwerveSubsystem extends SubsystemBase
           // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
           (speedsRobotRelative, moduleFeedForwards) -> {
             ChassisSpeeds modifiedSpeeds = new ChassisSpeeds(
-                speedsRobotRelative.vxMetersPerSecond,
-                speedsRobotRelative.vyMetersPerSecond,
+                -speedsRobotRelative.vxMetersPerSecond,
+                -speedsRobotRelative.vyMetersPerSecond,
                 speedsRobotRelative.omegaRadiansPerSecond
             );
             if (enableFeedforward)

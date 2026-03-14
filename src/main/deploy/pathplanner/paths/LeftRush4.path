@@ -3,57 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5524,
-        "y": 0.5659777777777777
+        "x": 7.700699001426534,
+        "y": 5.244764621968616
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7254111111111117,
-        "y": 1.9204555555555545
+        "x": 7.610128388017117,
+        "y": 7.043238231098431
       },
       "isLocked": false,
-      "linkedName": "ROutpost"
+      "linkedName": "LeftRushInnerIntake"
     },
     {
       "anchor": {
-        "x": 2.423333333333334,
-        "y": 3.8206222222222213
+        "x": 3.3274322396576315,
+        "y": 7.405520684736091
       },
       "prevControl": {
-        "x": 2.286911111111112,
-        "y": 3.450333333333333
+        "x": 6.62679029957204,
+        "y": 7.5996005706134095
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [
+  "rotationTargets": [
     {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.2647286821705469,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 1.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
+      "waypointRelativePos": 0.592164741336006,
+      "rotationDegrees": 180.0
     }
   ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "DriveBy",
-      "waypointRelativePos": 0.2740310077519405,
+      "name": "Aim Turret",
+      "waypointRelativePos": 0.6936090225563774,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "DriveBy"
+          "name": "Aim Turret"
         }
       }
     }
@@ -68,13 +59,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Depot+Outpost",
+  "folder": "Left Rush",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -110.55604521958377
   },
   "useDefaultConstraints": true
 }

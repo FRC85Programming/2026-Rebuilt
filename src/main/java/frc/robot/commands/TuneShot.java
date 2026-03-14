@@ -27,11 +27,11 @@ public class TuneShot extends Command{
     IndexerSubsystem indexer;
 
     public TuneShot(SwerveSubsystem swerve, ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret, Supplier<Translation3d> target) {
+        this.indexer = indexer;
         this.shooter = shooter;
         this.swerve = swerve;
         this.target = target;
         this.turret = turret;
-
         SmartDashboard.putBoolean("Feed", false);
         SmartDashboard.putNumber("Feed Speed", 0.8);
 
@@ -62,10 +62,6 @@ public class TuneShot extends Command{
         if (distance < 1e-6) {
             return;
         }
-
-            
-        /**goalRPM = SmartDashboard.getNumber("TUNE Shot RPM", 0);
-        goalAngle = SmartDashboard.getNumber("TUNE Shot Angle", 80);*/
 
         goalRPM = SmartDashboard.getNumber("TUNE RPM", 1000);
         goalAngle = SmartDashboard.getNumber("TUNE ANGLE", 75);
@@ -116,9 +112,8 @@ public class TuneShot extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        swerve.drive(new ChassisSpeeds(0, 0, 0));
         indexer.stopIndexing();
-        shooter.stopFlywheel();
+        shooter.setFlywheelSpeed(0);
         turret.setTurretAngle(0);
     }
 }
