@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.4530075187969967,
+      "waypointRelativePos": 0.3126566416040119,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",

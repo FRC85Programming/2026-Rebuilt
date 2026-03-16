@@ -1,0 +1,131 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.37546362339515,
+        "y": 7.392582025677603
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.471526390870184,
+        "y": 7.547845934379458
+      },
+      "isLocked": false,
+      "linkedName": "LeftRushStart"
+    },
+    {
+      "anchor": {
+        "x": 8.282938659058486,
+        "y": 6.279857346647646
+      },
+      "prevControl": {
+        "x": 8.218726391514247,
+        "y": 7.098563757836697
+      },
+      "nextControl": {
+        "x": 8.438202567760339,
+        "y": 4.300242510699001
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.116690442225392,
+        "y": 5.529415121255349
+      },
+      "prevControl": {
+        "x": 5.52700427960057,
+        "y": 5.542353780313838
+      },
+      "nextControl": {
+        "x": 3.5965846729282918,
+        "y": 5.52464350869299
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.1592296718972896,
+        "y": 7.276134094151213
+      },
+      "prevControl": {
+        "x": 2.965149786019971,
+        "y": 6.1245934379457925
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "LeftBumpRushStopPoint"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6338523355097954,
+      "rotationDegrees": -42.10552465375266
+    },
+    {
+      "waypointRelativePos": 1.1978905072827755,
+      "rotationDegrees": -143.58430417442253
+    },
+    {
+      "waypointRelativePos": 1.824711200401815,
+      "rotationDegrees": 45.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.6898496240601555,
+      "maxWaypointRelativePos": 3.0,
+      "constraints": {
+        "maxVelocity": 1.2,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Start Intake",
+      "waypointRelativePos": 0.650375939849627,
+      "endWaypointRelativePos": 1.6478696741854546,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Intake"
+        }
+      }
+    },
+    {
+      "name": "Start Shooting",
+      "waypointRelativePos": 1.960526315789494,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.7,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Left Bump Rush",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

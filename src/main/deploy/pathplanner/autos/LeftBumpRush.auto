@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftRush1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftRush2"
+            "pathName": "LeftBumpRush1"
           }
         },
         {
@@ -21,22 +15,9 @@
           "data": {
             "commands": [
               {
-                "type": "race",
+                "type": "wait",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Start Shooting"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 4.0
-                      }
-                    }
-                  ]
+                  "waitTime": 2.0
                 }
               },
               {
@@ -51,13 +32,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftRush3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftRush4"
+            "pathName": "LeftBumpRush2"
           }
         },
         {

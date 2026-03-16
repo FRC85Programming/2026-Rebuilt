@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.5206766917293267,
+      "waypointRelativePos": 0.46052631578947584,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",
@@ -74,7 +74,7 @@
   "folder": "Left Rush",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
