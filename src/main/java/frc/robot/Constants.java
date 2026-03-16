@@ -77,9 +77,9 @@ public final class Constants
 
   public static class FieldConstants {
       public static final Translation3d blueHub = new Translation3d(4.6, 4.05, 1.829);
-      public static final Translation3d blueFeedPosition = new Translation3d(0.7, 0.7, 0);
+      public static final Translation3d blueFeedPosition = new Translation3d(2.6, 0.0, 1.829);
       public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
-      public static final Translation3d redFeedPosition = new Translation3d(8.0, 0.7, 0);
+      public static final Translation3d redFeedPosition = new Translation3d(13.930, 0.0, 1.829);
 
       // Saftey poses
       public static final Translation2d blueLeftEnterAllianceZonePose = new Translation2d(5.825, 7.500);

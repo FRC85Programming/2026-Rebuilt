@@ -227,7 +227,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
         double clampedEffectiveDistance = Math.max(effectiveDistance, 0.1);
         var setpoint = (state == ShooterState.FEEDING)
-            ? FeedingTable.getSetpoint(clampedEffectiveDistance)
+            // CHANGE THIS TO FEEDING TABLE ONCE IT IS CREATED
+            ? ShooterTable.getSetpoint(clampedEffectiveDistance)
             : ShooterTable.getSetpoint(clampedEffectiveDistance);
 
         calculatedRPM = Math.abs(setpoint.flywheelRPM());
@@ -257,7 +258,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /** Enter FEEDING state: same as AIMING but uses FeedingTable for setpoints. */
-    public void startIndexing(SwerveSubsystem swerve, Supplier<Translation3d> target) {
+    public void startFeeding(SwerveSubsystem swerve, Supplier<Translation3d> target) {
         this.swerve = swerve;
         this.aimTarget = target;
         this.state = ShooterState.FEEDING;

@@ -167,10 +167,12 @@ public class RobotContainer
 
 
     autoChooser.addOption("LeftDoubleRush", "LeftDoubleRush");
+    autoChooser.addOption("LeftBumpRush", "LeftBumpRush");
     autoChooser.addOption("Left+Depot", "Left+Depot");
-    autoChooser.addOption("Left+Depot", "Left+Depot");
-    autoChooser.addOption("RightRush", "RightRush");
+    autoChooser.addOption("RightDoubleRush", "RightDoubleRush");
+    autoChooser.addOption("RightBumpRush", "RightBumpRush");
     autoChooser.addOption("Right+Outpost", "Right+Outpost");
+    autoChooser.addOption("Center", "Center");
 
     SmartDashboard.putData("Auto Selector", autoChooser);
 
@@ -225,7 +227,8 @@ public class RobotContainer
     } else
     {
       // TODO: Configure this pose to a better position/use apriltags
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
+      //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(4.375, 7.393, new Rotation2d(0)))));
       //driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
       // Right Trigger - Shoot based on current mode
@@ -255,6 +258,12 @@ public class RobotContainer
       driverXbox.b().onTrue(Commands.runOnce(() -> {
               shooter.startAiming(drivebase, () -> getTarget());
               turret.startAiming(drivebase, () -> getTarget());
+          }));
+
+      // A - Start feeding mode
+      driverXbox.a().onTrue(Commands.runOnce(() -> {
+              shooter.startFeeding(drivebase, () -> getFeedTarget());
+              turret.startFeeding(drivebase, () -> getFeedTarget());
           }));
 
       // Quick inputs for spinning turret - TEST ONLY
@@ -297,6 +306,18 @@ public class RobotContainer
     }
     else {
         return new Translation3d();
+    }
+  }
+
+  public Translation3d getFeedTarget() {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    double robotY = drivebase.getPose().getY();
+    if (alliance.isPresent() && alliance.get() == Alliance.Red) {
+        Translation3d base = Constants.FieldConstants.redFeedPosition;
+        return new Translation3d(base.getX(), robotY, base.getZ());
+    } else {
+        Translation3d base = Constants.FieldConstants.blueFeedPosition;
+        return new Translation3d(base.getX(), robotY, base.getZ());
     }
   }
 

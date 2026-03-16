@@ -74,6 +74,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         turretConfig.inverted(true);
 
+        turretConfig.closedLoopRampRate(0.1);
+
         turretConfig.signals
             .primaryEncoderPositionPeriodMs(20)
             .primaryEncoderVelocityPeriodMs(500)
@@ -168,7 +170,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     /** Enter FEEDING state: tracks the feed target using the same aiming logic. */
-    public void startIndexing(SwerveSubsystem swerve, Supplier<Translation3d> target) {
+    public void startFeeding(SwerveSubsystem swerve, Supplier<Translation3d> target) {
         this.swerve = swerve;
         this.aimTarget = target;
         this.state = TurretState.FEEDING;
