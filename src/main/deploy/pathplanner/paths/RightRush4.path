@@ -3,35 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.27,
-        "y": 3.0063766048502147
+        "x": 7.763288888888889,
+        "y": 2.992344444444444
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.3513552068473595,
-        "y": 0.6774179743223971
+        "x": 7.452761071485179,
+        "y": 0.650447154858139
       },
       "isLocked": false,
-      "linkedName": "RightRushIntake"
+      "linkedName": "RightRushInnerIntake"
     },
     {
       "anchor": {
-        "x": 3.560328102710413,
-        "y": 0.6515406562054205
+        "x": 3.4697574893009984,
+        "y": 0.6774179743223976
       },
       "prevControl": {
-        "x": 7.0796433666191145,
-        "y": 0.6515406562054205
+        "x": 6.2774465049928665,
+        "y": 0.7421112696148362
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RightShootPoint"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.706680060271218,
-      "rotationDegrees": 0.0
+      "waypointRelativePos": 0.6002009040683087,
+      "rotationDegrees": 180.0
     }
   ],
   "constraintZones": [],
@@ -39,7 +39,7 @@
   "eventMarkers": [
     {
       "name": "Aim Turret",
-      "waypointRelativePos": 0.7863408521303221,
+      "waypointRelativePos": 0.688596491228068,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -59,7 +59,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Right Rush",

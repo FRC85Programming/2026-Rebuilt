@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.5066191155492135,
-        "y": 0.7032952924393738
+        "x": 7.998288159771754,
+        "y": 0.6903566333808839
       },
       "isLocked": false,
       "linkedName": "RightRushStart"
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 8.27,
-        "y": 3.653309557774608
+        "y": 3.0063766048502147
       },
       "prevControl": {
         "x": 8.127674750356633,
-        "y": 2.0618544935805994
+        "y": 1.4149215406562061
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,10 +47,15 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "",
-      "waypointRelativePos": 0.36278195488722065,
-      "endWaypointRelativePos": null,
-      "command": null
+      "name": "Start Intake",
+      "waypointRelativePos": 0.2976190476190485,
+      "endWaypointRelativePos": 1.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Intake"
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -63,7 +68,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 103.32500000000002
   },
   "reversed": false,
   "folder": "Right Rush",

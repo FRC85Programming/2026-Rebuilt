@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RightRush1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RightRush2"
+            "pathName": "Center1"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Right",
+  "folder": "Center",
   "choreoAuto": false
 }
