@@ -15,6 +15,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -82,6 +83,20 @@ public class Robot extends LoggedRobot
 
     super.robotPeriodic();
     AlphaMechanism3d.getMeasured().log("Mechanism3d/Alpha");
+
+    String gameData = DriverStation.getGameSpecificMessage();
+    String alliance = "Unknown";
+    if (gameData.length() > 0) {
+      switch (gameData.charAt(0)) {
+        case 'B': alliance = "Blue"; break;
+        case 'R': alliance = "Red";  break;
+        default:  alliance = "Corrupt"; break;
+      }
+    } else {
+      alliance = "No Data";
+    }
+    SmartDashboard.putString("AUTO WINNER", alliance);
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
   }
 
   /**

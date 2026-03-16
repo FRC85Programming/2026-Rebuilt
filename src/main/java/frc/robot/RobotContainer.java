@@ -155,6 +155,8 @@ public class RobotContainer
         turret.stopAiming();
     }, shooter, turret);
 
+    NamedCommands.registerCommand("Aim Turret", new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())));
+
     NamedCommands.registerCommand("Stop Shooting", stopShootingCommand);
 
     //NamedCommands.registerCommand("Climb", new Climb(ClimberSubsystem));

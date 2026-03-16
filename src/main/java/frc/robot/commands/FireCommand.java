@@ -6,18 +6,13 @@ import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
-/**
- * Spins the flywheel to the RPM calculated by the shooter subsystem's active state
- * (AIMING or FEEDING) and releases the feed mechanism once all systems are on target.
- * State management (which target and lookup table to use) is handled externally in
- * RobotContainer via startAiming() / startIndexing() calls.
- */
 public class FireCommand extends Command {
 
     private final ShooterSubsystem shooter;
     private final TurretSubsystem turret;
     private final IndexerSubsystem indexer;
 
+    
     public FireCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret) {
         this.shooter = shooter;
         this.turret = turret;
@@ -38,9 +33,8 @@ public class FireCommand extends Command {
         if (ready) {
             indexer.startIndexing();
         } else {
-            indexer.stopIndexing();
+            indexer.runAgitation(); 
         }
-        
     }
 
     @Override
