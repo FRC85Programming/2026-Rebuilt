@@ -66,6 +66,8 @@ public class RobotContainer
   private final ClimberSubsystem climber = new ClimberSubsystem();
 
 
+  private boolean isAiming = false;
+
   BallFieldGenerator gen = new BallFieldGenerator();
 
   Translation2d[] balls;
@@ -245,17 +247,22 @@ public class RobotContainer
       driverXbox.pov(0).onTrue(new InstantCommand(() -> climber.climberUp()));
       driverXbox.pov(180).onTrue(new InstantCommand(() -> climber.climberDown()));
 
-      // X - Switch shooter to idle mode
+      // X - Exit aim mode; the aimingTrigger going false cancels FireCommand automatically
       driverXbox.x().onTrue(Commands.runOnce(() -> {
+              isAiming = false;
               shooter.stopAiming();
               turret.stopAiming();
           }));
 
-      // B - Start aiming in case of failure to auto init
+      // B - Enter aim mode; FireCommand runs continuously via aimingTrigger below
       driverXbox.b().onTrue(Commands.runOnce(() -> {
+              isAiming = true;
               shooter.startAiming(drivebase, () -> getTarget());
               turret.startAiming(drivebase, () -> getTarget());
           }));
+
+      // Continuously runs FireCommand for as long as the robot is in aim mode
+      new Trigger(() -> isAiming).whileTrue(new FireCommand(shooter, indexer, turret));
 
       // Quick inputs for spinning turret - TEST ONLY
       //driverXbox.pov(0).onTrue(new InstantCommand(() -> turret.setTurretAngle(0)));
