@@ -5,15 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "LeftRush1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftRush2"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Intake"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.05
+                }
+              }
+            ]
           }
         },
         {
@@ -51,6 +58,50 @@
         {
           "type": "path",
           "data": {
+            "pathName": "LeftRush1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftRush2"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "race",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Start Shooting"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.5
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Shooting"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
             "pathName": "LeftRush3"
           }
         },
@@ -69,7 +120,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "Left",
   "choreoAuto": false
 }

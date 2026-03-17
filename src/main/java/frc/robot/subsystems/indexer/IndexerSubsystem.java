@@ -13,6 +13,15 @@ import frc.robot.Constants.IndexerConstants;
 
 public class IndexerSubsystem extends SubsystemBase {
 
+    public enum IndexerState {
+        /** Actively feeding balls toward the shooter. */
+        RUN,
+        /** Rocking the indexer wheel back and forth to prevent jams. */
+        AGITATE,
+        /** All motors stopped; no agitation. */
+        STOP
+    }
+
     private final SparkFlex indexerMotor =
         new SparkFlex(IndexerConstants.INDEXER_MOTOR_ID, MotorType.kBrushless);
 
@@ -30,7 +39,8 @@ public class IndexerSubsystem extends SubsystemBase {
 
     private final Timer agitationTimer = new Timer();
     private boolean agitatingForward = true;
-    private boolean agitationEnabled = false;
+
+    private IndexerState state = IndexerState.STOP;
 
     public IndexerSubsystem() {
         SparkFlexConfig indexerConfig = new SparkFlexConfig();
@@ -75,57 +85,14 @@ public class IndexerSubsystem extends SubsystemBase {
         agitateForwardDuration = SmartDashboard.getNumber("Agitate Forward Duration", agitateForwardDuration);
         agitateReverseDuration = SmartDashboard.getNumber("Agitate Reverse Duration", agitateReverseDuration);
 
-        if (agitationEnabled && Math.abs(indexerMotor.getAppliedOutput()) < 0.01) {
-            runAgitation();
+        SmartDashboard.putString("Indexer State", state.name());
+
+        if (state == IndexerState.AGITATE) {
+            performAgitation();
         }
     }
 
-    /**
-     * Sets the speed of the indexer. This WILL NOT feed balls all the way through the system.
-     * This only sets the speed of the spinny part of the indexer.
-     *
-     * @param speed The speed the spinny part of the indexer runs at. Positive speed feeds the ball towards the shooter.
-     */
-    public void setIndexerSpeed(double speed) {
-        indexerMotor.set(speed);
-    }
-
-    /**
-     * Sets the speed of the belt part of the indexer.
-     *
-     * @param speed The speed the belt runs at. Positive speed feeds the ball towards the shooter.
-     */
-    public void setBeltSpeed(double speed) {
-        beltMotor.set(speed);
-    }
-
-    /**
-     * Starts all parts of the indexer at their tuned feed speeds.
-     */
-    public void startIndexing() {
-        indexerMotor.set(indexSpeed);
-        beltMotor.set(beltSpeed);
-    }
-
-    /**
-     * Stops commanded motion. Agitation remains enabled, so passive
-     * agitation will resume on the next periodic() cycle if the motor
-     * output drops to zero.
-     */
-    public void stopIndexing() {
-        indexerMotor.set(0);
-        beltMotor.set(0);
-    }
-
-    /**
-     * Rocks the indexer back and forth to keep balls loose.
-     * Enables passive agitation and drives the motor this cycle.
-     * Belt stays still — only the agitator moves.
-     * Call this every cycle when no active feed is needed.
-     */
-    public void runAgitation() {
-        agitationEnabled = true;
-
+    private void performAgitation() {
         double elapsed = agitationTimer.get();
         double phaseDuration = agitatingForward ? agitateForwardDuration : agitateReverseDuration;
 
@@ -138,12 +105,73 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     /**
-     * Hard stops all indexer motors and disables passive agitation.
-     * Agitation will not resume until runAgitation() is called again.
+     * Sets the speed of the indexer wheel directly, transitioning to the RUN state
+     * so agitation does not interfere with external motor control.
+     *
+     * @param speed The speed of the indexer wheel. Positive feeds toward the shooter.
+     */
+    public void setIndexerSpeed(double speed) {
+        state = IndexerState.RUN;
+        indexerMotor.set(speed);
+    }
+
+    /**
+     * Sets the speed of the belt directly, transitioning to the RUN state
+     * so agitation does not interfere with external motor control.
+     *
+     * @param speed The speed of the belt. Positive feeds toward the shooter.
+     */
+    public void setBeltSpeed(double speed) {
+        state = IndexerState.RUN;
+        beltMotor.set(speed);
+    }
+
+    /**
+     * Transitions to the RUN state and drives both motors at their tuned feed speeds.
+     */
+    public void startIndexing() {
+        state = IndexerState.RUN;
+        indexerMotor.set(indexSpeed);
+        beltMotor.set(beltSpeed);
+    }
+
+    /**
+     * Transitions to the AGITATE state. The belt stops immediately and the indexer
+     * wheel will be rocked back and forth by periodic() to keep balls loose.
+     */
+    public void stopIndexing() {
+        enterAgitateState();
+        beltMotor.set(0);
+    }
+
+    /**
+     * Transitions to the AGITATE state so the indexer wheel rocks back and forth
+     * while no active feed is needed. The belt is unaffected.
+     */
+    public void runAgitation() {
+        enterAgitateState();
+    }
+
+    /**
+     * Transitions to the STOP state, immediately halting all motors.
+     * Agitation will not run until the state changes.
      */
     public void disableIndexer() {
-        agitationEnabled = false;
+        state = IndexerState.STOP;
         indexerMotor.set(0);
         beltMotor.set(0);
+    }
+
+    /** Returns the current indexer state. */
+    public IndexerState getState() {
+        return state;
+    }
+
+    private void enterAgitateState() {
+        if (state != IndexerState.AGITATE) {
+            agitatingForward = true;
+            agitationTimer.reset();
+        }
+        state = IndexerState.AGITATE;
     }
 }
