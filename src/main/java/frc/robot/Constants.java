@@ -76,7 +76,7 @@ public final class Constants
   }
 
   public static class FieldConstants {
-      public static final Translation3d blueHub = new Translation3d(4.6, 4.05, 1.829);
+      public static final Translation3d blueHub = new Translation3d(4.620, 4.035, 1.829);
       public static final Translation3d blueFeedPosition = new Translation3d(2.6, 0.0, 1.829);
       public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
       public static final Translation3d redFeedPosition = new Translation3d(13.930, 0.0, 1.829);
@@ -85,6 +85,25 @@ public final class Constants
       public static final Translation2d blueLeftEnterAllianceZonePose = new Translation2d(5.825, 7.500);
       public static final Translation2d blueRightEnterAllianceZonePose = new Translation2d(5.825, 0.600);
 
+      /**
+       * X boundary near the blue alliance structure. When the robot is below this
+       * value and moving in the positive-X direction it is entering the protected zone
+       * and the shooter/turret should be idled automatically.
+       */
+      public static final double SHOOTER_IDLE_ZONE_BLUE_X = 4.2;
+
+      /**
+       * X boundary near the red alliance structure. When the robot is above this
+       * value and moving in the negative-X direction it is entering the protected zone
+       * and the shooter/turret should be idled automatically.
+       */
+      public static final double SHOOTER_IDLE_ZONE_RED_X = 11.4;
+
+      /**
+       * Minimum field-relative X speed (m/s) required to consider the robot
+       * "approaching" a boundary.  Prevents false triggers from slow drift.
+       */
+      public static final double SHOOTER_IDLE_APPROACH_VEL = 0.3;
   }
 
   public static class TurretConstants {
@@ -112,6 +131,9 @@ public final class Constants
     public static final double INTAKE_DOWN_POSITION = -9.4;
 
     public static final double INTAKE_STOW_POSITION = -4;
+
+    // The position (in motor rotations) in which the intake is fully up/retracted
+    public static final double INTAKE_UP_POSITION = 0;
   }
 
   public static class ObstacleAlignmentConstants {

@@ -66,12 +66,12 @@
       "rotationDegrees": -42.10552465375266
     },
     {
-      "waypointRelativePos": 1.1978905072827755,
-      "rotationDegrees": -143.58430417442253
+      "waypointRelativePos": 1.5671641791044806,
+      "rotationDegrees": 177.52404451135237
     },
     {
       "waypointRelativePos": 1.824711200401815,
-      "rotationDegrees": -45.0
+      "rotationDegrees": 135.0
     }
   ],
   "constraintZones": [
@@ -93,7 +93,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.650375939849627,
+      "waypointRelativePos": 0.5104659014179619,
       "endWaypointRelativePos": 1.6478696741854546,
       "command": {
         "type": "named",

@@ -61,7 +61,7 @@ public class RobotContainer
 
   private final TurretSubsystem turret = new TurretSubsystem();
 
-  private final VisionSubsystem vision = new VisionSubsystem();
+  //private final VisionSubsystem vision = new VisionSubsystem();
 
   private final ClimberSubsystem climber = new ClimberSubsystem();
 
@@ -131,7 +131,7 @@ public class RobotContainer
   {
     balls = gen.getBalls();
 
-    vision.setPoseSupplier(drivebase::getPose);
+    //vision.setPoseSupplier(drivebase::getPose);
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -159,10 +159,12 @@ public class RobotContainer
 
     NamedCommands.registerCommand("Stop Shooting", stopShootingCommand);
 
+    NamedCommands.registerCommand("Intake Up", new InstantCommand(() -> intake.toggleStowedUp()));
+
     //NamedCommands.registerCommand("Climb", new Climb(ClimberSubsystem));
 
     // Movement commands
-    NamedCommands.registerCommand("SmartIntakeBlueLeft", new PathPlanToBalls(drivebase, vision, 5.64, 8.43, 4, 7.5));
+    //NamedCommands.registerCommand("SmartIntakeBlueLeft", new PathPlanToBalls(drivebase, vision, 5.64, 8.43, 4, 7.5));
     NamedCommands.registerCommand("DriveToBlueLeftShoot", drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.toRadians(180)))));
 
 
@@ -209,7 +211,7 @@ public class RobotContainer
 
     if (Robot.isSimulation())
     {
-      driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
+      //driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
       driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
@@ -228,7 +230,7 @@ public class RobotContainer
     {
       // TODO: Configure this pose to a better position/use apriltags
       //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(4.375, 7.393, new Rotation2d(0)))));
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.690, 7.377, new Rotation2d(0)))));
       //driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
       // Right Trigger - Shoot based on current mode
@@ -236,14 +238,7 @@ public class RobotContainer
 
       // Left Trigger - Intake
       driverXbox.leftTrigger().whileTrue(new Intake(intake));
-
-      driverXbox.leftBumper().whileTrue(new InstantCommand(() -> indexer.startIndexing()));
-      driverXbox.leftBumper().onTrue(new InstantCommand(() -> shooter.setFlywheelRPM(6000)));
-      driverXbox.leftBumper().onTrue(new InstantCommand(() -> shooter.setHoodAngle(60)));
-      driverXbox.rightBumper().onTrue(new SequentialCommandGroup(new InstantCommand(() -> intake.stopRollers()), new InstantCommand(() -> intake.retractIntake())));
-
-
-      driverXbox.leftBumper().onTrue(drivebase.sysIdDriveMotorCommand());
+      driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.toggleStowedUp()));
 
       driverXbox.pov(0).onTrue(new InstantCommand(() -> climber.climberUp()));
       driverXbox.pov(180).onTrue(new InstantCommand(() -> climber.climberDown()));
@@ -269,6 +264,21 @@ public class RobotContainer
       // Quick inputs for spinning turret - TEST ONLY
       //driverXbox.pov(0).onTrue(new InstantCommand(() -> turret.setTurretAngle(0)));
       //driverXbox.pov(180).onTrue(new InstantCommand(() -> turret.setTurretAngle(180)));
+
+      // Automatically idle shooter and turret when the robot approaches either
+      // alliance-zone X boundary while moving toward it.
+      // new Trigger(() -> {
+      //   double x  = drivebase.getPose().getX();
+      //   double vx = -drivebase.getFieldVelocity().vxMetersPerSecond;
+      //   boolean approachingBlue = x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_X
+      //                             && vx > Constants.FieldConstants.SHOOTER_IDLE_APPROACH_VEL;
+      //   boolean approachingRed  = x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_X
+      //                             && vx < -Constants.FieldConstants.SHOOTER_IDLE_APPROACH_VEL;
+      //   return approachingBlue || approachingRed;
+      // }).onTrue(Commands.runOnce(() -> {
+      //   shooter.stopAiming();
+      //   turret.stopAiming();
+      // }));
     }
   }
 

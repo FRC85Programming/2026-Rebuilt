@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.452761071485179,
-        "y": 0.650447154858139
+        "x": 7.390171184022824,
+        "y": 0.5221540656205419
       },
       "isLocked": false,
       "linkedName": "RightRushInnerIntake"
@@ -20,8 +20,8 @@
         "y": 0.6774179743223976
       },
       "prevControl": {
-        "x": 6.2774465049928665,
-        "y": 0.7421112696148362
+        "x": 6.3938944365192585,
+        "y": 0.6127246790299581
       },
       "nextControl": null,
       "isLocked": false,

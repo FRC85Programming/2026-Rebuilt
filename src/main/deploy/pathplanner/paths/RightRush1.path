@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.323708987161198,
-        "y": 0.6256633380884444
+        "x": 3.703,
+        "y": 0.587
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.998288159771754,
-        "y": 0.6903566333808839
+        "x": 7.908064194008562,
+        "y": 0.4317360912981447
       },
       "isLocked": false,
       "linkedName": "RightRushStart"
@@ -32,10 +32,10 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.4304511278195463,
+      "minWaypointRelativePos": 0.4267386900742716,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 2.0,
+        "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.2976190476190485,
+      "waypointRelativePos": 0.2781904118838618,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",

@@ -62,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     boolean isSim;
 
-    double hoodHome = 0.6361150741577148;
+    double hoodHome = 0.273086279630661;
 
     SparkClosedLoopController leftController;
     SparkClosedLoopController rightController;

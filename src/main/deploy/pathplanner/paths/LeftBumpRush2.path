@@ -55,11 +55,11 @@
     },
     {
       "waypointRelativePos": 1.2044198895027642,
-      "rotationDegrees": -163.41940422092895
+      "rotationDegrees": -176.94566869225767
     },
     {
       "waypointRelativePos": 1.7026619789050725,
-      "rotationDegrees": -135.0
+      "rotationDegrees": 135.0
     }
   ],
   "constraintZones": [
@@ -81,7 +81,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.4448621553884711,
+      "waypointRelativePos": 0.31330182309250093,
       "endWaypointRelativePos": 1.1917293233082724,
       "command": {
         "type": "named",
@@ -94,7 +94,12 @@
       "name": "Start Shooting",
       "waypointRelativePos": 1.853383458646603,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Shooting"
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -107,7 +112,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -135.0
+    "rotation": 135.0
   },
   "reversed": false,
   "folder": "Left Bump Rush",

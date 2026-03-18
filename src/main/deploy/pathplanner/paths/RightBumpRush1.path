@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.323708987161198,
-        "y": 0.6256633380884444
+        "x": 3.7026533523537797,
+        "y": 0.5868473609129818
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.363766666666667,
-        "y": 0.6341888888888878
+        "x": 6.7427110318592485,
+        "y": 0.5953729117134252
       },
       "isLocked": false,
       "linkedName": "RightRushStart"
@@ -70,12 +70,8 @@
       "rotationDegrees": 175.9177483354067
     },
     {
-      "waypointRelativePos": 1.7600782778864863,
-      "rotationDegrees": 45.0
-    },
-    {
-      "waypointRelativePos": 2.0371819960860997,
-      "rotationDegrees": 45.0
+      "waypointRelativePos": 1.9317697228145003,
+      "rotationDegrees": -135.0
     }
   ],
   "constraintZones": [
@@ -97,7 +93,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.4430555555555699,
+      "waypointRelativePos": 0.3403106009453112,
       "endWaypointRelativePos": 1.4541666666666573,
       "command": {
         "type": "named",

@@ -54,12 +54,12 @@
       "rotationDegrees": 61.74830499638805
     },
     {
-      "waypointRelativePos": 1.0356164383561541,
-      "rotationDegrees": 161.02655304207624
+      "waypointRelativePos": 1.1684434968017008,
+      "rotationDegrees": -178.67015088617538
     },
     {
       "waypointRelativePos": 1.5898238747553863,
-      "rotationDegrees": 135.0
+      "rotationDegrees": -135.0
     }
   ],
   "constraintZones": [
@@ -112,7 +112,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 135.0
+    "rotation": -135.0
   },
   "reversed": false,
   "folder": "Right Bump Rush",
