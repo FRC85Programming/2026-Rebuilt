@@ -63,10 +63,10 @@ public class TurretSubsystem extends SubsystemBase {
 
         turretConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(0.35)
+                .p(0.31)
                 .i(0)
                 .d(0)
-                .outputRange(-0.65, 0.65)
+                .outputRange(-0.6, 0.6)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 

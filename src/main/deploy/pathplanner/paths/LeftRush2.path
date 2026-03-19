@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.231184022824536,
-        "y": 5.296519258202568
+        "x": 8.192044444444445,
+        "y": 5.321266666666666
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.946533523537802,
-        "y": 6.797403708987161
+        "x": 7.907393945157711,
+        "y": 6.822151117451259
       },
       "isLocked": false,
       "linkedName": "LeftRushIntake"
@@ -81,7 +81,7 @@
   "folder": "Left Rush",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -103.32453126189083
+    "rotation": -91.16913932790752
   },
   "useDefaultConstraints": true
 }

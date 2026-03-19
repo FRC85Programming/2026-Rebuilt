@@ -81,6 +81,15 @@ public final class Constants
       public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
       public static final Translation3d redFeedPosition = new Translation3d(13.930, 0.0, 1.829);
 
+      // Y range of the obstacle that blocks direct feed shots
+      public static final double FEED_BLOCK_Y_MIN = 3.25;
+      public static final double FEED_BLOCK_Y_MAX = 4.65;
+      // Tangent of the deflection angle used to offset the feed target around the obstacle.
+      // Positive value deflects above the midpoint upward and below the midpoint downward.
+      // Negate FEED_ANGLE_SCALE_RED if red requires the opposite deflection direction.
+      public static final double FEED_ANGLE_SCALE_BLUE = 0.15;
+      public static final double FEED_ANGLE_SCALE_RED  = 0.15;
+
       // Saftey poses
       public static final Translation2d blueLeftEnterAllianceZonePose = new Translation2d(5.825, 7.500);
       public static final Translation2d blueRightEnterAllianceZonePose = new Translation2d(5.825, 0.600);
@@ -90,14 +99,19 @@ public final class Constants
        * value and moving in the positive-X direction it is entering the protected zone
        * and the shooter/turret should be idled automatically.
        */
-      public static final double SHOOTER_IDLE_ZONE_BLUE_X = 4.2;
+      public static final double SHOOTER_IDLE_ZONE_BLUE_BOTTOM = 4.0;
+
+      public static final double SHOOTER_IDLE_ZONE_BLUE_TOP = 5.3;
 
       /**
        * X boundary near the red alliance structure. When the robot is above this
        * value and moving in the negative-X direction it is entering the protected zone
        * and the shooter/turret should be idled automatically.
        */
-      public static final double SHOOTER_IDLE_ZONE_RED_X = 11.4;
+      public static final double SHOOTER_IDLE_ZONE_RED_BOTTOM = 11.3;
+
+      public static final double SHOOTER_IDLE_ZONE_RED_TOP = 12.55;
+
 
       /**
        * Minimum field-relative X speed (m/s) required to consider the robot
@@ -131,6 +145,8 @@ public final class Constants
     public static final double INTAKE_DOWN_POSITION = -9.4;
 
     public static final double INTAKE_STOW_POSITION = -4;
+
+    public static final double INTAKE_DEPOT_POSITION = -8.7;
 
     // The position (in motor rotations) in which the intake is fully up/retracted
     public static final double INTAKE_UP_POSITION = 0;

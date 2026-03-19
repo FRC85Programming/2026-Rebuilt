@@ -21,11 +21,11 @@ public class ShooterTable {
     hoodAngleMap.put(3.2, Rotation2d.fromDegrees(65));
     hoodAngleMap.put(3.6, Rotation2d.fromDegrees(63));
     hoodAngleMap.put(3.8, Rotation2d.fromDegrees(61));
-    hoodAngleMap.put(4.28, Rotation2d.fromDegrees(58));
-    hoodAngleMap.put(4.53, Rotation2d.fromDegrees(57));
-    hoodAngleMap.put(4.63, Rotation2d.fromDegrees(56));
-    hoodAngleMap.put(5.13, Rotation2d.fromDegrees(54));
-    hoodAngleMap.put(6.07, Rotation2d.fromDegrees(52));
+    hoodAngleMap.put(4.28, Rotation2d.fromDegrees(57));
+    hoodAngleMap.put(4.53, Rotation2d.fromDegrees(56));
+    hoodAngleMap.put(4.63, Rotation2d.fromDegrees(55));
+    hoodAngleMap.put(5.13, Rotation2d.fromDegrees(52));
+    hoodAngleMap.put(6.07, Rotation2d.fromDegrees(51));
   
 
     flywheelSpeedMap.put(1.45, 3475.0); 

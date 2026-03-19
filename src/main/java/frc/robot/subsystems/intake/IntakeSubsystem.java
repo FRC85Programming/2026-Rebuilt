@@ -24,7 +24,9 @@ public class IntakeSubsystem extends SubsystemBase {
         /** Intake partially raised inside the robot frame. */
         STOWED,
         /** Intake fully retracted to home position. */
-        UP
+        UP,
+        /** Intake partially down to intake from the depot */
+        DEPOT
     }
 
     private final SparkFlex rollerMotor = new SparkFlex(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless);
@@ -36,7 +38,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private SparkClosedLoopController pivotController;
 
-    private double rollerSpeed = -0.4;
+    private double rollerSpeed = -0.55;
 
     private PivotState pivotState = PivotState.STOWED;
 
@@ -80,7 +82,7 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
-        pivotMotor.getEncoder().setPosition(0);
+        pivotMotor.getEncoder().setPosition(-9.4);
     }
 
     @Override
@@ -104,6 +106,9 @@ public class IntakeSubsystem extends SubsystemBase {
             case UP:
                 pivotController.setSetpoint(IntakeConstants.INTAKE_UP_POSITION, ControlType.kPosition, ClosedLoopSlot.kSlot0);
                 break;
+            case DEPOT:
+                 pivotController.setSetpoint(IntakeConstants.INTAKE_DEPOT_POSITION, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+                 break;
         }
     }
 
@@ -142,6 +147,10 @@ public class IntakeSubsystem extends SubsystemBase {
         rollerMotor.set(0);
     }
 
+    public void reverseRollers() {
+        rollerMotor.set(-rollerSpeed);
+    }
+
     /**
      * Deploys the intake to the downwards position using closed loop control
      */
@@ -158,6 +167,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void stowIntake() {
         setPivotState(PivotState.STOWED);
+    }
+
+    public void deployIntakeDepot() {
+        setPivotState(PivotState.DEPOT);
     }
 
     public boolean isPivotAtSetpoint(double tolerance) {

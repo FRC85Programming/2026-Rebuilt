@@ -144,7 +144,7 @@ public class RobotContainer
     // Change shooter states and start shooting
     Command shootCommand = new SequentialCommandGroup(new InstantCommand(() -> shooter.startAiming(drivebase, () -> getTarget())), 
                                                       new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())),
-                                                      new FireCommand(shooter, indexer, turret));
+                                                      new FireCommand(shooter, indexer, turret, intake));
     NamedCommands.registerCommand("Start Shooting", shootCommand);
 
 
@@ -160,6 +160,8 @@ public class RobotContainer
     NamedCommands.registerCommand("Stop Shooting", stopShootingCommand);
 
     NamedCommands.registerCommand("Intake Up", new InstantCommand(() -> intake.toggleStowedUp()));
+
+    NamedCommands.registerCommand("Intake Depot", new SequentialCommandGroup(new InstantCommand(() -> intake.deployIntakeDepot()), new InstantCommand(() -> intake.runRollers())));
 
     //NamedCommands.registerCommand("Climb", new Climb(ClimberSubsystem));
 
@@ -212,7 +214,7 @@ public class RobotContainer
     if (Robot.isSimulation())
     {
       //driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
-      driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret));
+      driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret, intake));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
     }
@@ -234,7 +236,7 @@ public class RobotContainer
       //driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
       // Right Trigger - Shoot based on current mode
-      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret));
+      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret, intake));
 
       // Left Trigger - Intake
       driverXbox.leftTrigger().whileTrue(new Intake(intake));
@@ -265,20 +267,41 @@ public class RobotContainer
       //driverXbox.pov(0).onTrue(new InstantCommand(() -> turret.setTurretAngle(0)));
       //driverXbox.pov(180).onTrue(new InstantCommand(() -> turret.setTurretAngle(180)));
 
-      // Automatically idle shooter and turret when the robot approaches either
-      // alliance-zone X boundary while moving toward it.
-      // new Trigger(() -> {
-      //   double x  = drivebase.getPose().getX();
-      //   double vx = -drivebase.getFieldVelocity().vxMetersPerSecond;
-      //   boolean approachingBlue = x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_X
-      //                             && vx > Constants.FieldConstants.SHOOTER_IDLE_APPROACH_VEL;
-      //   boolean approachingRed  = x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_X
-      //                             && vx < -Constants.FieldConstants.SHOOTER_IDLE_APPROACH_VEL;
-      //   return approachingBlue || approachingRed;
-      // }).onTrue(Commands.runOnce(() -> {
-      //   shooter.stopAiming();
-      //   turret.stopAiming();
-      // }));
+      // Idle shooter/turret when inside either trench idle box.
+      Trigger inIdleZone = new Trigger(() -> {
+        double x = drivebase.getPose().getX();
+        double y = drivebase.getPose().getY();
+        boolean inTrench = (y >= Constants.ObstacleAlignmentConstants.TRENCH1_Y_MIN
+                         && y <= Constants.ObstacleAlignmentConstants.TRENCH1_Y_MAX)
+                        || (y >= Constants.ObstacleAlignmentConstants.TRENCH2_Y_MIN
+                         && y <= Constants.ObstacleAlignmentConstants.TRENCH2_Y_MAX);
+        boolean inBlueBox = x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_BOTTOM
+                         && x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_TOP;
+        boolean inRedBox  = x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_BOTTOM
+                         && x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP;
+        return inTrench && (inBlueBox || inRedBox);
+      });
+      inIdleZone.onTrue(Commands.runOnce(() -> {
+        shooter.stopAiming();
+        turret.stopAiming();
+      }));
+
+      // Re-activate aiming when the robot crosses into the alliance from the idle box.
+      Trigger inAllianceZone = new Trigger(() -> {
+        double x = drivebase.getPose().getX();
+        double y = drivebase.getPose().getY();
+        boolean inTrench = (y >= Constants.ObstacleAlignmentConstants.TRENCH1_Y_MIN
+                         && y <= Constants.ObstacleAlignmentConstants.TRENCH1_Y_MAX)
+                        || (y >= Constants.ObstacleAlignmentConstants.TRENCH2_Y_MIN
+                         && y <= Constants.ObstacleAlignmentConstants.TRENCH2_Y_MAX);
+        boolean inBlueAlliance = x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_BOTTOM;
+        boolean inRedAlliance  = x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP;
+        return inTrench && (inBlueAlliance || inRedAlliance);
+      });
+      inAllianceZone.onTrue(Commands.runOnce(() -> {
+        shooter.startAiming(drivebase, () -> getTarget());
+        turret.startAiming(drivebase, () -> getTarget());
+      }));
     }
   }
 
@@ -321,14 +344,28 @@ public class RobotContainer
 
   public Translation3d getFeedTarget() {
     Optional<Alliance> alliance = DriverStation.getAlliance();
+    double robotX = drivebase.getPose().getX();
     double robotY = drivebase.getPose().getY();
-    if (alliance.isPresent() && alliance.get() == Alliance.Red) {
-        Translation3d base = Constants.FieldConstants.redFeedPosition;
-        return new Translation3d(base.getX(), robotY, base.getZ());
-    } else {
-        Translation3d base = Constants.FieldConstants.blueFeedPosition;
-        return new Translation3d(base.getX(), robotY, base.getZ());
+
+    Translation3d base = (alliance.isPresent() && alliance.get() == Alliance.Red)
+        ? Constants.FieldConstants.redFeedPosition
+        : Constants.FieldConstants.blueFeedPosition;
+
+    double targetY = robotY;
+    double yMin = Constants.FieldConstants.FEED_BLOCK_Y_MIN;
+    double yMax = Constants.FieldConstants.FEED_BLOCK_Y_MAX;
+
+    if (robotY >= yMin && robotY <= yMax) {
+      double midpoint = (yMin + yMax) / 2.0;
+      double sign     = (robotY >= midpoint) ? 1.0 : -1.0;
+      double xDist    = Math.abs(base.getX() - robotX);
+      double scale    = (alliance.isPresent() && alliance.get() == Alliance.Red)
+                        ? Constants.FieldConstants.FEED_ANGLE_SCALE_RED
+                        : Constants.FieldConstants.FEED_ANGLE_SCALE_BLUE;
+      targetY = robotY + sign * xDist * scale;
     }
+
+    return new Translation3d(base.getX(), targetY, base.getZ());
   }
 
   // I apoligize for how ugly this is :)

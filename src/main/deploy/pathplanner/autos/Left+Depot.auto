@@ -5,6 +5,50 @@
     "data": {
       "commands": [
         {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Intake"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.01
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Shooting"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Shooting"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Left+Depot1"
@@ -17,12 +61,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Stop Intake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Left+Depot3"
@@ -31,13 +69,7 @@
         {
           "type": "named",
           "data": {
-            "name": "SmartIntakeBlueLeft"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DriveToBlueLeftShoot"
+            "name": "Start Shooting"
           }
         }
       ]

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.231184022824536,
-        "y": 5.296519258202568
+        "x": 8.192044444444445,
+        "y": 5.321266666666666
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.674821683309558,
-        "y": 7.521968616262481
+        "x": 7.695077777777778,
+        "y": 7.718400000000001
       },
       "isLocked": false,
       "linkedName": "LeftRushIntake"
@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 0.4032952924393719,
-        "y": 5.969329529243937
+        "x": 0.5718888888888889,
+        "y": 5.9643999999999995
       },
       "prevControl": {
-        "x": 1.806495292432451,
-        "y": 5.72571841813203
+        "x": 2.1797222222222223,
+        "y": 5.915677777777778
       },
       "nextControl": null,
       "isLocked": false,
@@ -53,8 +53,8 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.0212962962963028,
-      "maxWaypointRelativePos": 1.7879629629629625,
+      "minWaypointRelativePos": 0.518114143920596,
+      "maxWaypointRelativePos": 1.852109181141435,
       "constraints": {
         "maxVelocity": 1.2,
         "maxAcceleration": 2.0,
@@ -66,10 +66,10 @@
     },
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.5902255639097764,
-      "maxWaypointRelativePos": 1.02,
+      "minWaypointRelativePos": 1.85,
+      "maxWaypointRelativePos": 2.0,
       "constraints": {
-        "maxVelocity": 2.0,
+        "maxVelocity": 0.5,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -81,16 +81,37 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "Aim Turret",
+      "waypointRelativePos": 0.7126550868486434,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Aim Turret"
+        }
+      }
+    },
+    {
       "name": "Start Shooting",
       "waypointRelativePos": 1.0012531328320389,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Shooting"
+        }
+      }
     },
     {
-      "name": "Start Intake",
-      "waypointRelativePos": 1.7932330827067702,
-      "endWaypointRelativePos": null,
-      "command": null
+      "name": "Intake Depot",
+      "waypointRelativePos": 1.5265508684863507,
+      "endWaypointRelativePos": 2.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Intake"
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -109,7 +130,7 @@
   "folder": "Left+Depot",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": -103.32453126189083
+    "rotation": -91.16913932790752
   },
   "useDefaultConstraints": true
 }
