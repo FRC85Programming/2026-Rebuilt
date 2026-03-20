@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4562444444444447,
-        "y": 5.438199999999999
+        "x": 3.5342000000000002,
+        "y": 5.6915555555555555
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.80097777777778,
-        "y": 5.41871111111111
+        "x": 4.878933333333335,
+        "y": 5.672066666666666
       },
       "isLocked": false,
       "linkedName": "LeftShootPoint"
@@ -29,12 +29,26 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.6957816377171206,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.2,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.5429280397022327,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",

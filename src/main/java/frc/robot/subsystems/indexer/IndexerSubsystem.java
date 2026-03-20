@@ -63,9 +63,6 @@ public class IndexerSubsystem extends SubsystemBase {
             .motorTemperaturePeriodMs(1000)
             .faultsPeriodMs(500);
 
-        indexerConfig.smartCurrentLimit(30);
-        beltConfig.smartCurrentLimit(40);
-
         indexerMotor.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         beltMotor.configure(beltConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 

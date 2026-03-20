@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -72,6 +73,7 @@ public final class Constants
     public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(Units.inchesToMeters(-5.5), 0);
 
     public static final double HOOD_HOME_ANGLE = 75;
+    public static final double HOOD_HOME_ENCODER_ABS = 0.22533927857875824;
     public static final double HOOD_LENGTH_METERS = 0.1;
   }
 
@@ -93,6 +95,11 @@ public final class Constants
       // Saftey poses
       public static final Translation2d blueLeftEnterAllianceZonePose = new Translation2d(5.825, 7.500);
       public static final Translation2d blueRightEnterAllianceZonePose = new Translation2d(5.825, 0.600);
+
+      public static final Pose2d BLUE_LEFT_START_POSE = new Pose2d(3.690, 7.377, new Rotation2d(0));
+      public static final Pose2d BLUE_RIGHT_START_POSE = new Pose2d(3.703, 0.587, new Rotation2d(0));
+      public static final Pose2d RED_RIGHT_START_POSE = new Pose2d(12.821, 7.407, new Rotation2d(Math.PI));
+      public static final Pose2d RED_LEFT_START_POSE = new Pose2d(12.821, 0.644, new Rotation2d(Math.PI));
 
       /**
        * X boundary near the blue alliance structure. When the robot is below this

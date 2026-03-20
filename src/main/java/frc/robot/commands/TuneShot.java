@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ShooterConstants;
@@ -63,8 +62,8 @@ public class TuneShot extends Command{
             return;
         }
 
-        goalRPM = SmartDashboard.getNumber("TUNE RPM", 1000);
-        goalAngle = SmartDashboard.getNumber("TUNE ANGLE", 75);
+        goalRPM = 600; //SmartDashboard.getNumber("TUNE RPM", 1000);
+        goalAngle = 70; //SmartDashboard.getNumber("TUNE ANGLE", 75);
 
         // Find where the turret pivot actually is in field space
         Translation2d turretFieldPos =

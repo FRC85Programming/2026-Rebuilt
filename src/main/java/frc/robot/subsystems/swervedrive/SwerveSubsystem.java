@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.util.FieldObstacleAligner;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.odometry.QuestResult;
@@ -180,6 +181,7 @@ public class SwerveSubsystem extends SubsystemBase
                                   Constants.MAX_SPEED,
                                   new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
                                              Rotation2d.fromDegrees(0)));
+
   }
 
   /**
@@ -195,6 +197,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
     aimController.setP(SmartDashboard.getNumber("AimController P", 5));
     aimController.setD(SmartDashboard.getNumber("AimController D", 0));
+    //swerveDrive.updateOdometry();
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
@@ -206,13 +209,33 @@ public class SwerveSubsystem extends SubsystemBase
       if (questFrames != null) {
         for (PoseFrame questFrame : questFrames) {
             QuestResult result = questNav.getResult(questFrame);
-
             swerveDrive.addVisionMeasurement(result.getPose().toPose2d(), result.getTimeStamp(), questNav.getStdDevs());
             fieldQuest.setRobotPose(result.getPose().toPose2d());
             SmartDashboard.putData("QuestField", fieldQuest);
         }
       }
       
+    }
+
+    if (SmartDashboard.getBoolean("BLUE LEFT RESET", false)) {
+
+      resetOdometry(FieldConstants.BLUE_LEFT_START_POSE);
+      SmartDashboard.putBoolean("BLUE LEFT RESET", false);
+
+    } else if (SmartDashboard.getBoolean("BLUE RIGHT RESET", false)) {
+
+      resetOdometry(FieldConstants.BLUE_RIGHT_START_POSE);
+      SmartDashboard.putBoolean("BLUE RIGHT RESET", false);
+
+    } else if (SmartDashboard.getBoolean("RED LEFT RESET", false)) {
+
+      resetOdometry(FieldConstants.RED_LEFT_START_POSE);
+      SmartDashboard.putBoolean("RED LEFT RESET", false);
+
+    } else if (SmartDashboard.getBoolean("RED RIGHT RESET", false)) {
+
+      resetOdometry(FieldConstants.RED_RIGHT_START_POSE);
+      SmartDashboard.putBoolean("RED RIGHT RESET", false);
     }
   }
 

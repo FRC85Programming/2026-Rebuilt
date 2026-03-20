@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4659888888888895,
-        "y": 2.5635888888888894
+        "x": 3.5147111111111116,
+        "y": 2.3784444444444444
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.531811111111113,
-        "y": 2.5538444444444464
+        "x": 5.570788888888886,
+        "y": 2.485633333333334
       },
       "isLocked": false,
       "linkedName": "RightShootPoint"
@@ -37,8 +37,8 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.25,
-      "maxWaypointRelativePos": 0.5,
+      "minWaypointRelativePos": 0.42580645161290465,
+      "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
@@ -53,7 +53,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.3166253101736983,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",

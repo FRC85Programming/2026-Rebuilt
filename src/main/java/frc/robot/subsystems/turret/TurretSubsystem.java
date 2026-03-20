@@ -20,7 +20,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,7 +43,6 @@ public class TurretSubsystem extends SubsystemBase {
     private final TurretSim turretSim = new TurretSim();
 
     private final boolean isSim;
-    double turretHome = 0;
 
     SparkClosedLoopController closedLoopController;
 

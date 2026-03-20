@@ -25,9 +25,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.FireCommand;
 import frc.robot.commands.Intake;
 import frc.robot.commands.TuneShot;
-import frc.robot.commands.swervedrive.auto.PathPlanToBalls;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.Vision.VisionSubsystem;
 import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -138,7 +136,7 @@ public class RobotContainer
 
     // Basic intaking command (same as the one bound to a button)
     Command intakeCommand = new Intake(intake);
-    NamedCommands.registerCommand("Start Intake", intakeCommand);
+    NamedCommands.registerCommand("Start Intake", intakeCommand.asProxy());
     //NamedCommands.registerCommand("Stop Intake", Commands.runOnce(() -> intakeCommand.cancel()));
 
     // Change shooter states and start shooting
@@ -178,6 +176,11 @@ public class RobotContainer
     autoChooser.addOption("Center", "Center");
 
     SmartDashboard.putData("Auto Selector", autoChooser);
+
+    SmartDashboard.putBoolean("RED RIGHT RESET", false);    
+    SmartDashboard.putBoolean("RED LEFT RESET", false);
+    SmartDashboard.putBoolean("BLUE LEFT RESET", false);
+    SmartDashboard.putBoolean("BLUE RIGHT RESET", false);
 
     for (var i = 0; i < getTestBalls().length; i++) {
       //SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(getTestBalls()[i]));
@@ -232,7 +235,7 @@ public class RobotContainer
       // TODO: Configure this pose to a better position/use apriltags
       //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.690, 7.377, new Rotation2d(0)))));
-      //driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverXbox.leftBumper().whileTrue(new TuneShot(drivebase, shooter, indexer, turret, () -> getTarget()));
 
       // Right Trigger - Shoot based on current mode
       driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret, intake));

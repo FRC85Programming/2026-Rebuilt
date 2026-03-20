@@ -75,8 +75,6 @@ public class IntakeSubsystem extends SubsystemBase {
             .motorTemperaturePeriodMs(1000)
             .faultsPeriodMs(500);
 
-        rollerConfig.smartCurrentLimit(30);
-
         pivotConfig.idleMode(IdleMode.kBrake);
 
         rollerConfig.idleMode(IdleMode.kCoast);

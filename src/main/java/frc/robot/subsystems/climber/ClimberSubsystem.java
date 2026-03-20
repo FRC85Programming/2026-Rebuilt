@@ -12,14 +12,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
     private final SparkFlex climbMotor = new SparkFlex(ClimberConstants.CLIMB_MOTOR_ID, MotorType.kBrushless);
     SparkClosedLoopController closedLoopController;
     SparkMaxConfig climbConfig = new SparkMaxConfig();
-    boolean climbed = false;
 
     public ClimberSubsystem() {
         closedLoopController = climbMotor.getClosedLoopController();
@@ -48,13 +46,6 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public void climberDown() {
-        if (climbed == false) {
-             closedLoopController.setSetpoint(ClimberConstants.CLIMBER_CLIMB_POSITION, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-            climbed = true;
-        }
-        else {
-            closedLoopController.setSetpoint(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-            climbed = false;
-        }
+        closedLoopController.setSetpoint(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 }
