@@ -17,7 +17,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.05
+                  "waitTime": 0.01
                 }
               }
             ]
@@ -43,25 +43,19 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Stop Shooting"
+            "pathName": "RightRush1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeftRush1"
+            "pathName": "RightTrenchRush2"
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "LeftRush2"
-          }
-        },
-        {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
@@ -71,42 +65,31 @@
                 }
               },
               {
-                "type": "wait",
+                "type": "sequential",
                 "data": {
-                  "waitTime": 4.0
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Intake Up"
+                      }
+                    }
+                  ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Shooting"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftRush3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftRush4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Start Shooting"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Left",
+  "folder": "Right",
   "choreoAuto": false
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.560328102710413,
-        "y": 0.6515406562054205
+        "x": 3.4659888888888895,
+        "y": 2.5635888888888894
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.881840228245361,
-        "y": 0.4703994293865891
+        "x": 5.531811111111113,
+        "y": 2.5538444444444464
       },
       "isLocked": false,
       "linkedName": "RightShootPoint"
     },
     {
       "anchor": {
-        "x": 7.763288888888889,
-        "y": 2.992344444444444
+        "x": 7.8704777777777775,
+        "y": 2.6025666666666654
       },
       "prevControl": {
-        "x": 7.815043525122839,
-        "y": 1.1162388809637027
+        "x": 7.392999999999999,
+        "y": 2.612311111111111
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,15 +30,15 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.2064289301858363,
+      "waypointRelativePos": 0.1,
       "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.4780553679945968,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 0.25,
+      "maxWaypointRelativePos": 0.5,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
@@ -53,7 +53,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.3565158676569898,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",
@@ -73,7 +73,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 103.32500000000002
+    "rotation": -1.397181027296173
   },
   "reversed": false,
   "folder": "Right Rush",

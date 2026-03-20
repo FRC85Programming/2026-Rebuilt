@@ -62,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     boolean isSim;
 
-    double hoodHome = 0.273086279630661;
+    double hoodHome = 0.2312132865190506;
 
     SparkClosedLoopController leftController;
     SparkClosedLoopController rightController;
@@ -159,7 +159,9 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("TUNE Shot Angle", 75);
         SmartDashboard.putNumber("Set Hood Angle", 69);
 
-        hoodMotor.getEncoder().setPosition((hoodMotor.getAbsoluteEncoder().getPosition() - hoodHome) * 10.96);
+        hoodMotor.getEncoder().setPosition((hoodMotor.getAbsoluteEncoder().getPosition() - hoodHome) * ShooterConstants.HOOD_GEAR_RATIO);
+
+        SmartDashboard.putBoolean("RESET HOOD", false);
     }
 
     @Override
@@ -173,7 +175,7 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 
         double encoderPos = hoodMotor.getEncoder().getPosition();
-        double hoodAngle = (((encoderPos * 360) / 9) / 10.96) + 75;
+        //double hoodAngle = (((encoderPos * 360) / 9) / 10.96) + 75;
 
         SmartDashboard.putNumber("Flywheel Goal RPM", goalRpm);
         SmartDashboard.putNumber("Flywheel Measured RPM", getFlywheelRPM());
@@ -182,9 +184,14 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Hood Encoder ABS", hoodMotor.getAbsoluteEncoder().getPosition());
         SmartDashboard.putNumber("Hood Encoder", encoderPos * 360);
         SmartDashboard.putNumber("Hood Encoder Converted", encoderPos * 360 / 9);
-        SmartDashboard.putNumber("Hood Angle", hoodAngle);
+        SmartDashboard.putNumber("Hood Angle", getHoodAngle());
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
         SmartDashboard.putString("Shooter State", state.toString());
+
+        if (SmartDashboard.getBoolean("RESET HOOD", false) == true) {
+            hoodMotor.getEncoder().setPosition((hoodMotor.getAbsoluteEncoder().getPosition() - hoodHome) * 10.96);
+            SmartDashboard.putBoolean("RESET HOOD", true);
+        }
     }
 
     private void updateAiming() {

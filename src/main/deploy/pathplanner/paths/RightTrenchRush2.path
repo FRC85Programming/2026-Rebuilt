@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6901111111111113,
-        "y": 7.377344444444444
+        "x": 8.260255555555556,
+        "y": 3.2164666666666655
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.182300000000001,
-        "y": 7.893800000000001
+        "x": 7.850988888888889,
+        "y": 0.6634222222222217
       },
       "isLocked": false,
-      "linkedName": "LeftRushStart"
+      "linkedName": "RightRushIntake"
     },
     {
       "anchor": {
-        "x": 8.231022222222222,
-        "y": 4.950977777777777
+        "x": 3.703,
+        "y": 0.587
       },
       "prevControl": {
-        "x": 8.133577777777777,
-        "y": 5.905933333333333
+        "x": 6.418555555555555,
+        "y": 0.575722222222222
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LeftRushIntake"
+      "linkedName": "RightRushStart"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -51.9583785845844
+      "waypointRelativePos": 0.7161825726141029,
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.42779156327543943,
+      "minWaypointRelativePos": 0.6977667493796528,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 1.8,
-        "maxAcceleration": 2.0,
+        "maxVelocity": 1.5,
+        "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -52,13 +52,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Start Intake",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": 1.0,
+      "name": "Aim Turret",
+      "waypointRelativePos": 0.7712158808932948,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "Start Intake"
+          "name": "Aim Turret"
         }
       }
     }
@@ -72,14 +72,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -91.16913932790752
-  },
-  "reversed": false,
-  "folder": "Left+Depot",
-  "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Right Trench Rush",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 92.09934582620421
   },
   "useDefaultConstraints": true
 }

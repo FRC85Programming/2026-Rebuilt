@@ -7,6 +7,7 @@ import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem.TurretState;
 
 public class FireCommand extends Command {
 
@@ -17,6 +18,7 @@ public class FireCommand extends Command {
 
     private final Timer intakeTimer = new Timer();
     private boolean intakeIsDown = false;
+    private double turretTolerance = 9;
 
     public FireCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret, IntakeSubsystem intake) {
         this.shooter = shooter;
@@ -39,11 +41,16 @@ public class FireCommand extends Command {
     public void execute() {
         shooter.setFlywheelRPM(shooter.getCalculatedRPM());
 
-        boolean ready = shooter.flywheelAtSpeed(0.80) && shooter.hoodAtAngle(1) && turret.turretAtAngle(4);
+        if (turret.getState() == TurretState.FEEDING) {
+            turretTolerance = SmartDashboard.getNumber("FEED TOLERANCE", 25);
+        } else {
+            turretTolerance = SmartDashboard.getNumber("TOLERANCE", 9);
+        }
+        boolean ready = shooter.flywheelAtSpeed(0.80) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turretTolerance);
         SmartDashboard.putBoolean("AIMED", ready);
         SmartDashboard.putBoolean("READY FLYWHEEL", shooter.flywheelAtSpeed(0.80));
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
-        SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(2));
+        SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(turretTolerance));
 
         if (ready) {
             indexer.startIndexing();
@@ -52,7 +59,7 @@ public class FireCommand extends Command {
         }
 
         if (intake.getCurrentCommand() == null) {
-            if (intakeTimer.advanceIfElapsed(0.65)) {
+            if (intakeTimer.advanceIfElapsed(0.7)) {
                 intakeIsDown = !intakeIsDown;
                 if (intakeIsDown) intake.deployIntake();
                 else              intake.stowIntake();

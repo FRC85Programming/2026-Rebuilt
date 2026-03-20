@@ -92,6 +92,9 @@ public class TurretSubsystem extends SubsystemBase {
         
         SmartDashboard.putNumber("Turret P", 1);
         SmartDashboard.putNumber("Setpoint", 0);
+
+        SmartDashboard.putNumber("TOLERANCE", 9);
+        SmartDashboard.getNumber("FEED TOLERANCE", 25);
     }
 
     @Override

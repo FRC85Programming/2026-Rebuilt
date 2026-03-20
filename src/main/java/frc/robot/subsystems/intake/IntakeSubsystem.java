@@ -75,6 +75,8 @@ public class IntakeSubsystem extends SubsystemBase {
             .motorTemperaturePeriodMs(1000)
             .faultsPeriodMs(500);
 
+        rollerConfig.smartCurrentLimit(30);
+
         pivotConfig.idleMode(IdleMode.kBrake);
 
         rollerConfig.idleMode(IdleMode.kCoast);
@@ -82,7 +84,7 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
-        pivotMotor.getEncoder().setPosition(-9.4);
+        pivotMotor.getEncoder().setPosition(0);
     }
 
     @Override

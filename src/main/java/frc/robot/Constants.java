@@ -60,7 +60,7 @@ public final class Constants
 
 
     public static final double FLYWHEEL_GEAR_RATIO = 1;
-    public static final double HOOD_GEAR_RATIO = 265/25;
+    public static final double HOOD_GEAR_RATIO = 265.0/25.0;
 
     // Hood limits - degrees
     public static final double HOOD_MIN_ANGLE = 40;
@@ -78,7 +78,7 @@ public final class Constants
   public static class FieldConstants {
       public static final Translation3d blueHub = new Translation3d(4.620, 4.035, 1.829);
       public static final Translation3d blueFeedPosition = new Translation3d(2.6, 0.0, 1.829);
-      public static final Translation3d redHub = new Translation3d(11.920, 4.030, 1.829);
+      public static final Translation3d redHub = new Translation3d(11.915, 4.035, 1.829);
       public static final Translation3d redFeedPosition = new Translation3d(13.930, 0.0, 1.829);
 
       // Y range of the obstacle that blocks direct feed shots

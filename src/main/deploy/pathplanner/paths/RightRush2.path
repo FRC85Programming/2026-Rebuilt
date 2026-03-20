@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.27,
-        "y": 3.0063766048502147
+        "x": 8.260255555555556,
+        "y": 3.2164666666666655
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.3513552068473595,
-        "y": 0.6774179743223971
+        "x": 7.042200000000001,
+        "y": 2.939334506260894
       },
       "isLocked": false,
       "linkedName": "RightRushIntake"
     },
     {
       "anchor": {
-        "x": 3.560328102710413,
-        "y": 0.6515406562054205
+        "x": 3.4659888888888895,
+        "y": 2.5635888888888894
       },
       "prevControl": {
-        "x": 7.0796433666191145,
-        "y": 0.6515406562054205
+        "x": 6.9853041527975925,
+        "y": 2.5635888888888894
       },
       "nextControl": null,
       "isLocked": false,
@@ -65,7 +65,7 @@
   "folder": "Right Rush",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 103.32500000000002
+    "rotation": 92.09934582620421
   },
   "useDefaultConstraints": true
 }

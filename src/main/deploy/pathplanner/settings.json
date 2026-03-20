@@ -3,10 +3,12 @@
   "robotLength": 0.66,
   "holonomicMode": true,
   "pathFolders": [
+    "Center",
     "Left Bump Rush",
     "Left Rush",
+    "Left Trench Rush",
     "Left+Depot",
-    "Center",
+    "Right Trench Rush",
     "Right Bump Rush",
     "Right Rush",
     "Right+Outpost"

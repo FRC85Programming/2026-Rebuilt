@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.908064194008562,
+        "x": 7.908064194008563,
         "y": 0.4317360912981447
       },
       "isLocked": false,
@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 8.27,
-        "y": 3.0063766048502147
+        "x": 8.260255555555556,
+        "y": 3.2164666666666655
       },
       "prevControl": {
-        "x": 8.127674750356633,
-        "y": 1.4149215406562061
+        "x": 8.11793030591219,
+        "y": 1.6250116024726569
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,10 +32,10 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.4267386900742716,
+      "minWaypointRelativePos": 0.425806451612903,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 1.5,
+        "maxVelocity": 2.0,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.2781904118838618,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",
@@ -68,7 +68,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 103.32500000000002
+    "rotation": 92.09934582620421
   },
   "reversed": false,
   "folder": "Right Rush",

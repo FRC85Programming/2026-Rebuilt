@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.192044444444445,
-        "y": 5.321266666666666
+        "x": 8.231022222222222,
+        "y": 4.950977777777777
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.907393945157711,
-        "y": 6.822151117451259
+        "x": 6.983733333333333,
+        "y": 5.7013
       },
       "isLocked": false,
       "linkedName": "LeftRushIntake"
     },
     {
       "anchor": {
-        "x": 5.8892867332382295,
-        "y": 7.405520684736091
+        "x": 3.4562444444444447,
+        "y": 5.438199999999999
       },
       "prevControl": {
-        "x": 7.183152639087017,
-        "y": 7.379643366619116
-      },
-      "nextControl": {
-        "x": 5.475130349147158,
-        "y": 7.413803812417912
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.625,
-        "y": 7.406
-      },
-      "prevControl": {
-        "x": 4.6471540656205415,
-        "y": 7.406
+        "x": 4.478398510064991,
+        "y": 5.438199999999999
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,7 +30,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.84,
+      "waypointRelativePos": 0.5286307053941914,
       "rotationDegrees": 0.0
     }
   ],
@@ -55,7 +39,7 @@
   "eventMarkers": [
     {
       "name": "Aim Turret",
-      "waypointRelativePos": 1.0764411027568794,
+      "waypointRelativePos": 0.55,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -66,7 +50,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.7,
+    "maxVelocity": 2.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -83,5 +67,5 @@
     "velocity": 0,
     "rotation": -91.16913932790752
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

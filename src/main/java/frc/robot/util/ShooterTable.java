@@ -28,17 +28,17 @@ public class ShooterTable {
     hoodAngleMap.put(6.07, Rotation2d.fromDegrees(51));
   
 
-    flywheelSpeedMap.put(1.45, 3475.0); 
-    flywheelSpeedMap.put(2.41, 3725.0); 
-    flywheelSpeedMap.put(2.71, 3925.0); 
-    flywheelSpeedMap.put(3.2, 4125.0); 
-    flywheelSpeedMap.put(3.6, 4250.0); 
-    flywheelSpeedMap.put(3.8, 4375.0); 
-    flywheelSpeedMap.put(4.28, 4375.0); 
-    flywheelSpeedMap.put(4.53, 4425.0); 
-    flywheelSpeedMap.put(4.63, 4575.0); 
-    flywheelSpeedMap.put(5.13, 4675.0); 
-    flywheelSpeedMap.put(6.07, 5075.0); 
+    flywheelSpeedMap.put(1.45, 3540.0); 
+    flywheelSpeedMap.put(2.41, 3790.0); 
+    flywheelSpeedMap.put(2.71, 4015.0); 
+    flywheelSpeedMap.put(3.2, 4215.0); 
+    flywheelSpeedMap.put(3.6, 4340.0); 
+    flywheelSpeedMap.put(3.8, 4465.0); 
+    flywheelSpeedMap.put(4.28, 4465.0); 
+    flywheelSpeedMap.put(4.53, 4515.0); 
+    flywheelSpeedMap.put(4.63, 4665.0); 
+    flywheelSpeedMap.put(5.13, 4765.0); 
+    flywheelSpeedMap.put(6.07, 5165.0); 
   }
 
   public static ShooterSetpoint getSetpoint(double distanceMeters) {

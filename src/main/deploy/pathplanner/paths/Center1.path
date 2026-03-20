@@ -8,82 +8,30 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2126333333333337,
-        "y": 2.1056
+        "x": 3.4757333333333333,
+        "y": 3.0118333333333327
       },
       "isLocked": false,
       "linkedName": "CenterStart"
     },
     {
       "anchor": {
-        "x": 1.7801999999999998,
-        "y": 0.488022222222221
+        "x": 2.413588888888889,
+        "y": 3.0118333333333327
       },
       "prevControl": {
-        "x": 2.706161974013485,
-        "y": 0.6375048727356094
-      },
-      "nextControl": {
-        "x": -0.39281111111111144,
-        "y": 0.13722222222221953
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.6474555555555552,
-        "y": 4.025255555555555
-      },
-      "prevControl": {
-        "x": 1.039622222222223,
-        "y": 1.6768444444444435
+        "x": 2.686433333333334,
+        "y": 3.0118333333333327
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.6035225048923727,
-      "rotationDegrees": -129.39756060071534
-    },
-    {
-      "waypointRelativePos": 0.9385518590997963,
-      "rotationDegrees": -172.9539376639774
-    },
-    {
-      "waypointRelativePos": 1.3236790606653546,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Start Shooting",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Start Shooting"
-        }
-      }
-    },
-    {
-      "name": "Start Intake",
-      "waypointRelativePos": 0.5101851851852041,
-      "endWaypointRelativePos": 1.6398148148147977,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Start Intake"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 1.2,
     "maxAcceleration": 3.0,

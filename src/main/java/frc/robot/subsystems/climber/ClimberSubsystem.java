@@ -29,7 +29,7 @@ public class ClimberSubsystem extends SubsystemBase {
                 .p(0.5)
                 .i(0)
                 .d(0)
-                .outputRange(-0.25, 0.25)
+                .outputRange(-0.8, 0.8)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
