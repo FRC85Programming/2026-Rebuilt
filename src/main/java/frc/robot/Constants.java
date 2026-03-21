@@ -73,7 +73,6 @@ public final class Constants
     public static final Translation2d SHOOTER_TRANSLATION = new Translation2d(Units.inchesToMeters(-5.5), 0);
 
     public static final double HOOD_HOME_ANGLE = 75;
-    public static final double HOOD_HOME_ENCODER_ABS = 0.22533927857875824;
     public static final double HOOD_LENGTH_METERS = 0.1;
   }
 

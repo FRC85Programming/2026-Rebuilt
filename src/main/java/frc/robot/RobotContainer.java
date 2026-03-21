@@ -235,7 +235,15 @@ public class RobotContainer
       // TODO: Configure this pose to a better position/use apriltags
       //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.690, 7.377, new Rotation2d(0)))));
-      driverXbox.leftBumper().whileTrue(new TuneShot(drivebase, shooter, indexer, turret, () -> getTarget()));
+      driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
+              shooter.startManualShooting(drivebase);
+              turret.startManualShooting(drivebase);
+          }));
+
+      driverXbox.pov(90).onTrue(Commands.runOnce(() -> {
+              shooter.startManualFeeding(drivebase);
+              turret.startManualFeeding(drivebase);
+          }));
 
       // Right Trigger - Shoot based on current mode
       driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret, intake));

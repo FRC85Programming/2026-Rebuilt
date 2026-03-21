@@ -46,7 +46,7 @@ public class FireCommand extends Command {
         } else {
             turretTolerance = SmartDashboard.getNumber("TOLERANCE", 9);
         }
-        boolean ready = shooter.flywheelAtSpeed(0.80) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turretTolerance);
+        boolean ready = shooter.flywheelAtSpeed(0.90) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turretTolerance);
         SmartDashboard.putBoolean("AIMED", ready);
         SmartDashboard.putBoolean("READY FLYWHEEL", shooter.flywheelAtSpeed(0.80));
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));

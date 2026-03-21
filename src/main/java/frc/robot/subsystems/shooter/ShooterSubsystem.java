@@ -30,6 +30,7 @@ import frc.robot.Robot;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem.TurretState;
 import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.ShooterTable;
 import frc.robot.util.TimeOfFlightTable;
@@ -40,7 +41,9 @@ public class ShooterSubsystem extends SubsystemBase {
     public enum ShooterState {
         IDLE,
         AIMING,
-        FEEDING
+        FEEDING,
+        MANUALSHOOT,
+        MANUALFEED
     }
 
     private final SparkFlex flywheelMotorLeft =
@@ -156,7 +159,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("TUNE Shot Angle", 75);
         SmartDashboard.putNumber("Set Hood Angle", 69);
 
-        hoodMotor.getEncoder().setPosition((hoodMotor.getAbsoluteEncoder().getPosition() - ShooterConstants.HOOD_HOME_ENCODER_ABS) * ShooterConstants.HOOD_GEAR_RATIO);
+        hoodMotor.getEncoder().setPosition(0);
 
         SmartDashboard.putBoolean("RESET HOOD", false);
     }
@@ -181,8 +184,8 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putString("Shooter State", state.toString());
 
         if (SmartDashboard.getBoolean("RESET HOOD", false) == true) {
-            hoodMotor.getEncoder().setPosition((hoodMotor.getAbsoluteEncoder().getPosition() - ShooterConstants.HOOD_HOME_ENCODER_ABS) * 10.96);
-            SmartDashboard.putBoolean("RESET HOOD", true);
+            hoodMotor.getEncoder().setPosition(0);
+            SmartDashboard.putBoolean("RESET HOOD", false);
         }
     }
 
@@ -271,6 +274,20 @@ public class ShooterSubsystem extends SubsystemBase {
         this.calculatedRPM = 0.0;
         setHoodAngle(ShooterConstants.HOOD_HOME_ANGLE);
         Logger.recordOutput("Shot/Trajectory3d", new Pose3d[0]);
+    }
+
+    public void startManualFeeding(SwerveSubsystem swerve) {
+        this.swerve = swerve;
+        setHoodAngle(55);
+        calculatedRPM = 5000;
+        this.state = ShooterState.MANUALFEED;
+    }
+
+    public void startManualShooting(SwerveSubsystem swerve) {
+        this.swerve = swerve;
+        setHoodAngle(67);
+        calculatedRPM = 4015;
+        this.state = ShooterState.MANUALSHOOT;
     }
 
     public ShooterState getState() {
@@ -367,5 +384,4 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelMotorLeft.set(speed);
         flywheelMotorRight.set(-speed);
     }
-
 }

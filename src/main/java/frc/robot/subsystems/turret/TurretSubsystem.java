@@ -34,7 +34,9 @@ public class TurretSubsystem extends SubsystemBase {
     public enum TurretState {
         IDLE,
         AIMING,
-        FEEDING
+        FEEDING,
+        MANUALSHOOT,
+        MANUALFEED
     }
 
     private final SparkFlex turretMotor =
@@ -99,7 +101,7 @@ public class TurretSubsystem extends SubsystemBase {
     public void periodic() {
         if ((state == TurretState.AIMING || state == TurretState.FEEDING) && swerve != null && aimTarget != null) {
             updateAiming();
-        }
+        } 
 
         updateLogging();
 
@@ -177,6 +179,18 @@ public class TurretSubsystem extends SubsystemBase {
         this.state = TurretState.FEEDING;
     }
 
+    public void startManualFeeding(SwerveSubsystem swerve) {
+        this.swerve = swerve;
+        setTurretAngle(90);
+        this.state = TurretState.MANUALFEED;
+    }
+
+    public void startManualShooting(SwerveSubsystem swerve) {
+        this.swerve = swerve;
+        setTurretAngle(0);
+        this.state = TurretState.MANUALSHOOT;
+    }
+
     /** Return to IDLE state and stop auto-tracking. */
     public void stopAiming() {
         this.state = TurretState.IDLE;
@@ -235,5 +249,13 @@ public class TurretSubsystem extends SubsystemBase {
         double currentDeg = Math.toDegrees(getTurretAngleRads());
         double goalDeg = (goalAngle / TurretConstants.TURRET_GEAR_RATIO) * 360.0;
         return Math.abs(currentDeg - goalDeg) < tolerance;
+    }
+
+    public void manualFeedPosition() {
+        setTurretAngle(90);
+    }
+
+    public void manualShootPosition() {
+        setTurretAngle(0);
     }
 }
