@@ -50,7 +50,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 .p(0.35)
                 .i(0)
                 .d(0)
-                .outputRange(-0.15, 0.15)
+                .outputRange(-0.25, 0.15)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
