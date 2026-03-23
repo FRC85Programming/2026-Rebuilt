@@ -86,12 +86,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Start Intake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "LeftRush3"

@@ -136,7 +136,7 @@ public class RobotContainer
 
     // Basic intaking command (same as the one bound to a button)
     Command intakeCommand = new Intake(intake);
-    NamedCommands.registerCommand("Start Intake", intakeCommand.asProxy());
+    NamedCommands.registerCommand("Start Intake", intakeCommand);
     //NamedCommands.registerCommand("Stop Intake", Commands.runOnce(() -> intakeCommand.cancel()));
 
     // Change shooter states and start shooting

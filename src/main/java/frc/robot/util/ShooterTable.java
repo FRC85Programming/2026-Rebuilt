@@ -36,9 +36,9 @@ public class ShooterTable {
     flywheelSpeedMap.put(3.8, 4465.0); 
     flywheelSpeedMap.put(4.28, 4465.0); 
     flywheelSpeedMap.put(4.53, 4515.0); 
-    flywheelSpeedMap.put(4.63, 4665.0); 
-    flywheelSpeedMap.put(5.13, 4765.0); 
-    flywheelSpeedMap.put(6.07, 5165.0); 
+    flywheelSpeedMap.put(4.63, 4705.0); 
+    flywheelSpeedMap.put(5.13, 4805.0); 
+    flywheelSpeedMap.put(6.07, 5205.0); 
   }
 
   public static ShooterSetpoint getSetpoint(double distanceMeters) {

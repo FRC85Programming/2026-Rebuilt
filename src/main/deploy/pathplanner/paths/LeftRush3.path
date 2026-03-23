@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5342000000000002,
-        "y": 5.6915555555555555
+        "x": 3.3490555555555557,
+        "y": 5.730533333333333
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.878933333333335,
-        "y": 5.672066666666666
+        "x": 4.693788888888891,
+        "y": 5.711044444444443
       },
       "isLocked": false,
       "linkedName": "LeftShootPoint"
@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.5429280397022327,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",
