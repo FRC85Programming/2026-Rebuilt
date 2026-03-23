@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.util.FieldObstacleAligner;
+import frc.robot.subsystems.odometry.PoseEstimationSubsystem;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.odometry.QuestResult;
 import gg.questnav.questnav.PoseFrame;
@@ -83,6 +84,8 @@ public class SwerveSubsystem extends SubsystemBase
   //private       Vision      vision;
 
   private QuestNavSubsystem questNav = new QuestNavSubsystem();
+
+  private PoseEstimationSubsystem visionPoseEstimator;
 
   PoseFrame[] questFrames;
 
@@ -140,6 +143,8 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
+    visionPoseEstimator = new PoseEstimationSubsystem(swerveDrive::getPose, swerveDrive.field);
+
     if (visionDriveTest)
     {
       setupPhotonVision();
@@ -214,8 +219,9 @@ public class SwerveSubsystem extends SubsystemBase
             SmartDashboard.putData("QuestField", fieldQuest);
         }
       }
-      
     }
+
+    visionPoseEstimator.updatePoseEstimation(swerveDrive);
 
     if (SmartDashboard.getBoolean("BLUE LEFT RESET", false)) {
 
