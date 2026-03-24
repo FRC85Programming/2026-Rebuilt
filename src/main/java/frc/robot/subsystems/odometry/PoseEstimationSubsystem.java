@@ -14,6 +14,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -55,6 +57,9 @@ public class PoseEstimationSubsystem
   //private final       double              maximumAmbiguity                = 0.25;
 
   private Field2d visionField = new Field2d();
+
+  private final StructPublisher<Pose3d> visionPose3dPublisher = NetworkTableInstance.getDefault()
+      .getStructTopic("SmartDashboard/Vision Pose 3D", Pose3d.struct).publish();
 
   static int updates = 0;
   /**
@@ -154,6 +159,8 @@ public class PoseEstimationSubsystem
                                                 pose.timestampSeconds,
                                                 camera.curStdDevs);
               visionField.setRobotPose(poseEst.get().estimatedPose.toPose2d());
+              SmartDashboard.putData("Vision Field", visionField);
+              visionPose3dPublisher.set(poseEst.get().estimatedPose);
             
           //}
         }
@@ -350,12 +357,13 @@ public class PoseEstimationSubsystem
     /**
      * Front Camera
      */
-    BACK_CAM("camera-back",// 12.125 up, y 14.5, 10.5 x
-             new Rotation3d(180, Units.degreesToRadians(1), Units.degreesToRadians(180)),
-             new Translation3d(Units.inchesToMeters(-14),
-                               Units.inchesToMeters(-11),
-                               Units.inchesToMeters(13)),
+    BACK_CAM("Apriltag-Front",
+             new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(0)),
+             new Translation3d(Units.inchesToMeters(13.75),
+                               Units.inchesToMeters(0.0),
+                               Units.inchesToMeters(19.5)),
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+             
     /*BACK2_CAM("camera-back2",
              new Rotation3d(0, Units.degreesToRadians(-26), Units.degreesToRadians(180)),
              new Translation3d(Units.inchesToMeters(-6.5),
@@ -425,7 +433,7 @@ public class PoseEstimationSubsystem
     /**
      * Estimated robot pose.
      */
-    public        Optional<EstimatedRobotPose> estimatedRobotPose;
+    public        Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
     /**
      * Simulated camera instance which only exists during simulations.
      */

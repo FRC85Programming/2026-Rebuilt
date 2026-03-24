@@ -200,18 +200,9 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-    aimController.setP(SmartDashboard.getNumber("AimController P", 5));
-    aimController.setD(SmartDashboard.getNumber("AimController D", 0));
-    //swerveDrive.updateOdometry();
-    // When vision is enabled we must manually update odometry in SwerveDrive
-    if (visionDriveTest)
-    {
-      //swerveDrive.updateOdometry();
-      //vision.updatePoseEstimation(swerveDrive);
-    }
     if (useQuestNav) {
       questFrames = questNav.getAllUnreadPoseFrames();
-      if (questFrames != null) {
+      if (questFrames != null && questNav.isQuestConnected()) {
         for (PoseFrame questFrame : questFrames) {
             QuestResult result = questNav.getResult(questFrame);
             swerveDrive.addVisionMeasurement(result.getPose().toPose2d(), result.getTimeStamp(), questNav.getStdDevs());

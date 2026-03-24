@@ -81,4 +81,8 @@ public class QuestNavSubsystem extends SubsystemBase {
 
         questNav.setPose(questPose);
     }
+
+    public boolean isQuestConnected() {
+        return questNav.isConnected();
+    }
 }
