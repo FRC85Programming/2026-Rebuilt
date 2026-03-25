@@ -214,7 +214,7 @@ public class ShooterSubsystem extends SubsystemBase {
         Translation2d toTargetDir = toTarget.div(distance);
 
         // Radial velocity: positive = moving toward target (reduces effective distance)
-        double radialVel =  -robotVel.vxMetersPerSecond * toTargetDir.getX()
+        double radialVel =  robotVel.vxMetersPerSecond * toTargetDir.getX()
                           + robotVel.vyMetersPerSecond * toTargetDir.getY();
 
         // Iterate to find effective distance accounting for radial velocity
@@ -222,7 +222,7 @@ public class ShooterSubsystem extends SubsystemBase {
         double timeOfFlight = 0;
         for (int i = 0; i < 3; i++) {
             timeOfFlight = TimeOfFlightTable.getTimeOfFlight(Math.max(effectiveDistance, 0.1));
-            effectiveDistance = distance - (-radialVel * timeOfFlight);
+            effectiveDistance = distance - (radialVel * timeOfFlight);
         }
 
         SmartDashboard.putNumber("CALCULATED TIME OF FLIGHT", timeOfFlight);

@@ -361,52 +361,15 @@ public class PoseEstimationSubsystem
              new Translation3d(Units.inchesToMeters(-11.25),
                                Units.inchesToMeters(-10.8),
                                Units.inchesToMeters(12.625)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(1, 1, 2)),
 
     BACKLEFT_CAM("Apriltag-BackLeft",
              new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(150)),
              new Translation3d(Units.inchesToMeters(-11.25),
                                Units.inchesToMeters(10.8),
                                Units.inchesToMeters(12.625)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(1, 1, 2));
              
-    /*BACK2_CAM("camera-back2",
-             new Rotation3d(0, Units.degreesToRadians(-26), Units.degreesToRadians(180)),
-             new Translation3d(Units.inchesToMeters(-6.5),
-                               Units.inchesToMeters(-2),
-                               Units.inchesToMeters(5)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-    FRONT_LEFT_CAM("camera-frontleft",
-             new Rotation3d(0, Units.degreesToRadians(-20), Units.degreesToRadians(45)),
-             new Translation3d(Units.inchesToMeters(-14.68),
-                               Units.inchesToMeters(14.7),
-                               Units.inchesToMeters(7.2)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-    FRONT_RIGHT_CAM("camera-frontright",
-             new Rotation3d(0, Units.degreesToRadians(-20), Units.degreesToRadians(-45)),
-             new Translation3d(Units.inchesToMeters(14.68),
-                               Units.inchesToMeters(14.7),
-                               Units.inchesToMeters(7.2)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));*/
-    /**
-     *
-     * Right Camera
-     */
-    /*RIGHT_CAM("right",
-              new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-30)),
-              new Translation3d(Units.inchesToMeters(12.056),
-                                Units.inchesToMeters(-10.981),
-                                Units.inchesToMeters(8.44)),
-              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),*/
-    /**
-     * Center Camera
-     */
-    /*CENTER_CAM("center",
-               new Rotation3d(0, Units.degreesToRadians(18), 0),
-               new Translation3d(Units.inchesToMeters(-4.628),
-                                 Units.inchesToMeters(-10.687),
-                                 Units.inchesToMeters(16.129)),
-               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));*/
 
     /**
      * Latency alert to use when high latency is detected.

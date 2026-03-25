@@ -136,8 +136,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         Translation2d toTargetDir = toTarget.div(distance);
 
-        double radialVel  =  -robotVel.vxMetersPerSecond * toTargetDir.getX()
-                           + -robotVel.vyMetersPerSecond * toTargetDir.getY();
+        double radialVel  =  robotVel.vxMetersPerSecond * toTargetDir.getX()
+                           + robotVel.vyMetersPerSecond * toTargetDir.getY();
         double lateralVel = robotVel.vxMetersPerSecond * toTargetDir.getY()
                            + -robotVel.vyMetersPerSecond * toTargetDir.getX();
 

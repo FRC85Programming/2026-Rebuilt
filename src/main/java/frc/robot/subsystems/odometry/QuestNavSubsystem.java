@@ -2,6 +2,7 @@ package frc.robot.subsystems.odometry;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.QuestADBWrapper;
 import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
 
@@ -30,6 +32,8 @@ public class QuestNavSubsystem extends SubsystemBase {
             new Rotation3d(0.0, 0.0, Math.toRadians(-94))
         );
 
+    private int questNavRestartAttempts = 0;
+
     // Values that indicate how much to trust the quest
     private static final Matrix<N3, N1> QUESTNAV_STD_DEVS =
         VecBuilder.fill(
@@ -37,6 +41,22 @@ public class QuestNavSubsystem extends SubsystemBase {
             0.02,
             0.035
         );
+
+    @Override
+    public void periodic() {
+        if (!questNav.isConnected()) {
+                if (questNavRestartAttempts < 25) {
+                    questNavRestartAttempts++;
+                    if (QuestADBWrapper.updateIsConnected()) { // QuestNav is not active but Quest ADB is connected, so try to restart QuestNav.
+                        System.out.println("Connected, running restart...");
+                        QuestADBWrapper.tryRestartQuestNav();
+                    } else {
+                        System.out.println("Disconnected, trying to reconnect lazily...");
+                        QuestADBWrapper.lazyTryConnect();
+                    }
+                }
+            }
+    }
 
     /**
      * Gets the latest data from the quest

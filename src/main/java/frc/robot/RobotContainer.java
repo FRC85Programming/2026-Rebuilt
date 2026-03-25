@@ -170,6 +170,7 @@ public class RobotContainer
 
     autoChooser.addOption("LeftDoubleRush", "LeftDoubleRush");
     autoChooser.addOption("LeftTrenchRush", "LeftTrenchRush");
+    autoChooser.addOption("NewLeftBumpRush", "NewLeftBumpRush");
     autoChooser.addOption("Left+Depot", "Left+Depot");
     autoChooser.addOption("RightDoubleRush", "RightDoubleRush");
     autoChooser.addOption("RightTrenchRush", "RightTrenchRush");
