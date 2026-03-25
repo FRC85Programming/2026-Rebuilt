@@ -59,6 +59,8 @@ public class Robot extends LoggedRobot
     // immediately when disabled, but then also let it be pushed more 
     disabledTimer = new Timer();
 
+    m_robotContainer.setIdleAnimation();
+
     if (isSimulation())
     {
       DriverStation.silenceJoystickConnectionWarning(true);
@@ -106,6 +108,7 @@ public class Robot extends LoggedRobot
   public void disabledInit()
   {
     m_robotContainer.setMotorBrake(true);
+    m_robotContainer.setIdleAnimation();
     disabledTimer.reset();
     disabledTimer.start();
   }
@@ -132,6 +135,8 @@ public class Robot extends LoggedRobot
 
     //Print the selected autonomous command upon autonomous init
     System.out.println("Auto selected: " + m_autonomousCommand);
+
+    m_robotContainer.setAutoAnimation();
 
     // schedule the autonomous command selected in the autoChooser
     if (m_autonomousCommand != null)

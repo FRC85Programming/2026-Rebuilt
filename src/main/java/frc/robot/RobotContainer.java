@@ -29,11 +29,14 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.leds.LEDSubsystem;
+import frc.robot.subsystems.leds.LEDSubsystem.Animation;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.util.BallFieldGenerator;
 
 import java.io.File;
+import java.sql.Driver;
 import java.util.Optional;
 
 import swervelib.SwerveInputStream;
@@ -62,6 +65,8 @@ public class RobotContainer
   //private final VisionSubsystem vision = new VisionSubsystem();
 
   private final ClimberSubsystem climber = new ClimberSubsystem();
+
+  private final LEDSubsystem leds = new LEDSubsystem();
 
 
   BallFieldGenerator gen = new BallFieldGenerator();
@@ -336,6 +341,10 @@ public class RobotContainer
   {
     /*shooter.startAiming (drivebase, this::getTarget);
     turret.startAiming(drivebase, this::getTarget);*/
+
+    boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
+
+    leds.setAnimation(isRedAlliance ? Animation.RED_ALLIANCE : Animation.BLUE_ALLIANCE);
   }
 
   public Translation3d getTarget() {
@@ -382,5 +391,13 @@ public class RobotContainer
   // I apoligize for how ugly this is :)
   public Translation2d[] getTestBalls() {
     return balls;
+  }
+
+  public void setAutoAnimation() {
+    leds.setAnimation(Animation.AUTO);
+  }
+
+  public void setIdleAnimation() {
+    leds.setAnimation(Animation.IDLE);
   }
 }

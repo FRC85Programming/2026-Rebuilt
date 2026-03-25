@@ -11,20 +11,25 @@
       "style": "0",
       "userScale": "2",
       "width": "1280",
-      "xpos": "445",
-      "ypos": "726"
+      "xpos": "443",
+      "ypos": "416"
     }
   },
   "Window": {
     "###/FMSInfo": {
       "Collapsed": "0",
       "Pos": "60,60",
-      "Size": "202,194"
+      "Size": "210,194"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "Pos": "356,90",
+      "Pos": "465,27",
       "Size": "740,373"
+    },
+    "###Addressable LEDs": {
+      "Collapsed": "0",
+      "Pos": "290,100",
+      "Size": "416,207"
     },
     "###FMS": {
       "Collapsed": "0",
