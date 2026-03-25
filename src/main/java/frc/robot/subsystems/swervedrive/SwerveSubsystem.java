@@ -55,6 +55,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -214,6 +215,8 @@ public class SwerveSubsystem extends SubsystemBase
 
     visionPoseEstimator.updatePoseEstimation(swerveDrive);
 
+    Logger.recordOutput("Odometry/Robot", new Pose3d(getPose()));
+
     if (SmartDashboard.getBoolean("BLUE LEFT RESET", false)) {
 
       resetOdometry(FieldConstants.BLUE_LEFT_START_POSE);
@@ -264,8 +267,8 @@ public class SwerveSubsystem extends SubsystemBase
           // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
           (speedsRobotRelative, moduleFeedForwards) -> {
             ChassisSpeeds modifiedSpeeds = new ChassisSpeeds(
-                -speedsRobotRelative.vxMetersPerSecond,
-                -speedsRobotRelative.vyMetersPerSecond,
+                speedsRobotRelative.vxMetersPerSecond,
+                speedsRobotRelative.vyMetersPerSecond,
                 speedsRobotRelative.omegaRadiansPerSecond
             );
             if (enableFeedforward)

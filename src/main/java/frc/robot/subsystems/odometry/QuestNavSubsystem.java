@@ -24,8 +24,8 @@ public class QuestNavSubsystem extends SubsystemBase {
         new Transform3d(
             new Translation3d(
                 Units.inchesToMeters(-3.143),
-                Units.inchesToMeters(-10.79),
-                Units.inchesToMeters(16.24)
+                Units.inchesToMeters(-10.29),
+                Units.inchesToMeters(16.59)
             ),
             new Rotation3d(0.0, 0.0, Math.toRadians(-94))
         );

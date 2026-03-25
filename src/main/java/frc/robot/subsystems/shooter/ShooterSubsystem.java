@@ -214,7 +214,7 @@ public class ShooterSubsystem extends SubsystemBase {
         Translation2d toTargetDir = toTarget.div(distance);
 
         // Radial velocity: positive = moving toward target (reduces effective distance)
-        double radialVel =  robotVel.vxMetersPerSecond * toTargetDir.getX()
+        double radialVel =  -robotVel.vxMetersPerSecond * toTargetDir.getX()
                           + robotVel.vyMetersPerSecond * toTargetDir.getY();
 
         // Iterate to find effective distance accounting for radial velocity

@@ -51,17 +51,17 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/neo"));
-  //private final ShooterSubsystem shooter = new ShooterSubsystem();
+  private final ShooterSubsystem shooter = new ShooterSubsystem();
 
-  //private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final IntakeSubsystem intake = new IntakeSubsystem();
 
-  //private final IndexerSubsystem indexer = new IndexerSubsystem();
+  private final IndexerSubsystem indexer = new IndexerSubsystem();
 
-  //private final TurretSubsystem turret = new TurretSubsystem();
+  private final TurretSubsystem turret = new TurretSubsystem();
 
   //private final VisionSubsystem vision = new VisionSubsystem();
 
-  //private final ClimberSubsystem climber = new ClimberSubsystem();
+  private final ClimberSubsystem climber = new ClimberSubsystem();
 
 
   BallFieldGenerator gen = new BallFieldGenerator();
@@ -72,9 +72,9 @@ public class RobotContainer
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * 1,
-                                                                () -> driverXbox.getLeftX() * 1)
-                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+                                                                () -> driverXbox.getLeftY() * -1,
+                                                                () -> driverXbox.getLeftX() * -1)
+                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * 1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -135,37 +135,37 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
 
     // Basic intaking command (same as the one bound to a button)
-    //Command intakeCommand = new Intake(intake);
-    // NamedCommands.registerCommand("Start Intake", intakeCommand);
-    // //NamedCommands.registerCommand("Stop Intake", Commands.runOnce(() -> intakeCommand.cancel()));
+    Command intakeCommand = new Intake(intake);
+    NamedCommands.registerCommand("Start Intake", intakeCommand);
+    //NamedCommands.registerCommand("Stop Intake", Commands.runOnce(() -> intakeCommand.cancel()));
 
-    // // Change shooter states and start shooting
-    // Command shootCommand = new SequentialCommandGroup(new InstantCommand(() -> shooter.startAiming(drivebase, () -> getTarget())), 
-    //                                                   new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())),
-    //                                                   new FireCommand(shooter, indexer, turret, intake));
-    // NamedCommands.registerCommand("Start Shooting", shootCommand);
+    // Change shooter states and start shooting
+    Command shootCommand = new SequentialCommandGroup(new InstantCommand(() -> shooter.startAiming(drivebase, () -> getTarget())), 
+                                                      new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())),
+                                                      new FireCommand(shooter, indexer, turret, intake));
+    NamedCommands.registerCommand("Start Shooting", shootCommand);
 
 
-    // // Change shooter states and stop shooting — requiring shooter+turret interrupts the running FireCommand,
-    // // which then calls FireCommand.end() to stop the flywheel and indexer automatically.
-    // Command stopShootingCommand = Commands.runOnce(() -> {
-    //     shooter.stopAiming();
-    //     turret.stopAiming();
-    // }, shooter, turret);
+    // Change shooter states and stop shooting — requiring shooter+turret interrupts the running FireCommand,
+    // which then calls FireCommand.end() to stop the flywheel and indexer automatically.
+    Command stopShootingCommand = Commands.runOnce(() -> {
+        shooter.stopAiming();
+        turret.stopAiming();
+    }, shooter, turret);
 
-    // NamedCommands.registerCommand("Aim Turret", new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())));
+    NamedCommands.registerCommand("Aim Turret", new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())));
 
-    // NamedCommands.registerCommand("Stop Shooting", stopShootingCommand);
+    NamedCommands.registerCommand("Stop Shooting", stopShootingCommand);
 
-    // NamedCommands.registerCommand("Intake Up", new InstantCommand(() -> intake.toggleStowedUp()));
+    NamedCommands.registerCommand("Intake Up", new InstantCommand(() -> intake.toggleStowedUp()));
 
-    // NamedCommands.registerCommand("Intake Depot", new SequentialCommandGroup(new InstantCommand(() -> intake.deployIntakeDepot()), new InstantCommand(() -> intake.runRollers())));
+    NamedCommands.registerCommand("Intake Depot", new SequentialCommandGroup(new InstantCommand(() -> intake.deployIntakeDepot()), new InstantCommand(() -> intake.runRollers())));
 
-    // //NamedCommands.registerCommand("Climb", new Climb(ClimberSubsystem));
+    //NamedCommands.registerCommand("Climb", new Climb(ClimberSubsystem));
 
-    // // Movement commands
-    // //NamedCommands.registerCommand("SmartIntakeBlueLeft", new PathPlanToBalls(drivebase, vision, 5.64, 8.43, 4, 7.5));
-    // NamedCommands.registerCommand("DriveToBlueLeftShoot", drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.toRadians(180)))));
+    // Movement commands
+    //NamedCommands.registerCommand("SmartIntakeBlueLeft", new PathPlanToBalls(drivebase, vision, 5.64, 8.43, 4, 7.5));
+    NamedCommands.registerCommand("DriveToBlueLeftShoot", drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.toRadians(180)))));
 
 
     autoChooser.addOption("LeftDoubleRush", "LeftDoubleRush");
@@ -216,9 +216,9 @@ public class RobotContainer
     if (Robot.isSimulation())
     {
       //driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
-      //driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret, intake));
+      driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret, intake));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
-      //driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
+      driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
     }
     if (DriverStation.isTest())
     {
@@ -235,43 +235,43 @@ public class RobotContainer
       // TODO: Configure this pose to a better position/use apriltags
       //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.690, 7.377, new Rotation2d(0)))));
-      // driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
-      //         shooter.startManualShooting(drivebase);
-      //         turret.startManualShooting(drivebase);
-      //     }));
+      driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
+              shooter.startManualShooting(drivebase);
+              turret.startManualShooting(drivebase);
+          }));
 
-      // driverXbox.pov(90).onTrue(Commands.runOnce(() -> {
-      //         shooter.startManualFeeding(drivebase);
-      //         turret.startManualFeeding(drivebase);
-      //     }));
+      driverXbox.pov(90).onTrue(Commands.runOnce(() -> {
+              shooter.startManualFeeding(drivebase);
+              turret.startManualFeeding(drivebase);
+          }));
 
-      // // Right Trigger - Shoot based on current mode
-      // driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret, intake));
+      // Right Trigger - Shoot based on current mode
+      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret, intake));
 
       // Left Trigger - Intake
-      // driverXbox.leftTrigger().whileTrue(new Intake(intake));
-      // driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.toggleStowedUp()));
+      driverXbox.leftTrigger().whileTrue(new Intake(intake));
+      driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.toggleStowedUp()));
 
-      // driverXbox.pov(0).onTrue(new InstantCommand(() -> climber.climberUp()));
-      // driverXbox.pov(180).onTrue(new InstantCommand(() -> climber.climberDown()));
+      driverXbox.pov(0).onTrue(new InstantCommand(() -> climber.climberUp()));
+      driverXbox.pov(180).onTrue(new InstantCommand(() -> climber.climberDown()));
 
-      // // X - Switch shooter to idle mode
-      // driverXbox.x().onTrue(Commands.runOnce(() -> {
-      //         shooter.stopAiming();
-      //         turret.stopAiming();
-      //     }));
+      // X - Switch shooter to idle mode
+      driverXbox.x().onTrue(Commands.runOnce(() -> {
+              shooter.stopAiming();
+              turret.stopAiming();
+          }));
 
-      // // B - Start aiming in case of failure to auto init
-      // driverXbox.b().onTrue(Commands.runOnce(() -> {
-      //         shooter.startAiming(drivebase, () -> getTarget());
-      //         turret.startAiming(drivebase, () -> getTarget());
-      //     }));
+      // B - Start aiming in case of failure to auto init
+      driverXbox.b().onTrue(Commands.runOnce(() -> {
+              shooter.startAiming(drivebase, () -> getTarget());
+              turret.startAiming(drivebase, () -> getTarget());
+          }));
 
       // A - Start feeding mode
-      // driverXbox.a().onTrue(Commands.runOnce(() -> {
-      //         shooter.startFeeding(drivebase, () -> getFeedTarget());
-      //         turret.startFeeding(drivebase, () -> getFeedTarget());
-      //     }));
+      driverXbox.a().onTrue(Commands.runOnce(() -> {
+              shooter.startFeeding(drivebase, () -> getFeedTarget());
+              turret.startFeeding(drivebase, () -> getFeedTarget());
+          }));
 
       // Quick inputs for spinning turret - TEST ONLY
       //driverXbox.pov(0).onTrue(new InstantCommand(() -> turret.setTurretAngle(0)));
@@ -291,10 +291,10 @@ public class RobotContainer
                          && x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP;
         return inTrench && (inBlueBox || inRedBox);
       });
-      // inIdleZone.onTrue(Commands.runOnce(() -> {
-      //   shooter.stopAiming();
-      //   turret.stopAiming();
-      // }));
+      inIdleZone.onTrue(Commands.runOnce(() -> {
+        shooter.stopAiming();
+        turret.stopAiming();
+      }));
 
       // Re-activate aiming when the robot crosses into the alliance from the idle box.
       Trigger inAllianceZone = new Trigger(() -> {
@@ -308,10 +308,10 @@ public class RobotContainer
         boolean inRedAlliance  = x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP;
         return inTrench && (inBlueAlliance || inRedAlliance);
       });
-      // inAllianceZone.onTrue(Commands.runOnce(() -> {
-      //   shooter.startAiming(drivebase, () -> getTarget());
-      //   turret.startAiming(drivebase, () -> getTarget());
-      // }));
+      inAllianceZone.onTrue(Commands.runOnce(() -> {
+        shooter.startAiming(drivebase, () -> getTarget());
+        turret.startAiming(drivebase, () -> getTarget());
+      }));
     }
   }
 

@@ -154,15 +154,14 @@ public class PoseEstimationSubsystem
 
         if (poseEst.isPresent()) {
           var pose = poseEst.get();
-            //if (poseEst.get().targetsUsed.get(0).getPoseAmbiguity() < 0.5) {
-              swerveDrive.addVisionMeasurement(poseEst.get().estimatedPose.toPose2d(),
-                                                pose.timestampSeconds,
-                                                camera.curStdDevs);
-              visionField.setRobotPose(poseEst.get().estimatedPose.toPose2d());
-              SmartDashboard.putData("Vision Field", visionField);
-              visionPose3dPublisher.set(poseEst.get().estimatedPose);
-            
-          //}
+          if (pose.targetsUsed.get(0).getPoseAmbiguity() < 0.1) {
+            swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+                                              pose.timestampSeconds,
+                                              camera.curStdDevs);
+            visionField.setRobotPose(pose.estimatedPose.toPose2d());
+            SmartDashboard.putData("Vision Field", visionField);
+            visionPose3dPublisher.set(pose.estimatedPose);
+          }
         }
     }
 
@@ -357,11 +356,18 @@ public class PoseEstimationSubsystem
     /**
      * Front Camera
      */
-    BACK_CAM("Apriltag-Front",
-             new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(0)),
-             new Translation3d(Units.inchesToMeters(13.75),
-                               Units.inchesToMeters(0.0),
-                               Units.inchesToMeters(19.5)),
+    BACKRIGHT_CAM("Apriltag-BackRight",
+             new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(-150)),
+             new Translation3d(Units.inchesToMeters(-11.25),
+                               Units.inchesToMeters(-10.8),
+                               Units.inchesToMeters(12.625)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+
+    BACKLEFT_CAM("Apriltag-BackLeft",
+             new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(150)),
+             new Translation3d(Units.inchesToMeters(-11.25),
+                               Units.inchesToMeters(10.8),
+                               Units.inchesToMeters(12.625)),
              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
              
     /*BACK2_CAM("camera-back2",

@@ -231,6 +231,6 @@ public class Robot extends LoggedRobot
       Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
     }
 
-    //Logger.start();
+    Logger.start();
   }
 }

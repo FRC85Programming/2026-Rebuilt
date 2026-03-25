@@ -136,10 +136,10 @@ public class TurretSubsystem extends SubsystemBase {
 
         Translation2d toTargetDir = toTarget.div(distance);
 
-        double radialVel  =  robotVel.vxMetersPerSecond * toTargetDir.getX()
-                           + robotVel.vyMetersPerSecond * toTargetDir.getY();
-        double lateralVel = -robotVel.vxMetersPerSecond * toTargetDir.getY()
-                           + robotVel.vyMetersPerSecond * toTargetDir.getX();
+        double radialVel  =  -robotVel.vxMetersPerSecond * toTargetDir.getX()
+                           + -robotVel.vyMetersPerSecond * toTargetDir.getY();
+        double lateralVel = robotVel.vxMetersPerSecond * toTargetDir.getY()
+                           + -robotVel.vyMetersPerSecond * toTargetDir.getX();
 
         // Iterate to find time of flight accounting for radial velocity compensation
         double effectiveDistance = distance;

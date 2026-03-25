@@ -21,24 +21,24 @@ public class ShooterTable {
     hoodAngleMap.put(3.2, Rotation2d.fromDegrees(65));
     hoodAngleMap.put(3.6, Rotation2d.fromDegrees(63));
     hoodAngleMap.put(3.8, Rotation2d.fromDegrees(61));
-    hoodAngleMap.put(4.28, Rotation2d.fromDegrees(57));
-    hoodAngleMap.put(4.53, Rotation2d.fromDegrees(56));
+    hoodAngleMap.put(4.28, Rotation2d.fromDegrees(59));
+    hoodAngleMap.put(4.53, Rotation2d.fromDegrees(57));
     hoodAngleMap.put(4.63, Rotation2d.fromDegrees(55));
-    hoodAngleMap.put(5.13, Rotation2d.fromDegrees(52));
+    hoodAngleMap.put(5.13, Rotation2d.fromDegrees(53));
     hoodAngleMap.put(6.07, Rotation2d.fromDegrees(51));
   
 
-    flywheelSpeedMap.put(1.45, 3540.0); 
-    flywheelSpeedMap.put(2.41, 3790.0); 
-    flywheelSpeedMap.put(2.71, 4015.0); 
-    flywheelSpeedMap.put(3.2, 4215.0); 
-    flywheelSpeedMap.put(3.6, 4340.0); 
-    flywheelSpeedMap.put(3.8, 4465.0); 
-    flywheelSpeedMap.put(4.28, 4465.0); 
-    flywheelSpeedMap.put(4.53, 4515.0); 
-    flywheelSpeedMap.put(4.63, 4705.0); 
-    flywheelSpeedMap.put(5.13, 4805.0); 
-    flywheelSpeedMap.put(6.07, 5205.0); 
+    flywheelSpeedMap.put(1.45, 3340.0); 
+    flywheelSpeedMap.put(2.41, 3590.0); 
+    flywheelSpeedMap.put(2.71, 3885.0); 
+    flywheelSpeedMap.put(3.2, 4015.0); 
+    flywheelSpeedMap.put(3.6, 4140.0); 
+    flywheelSpeedMap.put(3.8, 4265.0); 
+    flywheelSpeedMap.put(4.28, 4200.0); 
+    flywheelSpeedMap.put(4.53, 4300.0); 
+    flywheelSpeedMap.put(4.63, 4400.0); 
+    flywheelSpeedMap.put(5.13, 4500.0); 
+    flywheelSpeedMap.put(6.07, 4600.0); 
   }
 
   public static ShooterSetpoint getSetpoint(double distanceMeters) {
