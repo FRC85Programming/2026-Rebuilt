@@ -29,7 +29,7 @@ public class QuestNavSubsystem extends SubsystemBase {
                 Units.inchesToMeters(-10.29),
                 Units.inchesToMeters(16.59)
             ),
-            new Rotation3d(0.0, 0.0, Math.toRadians(-94))
+            new Rotation3d(0.0, 0.0, Math.toRadians(-90))
         );
 
     private int questNavRestartAttempts = 0;
@@ -37,8 +37,8 @@ public class QuestNavSubsystem extends SubsystemBase {
     // Values that indicate how much to trust the quest
     private static final Matrix<N3, N1> QUESTNAV_STD_DEVS =
         VecBuilder.fill(
-            0.02,
-            0.02,
+            0.001,
+            0.001,
             0.035
         );
 

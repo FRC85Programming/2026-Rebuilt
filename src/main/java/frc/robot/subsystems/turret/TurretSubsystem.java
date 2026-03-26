@@ -258,4 +258,8 @@ public class TurretSubsystem extends SubsystemBase {
     public void manualShootPosition() {
         setTurretAngle(0);
     }
+
+    public double getTurretSetpointRadians() {
+        return (closedLoopController.getSetpoint() / TurretConstants.TURRET_GEAR_RATIO) * (Math.PI * 2);
+    }  
 }

@@ -88,8 +88,8 @@ public final class Constants
       // Tangent of the deflection angle used to offset the feed target around the obstacle.
       // Positive value deflects above the midpoint upward and below the midpoint downward.
       // Negate FEED_ANGLE_SCALE_RED if red requires the opposite deflection direction.
-      public static final double FEED_ANGLE_SCALE_BLUE = 0.15;
-      public static final double FEED_ANGLE_SCALE_RED  = 0.15;
+      public static final double FEED_ANGLE_SCALE_BLUE = 0.5;
+      public static final double FEED_ANGLE_SCALE_RED  = 0.5;
 
       // Saftey poses
       public static final Translation2d blueLeftEnterAllianceZonePose = new Translation2d(5.825, 7.500);

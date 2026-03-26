@@ -52,11 +52,13 @@ public class FireCommand extends Command {
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
         SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(turretTolerance));
 
-        if (ready) {
+        if (ready && Math.abs(Math.toDegrees(turret.getTurretAngleRads()) - Math.toDegrees(turret.getTurretSetpointRadians())) < 45) {
             indexer.startIndexing();
         } else {
             indexer.runAgitation(); 
         }
+
+        SmartDashboard.putNumber("Turret Setpoint Degrees", Math.toDegrees(turret.getTurretSetpointRadians()));
 
         if (intake.getCurrentCommand() == null) {
             if (intakeTimer.advanceIfElapsed(0.7)) {
