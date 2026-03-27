@@ -17,28 +17,28 @@ public class ShooterTable {
     // These were calculated with a drop angle of 65 degrees
     hoodAngleMap.put(1.45, Rotation2d.fromDegrees(73));
     hoodAngleMap.put(2.41, Rotation2d.fromDegrees(70));
-    hoodAngleMap.put(2.71, Rotation2d.fromDegrees(67));
-    hoodAngleMap.put(3.2, Rotation2d.fromDegrees(65));
-    hoodAngleMap.put(3.6, Rotation2d.fromDegrees(63));
-    hoodAngleMap.put(3.8, Rotation2d.fromDegrees(61));
-    hoodAngleMap.put(4.28, Rotation2d.fromDegrees(59));
-    hoodAngleMap.put(4.53, Rotation2d.fromDegrees(57));
+    hoodAngleMap.put(2.71, Rotation2d.fromDegrees(66));
+    hoodAngleMap.put(3.2, Rotation2d.fromDegrees(64));
+    hoodAngleMap.put(3.6, Rotation2d.fromDegrees(62));
+    hoodAngleMap.put(3.8, Rotation2d.fromDegrees(60));
+    hoodAngleMap.put(4.28, Rotation2d.fromDegrees(57));
+    hoodAngleMap.put(4.53, Rotation2d.fromDegrees(56));
     hoodAngleMap.put(4.63, Rotation2d.fromDegrees(55));
-    hoodAngleMap.put(5.13, Rotation2d.fromDegrees(53));
+    hoodAngleMap.put(5.13, Rotation2d.fromDegrees(52));
     hoodAngleMap.put(6.07, Rotation2d.fromDegrees(51));
   
 
-    flywheelSpeedMap.put(1.45, 3340.0); 
-    flywheelSpeedMap.put(2.41, 3590.0); 
-    flywheelSpeedMap.put(2.71, 3885.0); 
-    flywheelSpeedMap.put(3.2, 4015.0); 
-    flywheelSpeedMap.put(3.6, 4140.0); 
-    flywheelSpeedMap.put(3.8, 4265.0); 
-    flywheelSpeedMap.put(4.28, 4200.0); 
-    flywheelSpeedMap.put(4.53, 4300.0); 
-    flywheelSpeedMap.put(4.63, 4400.0); 
-    flywheelSpeedMap.put(5.13, 4500.0); 
-    flywheelSpeedMap.put(6.07, 4600.0); 
+    flywheelSpeedMap.put(1.45, 3540.0); 
+    flywheelSpeedMap.put(2.41, 3790.0); 
+    flywheelSpeedMap.put(2.71, 4065.0); 
+    flywheelSpeedMap.put(3.2, 4205.0); 
+    flywheelSpeedMap.put(3.6, 4305.0); 
+    flywheelSpeedMap.put(3.8, 4405.0); 
+    flywheelSpeedMap.put(4.28, 4505.0); 
+    flywheelSpeedMap.put(4.53, 4605.0); 
+    flywheelSpeedMap.put(4.63, 4705.0); 
+    flywheelSpeedMap.put(5.13, 4805.0); 
+    flywheelSpeedMap.put(6.07, 5205.0); 
   }
 
   public static ShooterSetpoint getSetpoint(double distanceMeters) {

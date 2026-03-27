@@ -179,6 +179,7 @@ public class RobotContainer
     autoChooser.addOption("Left+Depot", "Left+Depot");
     autoChooser.addOption("RightDoubleRush", "RightDoubleRush");
     autoChooser.addOption("RightTrenchRush", "RightTrenchRush");
+    autoChooser.addOption("NewRightBumpRush", "NewRightBumpRush");
     autoChooser.addOption("Center", "Center");
 
     SmartDashboard.putData("Auto Selector", autoChooser);

@@ -156,7 +156,7 @@ public class PoseEstimationSubsystem
           var pose = poseEst.get();
           var bestTarget = pose.targetsUsed.get(0);
           boolean ambiguityOk = bestTarget.getPoseAmbiguity() < 0.1;
-          boolean distanceOk  = bestTarget.getBestCameraToTarget().getTranslation().getNorm() < 3.0;
+          boolean distanceOk  = bestTarget.getBestCameraToTarget().getTranslation().getNorm() < 3.8;
           if (ambiguityOk && distanceOk) {
             swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                               pose.timestampSeconds,
@@ -364,14 +364,14 @@ public class PoseEstimationSubsystem
              new Translation3d(Units.inchesToMeters(-11.25),
                                Units.inchesToMeters(-10.8),
                                Units.inchesToMeters(12.625)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 4)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(2, 2, 2)),
 
     BACKLEFT_CAM("Apriltag-BackLeft",
              new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(150)),
              new Translation3d(Units.inchesToMeters(-11.25),
                                Units.inchesToMeters(10.8),
                                Units.inchesToMeters(12.625)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(4, 4, 4));
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(2, 2, 2));
              
 
     /**
