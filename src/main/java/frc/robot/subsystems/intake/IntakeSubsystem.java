@@ -50,7 +50,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 .p(0.35)
                 .i(0)
                 .d(0)
-                .outputRange(-0.25, 0.15)
+                .outputRange(-0.2, 0.15)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
@@ -83,12 +83,19 @@ public class IntakeSubsystem extends SubsystemBase {
         rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         pivotMotor.getEncoder().setPosition(0);
+
+        SmartDashboard.putBoolean("RESET INTAKE", false);
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Intake Position", pivotMotor.getEncoder().getPosition());
         SmartDashboard.putString("Intake Pivot State", pivotState.toString());
+
+        if (SmartDashboard.getBoolean("RESET INTAKE", false) == true) {
+            pivotMotor.getEncoder().setPosition(0);
+            SmartDashboard.putBoolean("RESET INTAKE", false);
+        }
     }
 
     /**

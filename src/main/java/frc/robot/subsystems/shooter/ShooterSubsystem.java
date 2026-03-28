@@ -60,6 +60,8 @@ public class ShooterSubsystem extends SubsystemBase {
     double goalRpm = 0.0;
     double goalAngle = 69;
 
+    double flywheelOffset = 0;
+
     boolean readyToFire = false;
 
     boolean isSim;
@@ -182,6 +184,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Hood Angle", getHoodAngle());
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
         SmartDashboard.putString("Shooter State", state.toString());
+        SmartDashboard.putNumber("Flywheel RPM Offset", flywheelOffset);
 
         if (SmartDashboard.getBoolean("RESET HOOD", false) == true) {
             hoodMotor.getEncoder().setPosition(0);
@@ -208,6 +211,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         Translation2d toTarget = targetTranslation.toTranslation2d().minus(turretFieldPos2d);
         double distance = toTarget.getNorm();
+        SmartDashboard.putNumber("DISTANCE TO HUB", distance);
 
         if (distance < 1e-6) return;
 
@@ -234,6 +238,7 @@ public class ShooterSubsystem extends SubsystemBase {
             : ShooterTable.getSetpoint(clampedEffectiveDistance);
 
         calculatedRPM = Math.abs(setpoint.flywheelRPM());
+        calculatedRPM = calculatedRPM + flywheelOffset;
         double hoodAngleRad = setpoint.hoodAngle().getRadians();
 
         setHoodAngle(Math.toDegrees(hoodAngleRad));
@@ -383,5 +388,13 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setFlywheelSpeed(double speed) {
         flywheelMotorLeft.set(speed);
         flywheelMotorRight.set(-speed);
+    }
+
+    public void increaseFlywheelOffset() {
+        flywheelOffset += 50;
+    }
+
+    public void decreaseFlywheelOffset() {
+        flywheelOffset -= 50;
     }
 }

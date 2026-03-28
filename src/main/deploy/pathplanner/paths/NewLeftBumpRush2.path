@@ -95,11 +95,22 @@
     {
       "name": "Start Intake",
       "waypointRelativePos": 0.3553349875930576,
-      "endWaypointRelativePos": 2.0,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
           "name": "Start Intake"
+        }
+      }
+    },
+    {
+      "name": "Stop Intake",
+      "waypointRelativePos": 1.836596893990542,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Intake"
         }
       }
     }
@@ -120,7 +131,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

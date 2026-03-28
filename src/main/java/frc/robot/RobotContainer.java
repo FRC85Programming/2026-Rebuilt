@@ -68,6 +68,8 @@ public class RobotContainer
 
   private final LEDSubsystem leds = new LEDSubsystem();
 
+  boolean isRedAlliance = false;
+
 
   BallFieldGenerator gen = new BallFieldGenerator();
 
@@ -140,14 +142,14 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
 
     // Basic intaking command (same as the one bound to a button)
-    Command intakeCommand = new Intake(intake);
-    NamedCommands.registerCommand("Start Intake", intakeCommand);
-    //NamedCommands.registerCommand("Stop Intake", Commands.runOnce(() -> intakeCommand.cancel()));
+    Command intakeCommand = new Intake(intake, leds);
+    NamedCommands.registerCommand("Start Intake", intakeCommand.asProxy());
+    NamedCommands.registerCommand("Stop Intake", Commands.runOnce(() -> intakeCommand.cancel()));
 
     // Change shooter states and start shooting
     Command shootCommand = new SequentialCommandGroup(new InstantCommand(() -> shooter.startAiming(drivebase, () -> getTarget())), 
                                                       new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())),
-                                                      new FireCommand(shooter, indexer, turret, intake));
+                                                      new FireCommand(shooter, indexer, turret, intake, leds));
     NamedCommands.registerCommand("Start Shooting", shootCommand);
 
 
@@ -223,7 +225,7 @@ public class RobotContainer
     if (Robot.isSimulation())
     {
       //driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
-      driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret, intake));
+      driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret, intake, leds));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
     }
@@ -252,11 +254,14 @@ public class RobotContainer
               turret.startManualFeeding(drivebase);
           }));
 
+      driverXbox.pov(270).onTrue(new InstantCommand(() -> shooter.decreaseFlywheelOffset()));
+      driverXbox.y().onTrue(new InstantCommand(() -> shooter.increaseFlywheelOffset()));
+
       // Right Trigger - Shoot based on current mode
-      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret, intake));
+      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret, intake, leds));
 
       // Left Trigger - Intake
-      driverXbox.leftTrigger().whileTrue(new Intake(intake));
+      driverXbox.leftTrigger().whileTrue(new Intake(intake, leds));
       driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.toggleStowedUp()));
 
       driverXbox.pov(0).onTrue(new InstantCommand(() -> climber.climberUp()));
@@ -343,9 +348,10 @@ public class RobotContainer
     /*shooter.startAiming (drivebase, this::getTarget);
     turret.startAiming(drivebase, this::getTarget);*/
 
-    boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
+    isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
 
     leds.setAnimation(isRedAlliance ? Animation.RED_ALLIANCE : Animation.BLUE_ALLIANCE);
+    leds.setAllianceAnimation(isRedAlliance ? Animation.RED_ALLIANCE : Animation.BLUE_ALLIANCE);
   }
 
   public Translation3d getTarget() {

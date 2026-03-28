@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.leds.LEDSubsystem;
+import frc.robot.subsystems.leds.LEDSubsystem.Animation;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem.TurretState;
@@ -15,16 +17,18 @@ public class FireCommand extends Command {
     private final TurretSubsystem turret;
     private final IndexerSubsystem indexer;
     private final IntakeSubsystem intake;
+    private final LEDSubsystem leds;
 
     private final Timer intakeTimer = new Timer();
     private boolean intakeIsDown = false;
     private double turretTolerance = 9;
 
-    public FireCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret, IntakeSubsystem intake) {
+    public FireCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret, IntakeSubsystem intake, LEDSubsystem leds) {
         this.shooter = shooter;
         this.turret = turret;
         this.indexer = indexer;
         this.intake = intake;
+        this.leds = leds;
         addRequirements(shooter, turret);
     }
 
@@ -46,7 +50,7 @@ public class FireCommand extends Command {
         } else {
             turretTolerance = SmartDashboard.getNumber("TOLERANCE", 9);
         }
-        boolean ready = shooter.flywheelAtSpeed(0.90) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turretTolerance);
+        boolean ready = shooter.flywheelAtSpeed(0.95) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turretTolerance);
         SmartDashboard.putBoolean("AIMED", ready);
         SmartDashboard.putBoolean("READY FLYWHEEL", shooter.flywheelAtSpeed(0.80));
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
@@ -54,8 +58,10 @@ public class FireCommand extends Command {
 
         if (ready && Math.abs(Math.toDegrees(turret.getTurretAngleRads()) - Math.toDegrees(turret.getTurretSetpointRadians())) < 45) {
             indexer.startIndexing();
+            leds.setAnimation(Animation.BLINK_GREEN);
         } else {
             indexer.runAgitation(); 
+            leds.setAnimation(Animation.BLINK_WHITE);
         }
 
         SmartDashboard.putNumber("Turret Setpoint Degrees", Math.toDegrees(turret.getTurretSetpointRadians()));
@@ -81,5 +87,6 @@ public class FireCommand extends Command {
         shooter.stopFlywheel();
         indexer.stopIndexing();
         intake.stowIntake();
+        leds.setAnimation(Animation.ALLIANCE_SPECIFIC);
     }
 }

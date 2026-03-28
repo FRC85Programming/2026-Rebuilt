@@ -363,15 +363,15 @@ public class PoseEstimationSubsystem
              new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(-150)),
              new Translation3d(Units.inchesToMeters(-11.25),
                                Units.inchesToMeters(-10.8),
-                               Units.inchesToMeters(12.625)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(2, 2, 2)),
+                               Units.inchesToMeters(15.5)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(3, 3, 3)),
 
     BACKLEFT_CAM("Apriltag-BackLeft",
              new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(150)),
              new Translation3d(Units.inchesToMeters(-11.25),
                                Units.inchesToMeters(10.8),
-                               Units.inchesToMeters(12.625)),
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(2, 2, 2));
+                               Units.inchesToMeters(15.5)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(3, 3, 3));
              
 
     /**

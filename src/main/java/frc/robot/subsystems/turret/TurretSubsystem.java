@@ -95,6 +95,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("TOLERANCE", 9);
         SmartDashboard.getNumber("FEED TOLERANCE", 25);
+        SmartDashboard.putBoolean("RESET TURRET", false);
     }
 
     @Override
@@ -109,6 +110,11 @@ public class TurretSubsystem extends SubsystemBase {
             AlphaMechanism3d.setTurretAngle(
                 isSim ? turretSim.getTurretAngleRads() : getTurretAngleRads()
             );
+        }
+
+        if (SmartDashboard.getBoolean("RESET TURRET", false) == true) {
+            turretMotor.getEncoder().setPosition(0);
+            SmartDashboard.putBoolean("RESET TURRET", false);
         }
     }
 

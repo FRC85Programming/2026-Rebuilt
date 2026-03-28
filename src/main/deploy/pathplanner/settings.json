@@ -8,9 +8,10 @@
     "Left Rush",
     "Left Trench Rush",
     "Left+Depot",
-    "Right Trench Rush",
+    "LeftNoPreloadRush",
     "Right Bump Rush",
     "Right Rush",
+    "Right Trench Rush",
     "Right+Outpost"
   ],
   "autoFolders": [
