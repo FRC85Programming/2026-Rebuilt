@@ -190,6 +190,7 @@ public class RobotContainer
     SmartDashboard.putBoolean("RED LEFT RESET", false);
     SmartDashboard.putBoolean("BLUE LEFT RESET", false);
     SmartDashboard.putBoolean("BLUE RIGHT RESET", false);
+    SmartDashboard.putBoolean("RESET QUEST TO VISION", false);
 
     for (var i = 0; i < getTestBalls().length; i++) {
       //SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(getTestBalls()[i]));
@@ -390,6 +391,12 @@ public class RobotContainer
                         ? Constants.FieldConstants.FEED_ANGLE_SCALE_RED
                         : Constants.FieldConstants.FEED_ANGLE_SCALE_BLUE;
       targetY = robotY + sign * xDist * scale;
+    }
+
+    if (targetY <= 1) {
+      targetY = 1;
+    } else if (targetY >= 7) {
+      targetY = 7;
     }
 
     return new Translation3d(base.getX(), targetY, base.getZ());

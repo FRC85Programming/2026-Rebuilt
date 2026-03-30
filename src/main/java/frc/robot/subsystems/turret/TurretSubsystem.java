@@ -118,6 +118,60 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
+    // private void updateAiming() {
+    //     Translation3d targetTranslation = aimTarget.get();
+    //     ChassisSpeeds robotVel = swerve.getFieldVelocity();
+    //     Pose2d robotPose = swerve.getPose();
+    //     ChassisSpeeds robotRelVel = swerve.getRobotVelocity();
+
+    //     final double PHASE_DELAY = 0.03;
+    //     robotPose = robotPose.exp(new Twist2d(
+    //         robotRelVel.vxMetersPerSecond * PHASE_DELAY,
+    //         robotRelVel.vyMetersPerSecond * PHASE_DELAY,
+    //         robotRelVel.omegaRadiansPerSecond * PHASE_DELAY
+    //     ));
+
+    //     Translation2d turretFieldPos2d =
+    //         robotPose.getTranslation()
+    //             .plus(TurretConstants.ROBOT_TO_TURRET.getTranslation().toTranslation2d().rotateBy(robotPose.getRotation()));
+
+    //     Translation2d toTarget = targetTranslation.toTranslation2d().minus(turretFieldPos2d);
+    //     double distance = toTarget.getNorm();
+
+    //     if (distance < 1e-6) return;
+
+    //     Translation2d toTargetDir = toTarget.div(distance);
+
+    //     double radialVel  =  robotVel.vxMetersPerSecond * toTargetDir.getX()
+    //                        + robotVel.vyMetersPerSecond * toTargetDir.getY();
+    //     double lateralVel = robotVel.vxMetersPerSecond * toTargetDir.getY()
+    //                        + -robotVel.vyMetersPerSecond * toTargetDir.getX();
+
+    //     // Iterate to find time of flight accounting for radial velocity compensation
+    //     double effectiveDistance = distance;
+    //     double timeOfFlight = 0;
+    //     for (int i = 0; i < 3; i++) {
+    //         timeOfFlight = TimeOfFlightTable.getTimeOfFlight(Math.max(effectiveDistance, 0.1));
+    //         effectiveDistance = distance - (radialVel * timeOfFlight);
+    //     }
+
+    //     // Lead-compensated target position
+    //     Translation2d leadTargetFieldPos = targetTranslation.toTranslation2d()
+    //         .plus(new Translation2d(
+    //             lateralVel * timeOfFlight,
+    //             toTarget.getAngle().plus(Rotation2d.fromDegrees(90))
+    //         ));
+
+    //     Translation2d turretToTarget = leadTargetFieldPos.minus(turretFieldPos2d);
+    //     Rotation2d fieldAngle  = new Rotation2d(turretToTarget.getX(), turretToTarget.getY());
+    //     Rotation2d turretAngle = fieldAngle.minus(robotPose.getRotation());
+
+    //     setTurretAngle(turretAngle.getDegrees() - TurretConstants.MOUNTING_OFFSET);
+
+    //     SmartDashboard.putNumber("Calced Turret Angle", turretAngle.getDegrees());
+    // }
+
+    // FIXED FOR  ROTATIONAL VELOCITY
     private void updateAiming() {
         Translation3d targetTranslation = aimTarget.get();
         ChassisSpeeds robotVel = swerve.getFieldVelocity();
@@ -142,10 +196,16 @@ public class TurretSubsystem extends SubsystemBase {
 
         Translation2d toTargetDir = toTarget.div(distance);
 
-        double radialVel  =  robotVel.vxMetersPerSecond * toTargetDir.getX()
-                           + robotVel.vyMetersPerSecond * toTargetDir.getY();
-        double lateralVel = robotVel.vxMetersPerSecond * toTargetDir.getY()
-                           + -robotVel.vyMetersPerSecond * toTargetDir.getX();
+        // Compute turret's true field velocity by adding tangential velocity from robot rotation
+        Translation2d rVec = turretFieldPos2d.minus(robotPose.getTranslation());
+        double omega = robotRelVel.omegaRadiansPerSecond;
+        double turretVx = robotVel.vxMetersPerSecond + (-omega * rVec.getY());
+        double turretVy = robotVel.vyMetersPerSecond + ( omega * rVec.getX());
+
+        double radialVel  =  turretVx * toTargetDir.getX()
+                        + turretVy * toTargetDir.getY();
+        double lateralVel =  turretVx * toTargetDir.getY()
+                        + -turretVy * toTargetDir.getX();
 
         // Iterate to find time of flight accounting for radial velocity compensation
         double effectiveDistance = distance;

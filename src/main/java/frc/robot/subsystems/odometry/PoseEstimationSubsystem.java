@@ -62,6 +62,8 @@ public class PoseEstimationSubsystem
       .getStructTopic("SmartDashboard/Vision Pose 3D", Pose3d.struct).publish();
 
   static int updates = 0;
+
+  Pose3d lastVisionPose = new Pose3d();
   /**
    * Photon Vision Simulation
    */
@@ -164,10 +166,15 @@ public class PoseEstimationSubsystem
             visionField.setRobotPose(pose.estimatedPose.toPose2d());
             SmartDashboard.putData("Vision Field", visionField);
             visionPose3dPublisher.set(pose.estimatedPose);
+            lastVisionPose = pose.estimatedPose;
           }
         }
     }
 
+  }
+  
+  public Pose3d getLastEstimatedVisionPose() {
+      return lastVisionPose;
   }
 
   /**
@@ -649,7 +656,6 @@ public class PoseEstimationSubsystem
         }
       }
     }
-
 
   }
 

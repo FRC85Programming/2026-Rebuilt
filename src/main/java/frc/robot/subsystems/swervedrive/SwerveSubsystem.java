@@ -213,7 +213,14 @@ public class SwerveSubsystem extends SubsystemBase
       }
     }
 
+
+
     visionPoseEstimator.updatePoseEstimation(swerveDrive);
+
+    if (SmartDashboard.getBoolean("RESET QUEST TO VISION", false)) {
+      questNav.setPose(visionPoseEstimator.getLastEstimatedVisionPose());
+      SmartDashboard.putBoolean("RESET QUEST TO VISION", false);
+    }
 
     Logger.recordOutput("Odometry/Robot", new Pose3d(getPose()));
 
