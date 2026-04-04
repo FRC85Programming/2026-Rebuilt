@@ -325,6 +325,28 @@ public class RobotContainer
         shooter.startAiming(drivebase, () -> getTarget());
         turret.startAiming(drivebase, () -> getTarget());
       }));
+
+      // Feeding when crossing into neutral field (past idle), still in a trench Y-band.
+      Trigger inNeutralFeedZone = new Trigger(() -> {
+        double x = drivebase.getPose().getX();
+        double y = drivebase.getPose().getY();
+        boolean inTrench = (y >= Constants.ObstacleAlignmentConstants.TRENCH1_Y_MIN
+                         && y <= Constants.ObstacleAlignmentConstants.TRENCH1_Y_MAX)
+                        || (y >= Constants.ObstacleAlignmentConstants.TRENCH2_Y_MIN
+                         && y <= Constants.ObstacleAlignmentConstants.TRENCH2_Y_MAX);
+        boolean onAllianceSide = x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_BOTTOM
+            || x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP;
+        boolean inIdleCorridor =
+            (x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_BOTTOM
+                && x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_TOP)
+            || (x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_BOTTOM
+                && x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP);
+        return inTrench && !onAllianceSide && !inIdleCorridor;
+      });
+      inNeutralFeedZone.onTrue(Commands.runOnce(() -> {
+        shooter.startFeeding(drivebase, () -> getFeedTarget());
+        turret.startFeeding(drivebase, () -> getFeedTarget());
+      }));
     }
   }
 
