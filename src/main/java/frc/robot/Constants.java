@@ -150,7 +150,7 @@ public final class Constants
     // The position (in motor rotations) in which the intake is in the down position
     public static final double INTAKE_DOWN_POSITION = -9.4;
 
-    public static final double INTAKE_STOW_POSITION = -4;
+    public static final double INTAKE_STOW_POSITION = -3;
 
     public static final double INTAKE_DEPOT_POSITION = -8.7;
 

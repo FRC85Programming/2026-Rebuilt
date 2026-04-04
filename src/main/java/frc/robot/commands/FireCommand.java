@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -67,7 +68,7 @@ public class FireCommand extends Command {
         SmartDashboard.putNumber("Turret Setpoint Degrees", Math.toDegrees(turret.getTurretSetpointRadians()));
 
         if (intake.getCurrentCommand() == null) {
-            if (intakeTimer.advanceIfElapsed(0.7)) {
+            if (intakeTimer.advanceIfElapsed(0.45)) {
                 intakeIsDown = !intakeIsDown;
                 if (intakeIsDown) intake.deployIntake();
                 else              intake.stowIntake();
@@ -87,6 +88,10 @@ public class FireCommand extends Command {
         shooter.stopFlywheel();
         indexer.stopIndexing();
         intake.stowIntake();
-        leds.setAnimation(Animation.ALLIANCE_SPECIFIC);
+        if (!DriverStation.isAutonomous()) {
+            leds.setAnimation(Animation.ALLIANCE_SPECIFIC);
+        } else {
+            leds.setAnimation(Animation.AUTO);
+        }
     }
 }

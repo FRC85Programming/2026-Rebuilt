@@ -178,6 +178,8 @@ public class RobotContainer
     autoChooser.addOption("LeftDoubleRush", "LeftDoubleRush");
     autoChooser.addOption("LeftTrenchRush", "LeftTrenchRush");
     autoChooser.addOption("NewLeftBumpRush", "NewLeftBumpRush");
+        autoChooser.addOption("NewLeftBumpRush2.0", "NewLeftBumpRush2.0");
+    autoChooser.addOption("3539Left", "3539Left");
     autoChooser.addOption("Left+Depot", "Left+Depot");
     autoChooser.addOption("RightDoubleRush", "RightDoubleRush");
     autoChooser.addOption("RightTrenchRush", "RightTrenchRush");
@@ -435,5 +437,9 @@ public class RobotContainer
 
   public void setIdleAnimation() {
     leds.setAnimation(Animation.IDLE);
+  }
+
+  public void setBatteryBadAnimation() {
+    leds.setAnimation(Animation.BAD_BATTERY);
   }
 }

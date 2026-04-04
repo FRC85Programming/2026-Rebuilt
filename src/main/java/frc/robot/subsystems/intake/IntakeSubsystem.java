@@ -38,7 +38,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private SparkClosedLoopController pivotController;
 
-    private double rollerSpeed = -0.55;
+    private double rollerSpeed = -0.6;
 
     private PivotState pivotState = PivotState.STOWED;
 

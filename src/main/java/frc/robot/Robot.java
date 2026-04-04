@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -59,8 +60,8 @@ public class Robot extends LoggedRobot
     // immediately when disabled, but then also let it be pushed more 
     disabledTimer = new Timer();
 
-    m_robotContainer.setIdleAnimation();
-
+    //m_robotContainer.setIdleAnimation();
+    m_robotContainer.setBatteryBadAnimation();
     if (isSimulation())
     {
       DriverStation.silenceJoystickConnectionWarning(true);
@@ -96,6 +97,9 @@ public class Robot extends LoggedRobot
       }
     } else {
       alliance = "No Data";
+    }
+    if (RobotController.getBatteryVoltage() < 8) {
+      m_robotContainer.setBatteryBadAnimation();
     }
     SmartDashboard.putString("AUTO WINNER", alliance);
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());

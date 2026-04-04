@@ -3,13 +3,14 @@
   "robotLength": 0.66,
   "holonomicMode": true,
   "pathFolders": [
+    "3539 Left",
     "Center",
     "Left Bump Rush",
     "Left Rush",
     "Left Trench Rush",
     "Left+Depot",
     "LeftNoPreloadRush",
-    "3539 Left",
+    "LeftFeedAuto",
     "Right Bump Rush",
     "Right Rush",
     "Right Trench Rush",
@@ -44,5 +45,7 @@
   "brModuleY": -0.23,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.0,\"y\":-0.3},\"size\":{\"width\":0.1,\"length\":0.1},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
+  ]
 }
