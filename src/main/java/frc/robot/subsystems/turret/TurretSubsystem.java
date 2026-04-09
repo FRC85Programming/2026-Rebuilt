@@ -58,7 +58,7 @@ public class TurretSubsystem extends SubsystemBase {
     private Supplier<Translation3d> aimTarget = null;
 
     // TUNE THIS
-    final double K_SPIN = 0.10;
+    final double K_SPIN = 0.1;
 
     public TurretSubsystem() {
         isSim = Robot.isSimulation();
@@ -224,7 +224,9 @@ public class TurretSubsystem extends SubsystemBase {
         Rotation2d fieldAnglePreSpin = new Rotation2d(toTargetPreSpin.getX(), toTargetPreSpin.getY());
         Rotation2d turretAnglePreSpin = fieldAnglePreSpin.minus(robotPose.getRotation());
 
-        double spinLateralOffset = K_SPIN * Math.sin(turretAnglePreSpin.getRadians()) * timeOfFlight;
+        //double spinLateralOffset = K_SPIN * Math.sin(turretAnglePreSpin.getRadians()) * timeOfFlight;
+
+        double spinLateralOffset = SmartDashboard.getNumber("SPIN FACTOR", 0.1) * Math.sin(turretAnglePreSpin.getRadians()) * timeOfFlight;
 
         // Lead-compensated target position, including spin offset
         Translation2d leadTargetFieldPos = targetTranslation.toTranslation2d()

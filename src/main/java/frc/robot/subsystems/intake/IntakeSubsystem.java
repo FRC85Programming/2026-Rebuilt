@@ -29,7 +29,9 @@ public class IntakeSubsystem extends SubsystemBase {
         DEPOT
     }
 
-    private final SparkFlex rollerMotor = new SparkFlex(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless);
+    private final SparkFlex rollerMotorLeft = new SparkFlex(IntakeConstants.ROLLER_MOTOR_LEFT_ID, MotorType.kBrushless);
+
+    private final SparkFlex rollerMotorRight = new SparkFlex(IntakeConstants.ROLLER_MOTOR_RIGHT_ID, MotorType.kBrushless);
 
     private final SparkFlex pivotMotor = new SparkFlex(IntakeConstants.PIVOT_MOTOR_ID, MotorType.kBrushless);
 
@@ -80,7 +82,8 @@ public class IntakeSubsystem extends SubsystemBase {
         rollerConfig.idleMode(IdleMode.kCoast);
 
         pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        rollerMotorLeft.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        rollerMotorRight.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         pivotMotor.getEncoder().setPosition(0);
 
@@ -144,18 +147,21 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public void runRollers() {
         // TODO: Change back
-        rollerMotor.set(rollerSpeed);
+        rollerMotorLeft.set(rollerSpeed);
+        rollerMotorRight.set(-rollerSpeed);
     }
 
     /**
      * Stops the intake rollers
      */
     public void stopRollers() {
-        rollerMotor.set(0);
+        rollerMotorLeft.set(0);
+        rollerMotorRight.set(0);
     }
 
     public void reverseRollers() {
-        rollerMotor.set(-rollerSpeed);
+        rollerMotorLeft.set(-rollerSpeed);
+        rollerMotorRight.set(rollerSpeed);
     }
 
     /**

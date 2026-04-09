@@ -192,6 +192,8 @@ public class RobotContainer
     SmartDashboard.putBoolean("BLUE RIGHT RESET", false);
     SmartDashboard.putBoolean("RESET QUEST TO VISION", false);
 
+    SmartDashboard.putNumber("SPIN FACTOR", 0.1);
+
     for (var i = 0; i < getTestBalls().length; i++) {
       //SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(getTestBalls()[i]));
     }

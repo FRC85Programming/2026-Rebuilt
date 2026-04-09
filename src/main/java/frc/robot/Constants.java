@@ -147,7 +147,9 @@ public final class Constants
   }
   
   public static class IntakeConstants {
-    public static final int ROLLER_MOTOR_ID = 18;
+    public static final int ROLLER_MOTOR_LEFT_ID = 18;
+
+    public static final int ROLLER_MOTOR_RIGHT_ID = 50;
 
     public static final int PIVOT_MOTOR_ID = 25;
 
