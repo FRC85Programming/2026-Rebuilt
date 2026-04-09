@@ -210,12 +210,10 @@ public class SwerveSubsystem extends SubsystemBase
             fieldQuest.setRobotPose(result.getPose().toPose2d());
             SmartDashboard.putData("QuestField", fieldQuest);
         }
+      } else {
+        visionPoseEstimator.updatePoseEstimation(swerveDrive);
       }
     }
-
-
-
-    visionPoseEstimator.updatePoseEstimation(swerveDrive);
 
     if (SmartDashboard.getBoolean("RESET QUEST TO VISION", false)) {
       questNav.setPose(visionPoseEstimator.getLastEstimatedVisionPose());

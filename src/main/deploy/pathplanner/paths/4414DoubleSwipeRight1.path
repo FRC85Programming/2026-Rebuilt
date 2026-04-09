@@ -1,0 +1,86 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.3235,
+        "y": 0.6536777777777774
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.3235,
+        "y": 0.6536777777777774
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.133577777777777,
+        "y": 2.738988888888889
+      },
+      "prevControl": {
+        "x": 8.057707038532614,
+        "y": 0.09868716315720594
+      },
+      "nextControl": {
+        "x": 8.1823,
+        "y": 4.434522222222222
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.1481,
+        "y": 2.738988888888889
+      },
+      "prevControl": {
+        "x": 5.999544444444444,
+        "y": 2.7974555555555547
+      },
+      "nextControl": {
+        "x": 3.1208156879529643,
+        "y": 2.706548331666352
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.6024111111111115,
+        "y": 0.6536777777777774
+      },
+      "prevControl": {
+        "x": 2.6024111111111115,
+        "y": 0.6536777777777774
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "RightBumpRushStopPoint"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.7,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "4414 Double Swipe Right",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}

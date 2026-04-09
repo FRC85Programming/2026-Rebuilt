@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AlphaMechanism3d;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.Robot;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -63,9 +64,9 @@ public class TurretSubsystem extends SubsystemBase {
 
         turretConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(0.31)
+                .p(0.23)
                 .i(0)
-                .d(0)
+                .d(0.0)
                 .outputRange(-0.6, 0.6)
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
@@ -309,6 +310,7 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Turret RAD", turretAngleRads);
         SmartDashboard.putNumber("Turret DEG", turretAngleDeg);
         SmartDashboard.putString("Turret State", state.toString());
+        SmartDashboard.putNumber("TURRET SPEED RPM", turretMotor.getEncoder().getVelocity());
     }
 
     public boolean turretAtAngle(double tolerance) {
@@ -327,5 +329,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getTurretSetpointRadians() {
         return (closedLoopController.getSetpoint() / TurretConstants.TURRET_GEAR_RATIO) * (Math.PI * 2);
-    }  
+    }
+    
+    public boolean isSpeedSafeToFire() {
+        return turretMotor.getEncoder().getVelocity() < TurretConstants.TURRET_SPEED_SAFEZONE;
+    }
 }

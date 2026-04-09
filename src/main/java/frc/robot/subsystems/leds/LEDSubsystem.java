@@ -16,7 +16,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     public enum Animation {
         IDLE, AUTO, RED_ALLIANCE, BLUE_ALLIANCE, LIGHTNING, BUILT_ON_BRAINS,
-        BLINK_GREEN, BLINK_WHITE, ALLIANCE_SPECIFIC, BAD_BATTERY
+        BLINK_GREEN, BLINK_WHITE, ALLIANCE_SPECIFIC, BAD_BATTERY, BLINK_YELLOW, BLINK_PURPLE
     }
 
     private Animation m_current = Animation.IDLE;
@@ -72,6 +72,8 @@ public class LEDSubsystem extends SubsystemBase {
             case BLINK_WHITE     -> animateBlinkWhite();
             case ALLIANCE_SPECIFIC -> animateAllianceSpecific();
             case BAD_BATTERY       -> animateBadBattery();
+            case BLINK_YELLOW  -> animateBlinkYellow();
+            case BLINK_PURPLE  -> animateBlinkPurple();
         }
         m_led.setData(m_buffer);
         m_tick++;
@@ -227,6 +229,22 @@ public class LEDSubsystem extends SubsystemBase {
         int value = on ? scale(255) : 0;
         for (int i = 0; i < LED_COUNT; i++) {
             m_buffer.setRGB(i, value, value, value);
+        }
+    }
+
+    private void animateBlinkYellow() {
+        boolean on = (m_tick % (BLINK_HALF_PERIOD * 2)) < BLINK_HALF_PERIOD;
+        int value = on ? scale(1) : 0;
+        for (int i = 0; i < LED_COUNT; i++) {
+            m_buffer.setRGB(i, value*240, value*214, value*7);
+        }
+    }
+
+    private void animateBlinkPurple() {
+        boolean on = (m_tick % (BLINK_HALF_PERIOD * 2)) < BLINK_HALF_PERIOD;
+        int value = on ? scale(255) : 0;
+        for (int i = 0; i < LED_COUNT; i++) {
+            m_buffer.setRGB(i, value, 0, value);
         }
     }
 

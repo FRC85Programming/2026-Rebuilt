@@ -57,9 +57,15 @@ public class FireCommand extends Command {
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
         SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(turretTolerance));
 
-        if (ready && Math.abs(Math.toDegrees(turret.getTurretAngleRads()) - Math.toDegrees(turret.getTurretSetpointRadians())) < 45) {
+        if (ready && turret.isSpeedSafeToFire()) {
             indexer.startIndexing();
-            leds.setAnimation(Animation.BLINK_GREEN);
+            if (turret.getState() == TurretState.AIMING) {
+                leds.setAnimation(Animation.BLINK_GREEN);
+            } else if (turret.getState() == TurretState.FEEDING) {
+                leds.setAnimation(Animation.BLINK_GREEN);
+            } else if (turret.getState() == TurretState.MANUALSHOOT) {
+                leds.setAnimation(Animation.BLINK_GREEN);
+            }
         } else {
             indexer.runAgitation(); 
             leds.setAnimation(Animation.BLINK_WHITE);
@@ -68,10 +74,10 @@ public class FireCommand extends Command {
         SmartDashboard.putNumber("Turret Setpoint Degrees", Math.toDegrees(turret.getTurretSetpointRadians()));
 
         if (intake.getCurrentCommand() == null) {
-            if (intakeTimer.advanceIfElapsed(0.45)) {
+            if (intakeTimer.advanceIfElapsed(0.8)) {
                 intakeIsDown = !intakeIsDown;
-                if (intakeIsDown) intake.deployIntake();
-                else              intake.stowIntake();
+                if (!intakeIsDown) intake.stowIntake();
+                else              intake.deployIntake();
             }
         } else {
             intakeTimer.restart();

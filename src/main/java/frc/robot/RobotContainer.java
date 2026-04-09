@@ -26,7 +26,6 @@ import frc.robot.commands.FireCommand;
 import frc.robot.commands.Intake;
 import frc.robot.commands.TuneShot;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.leds.LEDSubsystem;
@@ -63,8 +62,6 @@ public class RobotContainer
   private final TurretSubsystem turret = new TurretSubsystem();
 
   //private final VisionSubsystem vision = new VisionSubsystem();
-
-  private final ClimberSubsystem climber = new ClimberSubsystem();
 
   private final LEDSubsystem leds = new LEDSubsystem();
 
@@ -160,7 +157,7 @@ public class RobotContainer
         turret.stopAiming();
     }, shooter, turret);
 
-    NamedCommands.registerCommand("Aim Turret", new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())));
+    NamedCommands.registerCommand("Aim Turret", new SequentialCommandGroup(new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())), new InstantCommand(() -> shooter.setFlywheelRPM(3000))));
 
     NamedCommands.registerCommand("Stop Shooting", stopShootingCommand);
 
@@ -178,6 +175,7 @@ public class RobotContainer
     autoChooser.addOption("LeftDoubleRush", "LeftDoubleRush");
     autoChooser.addOption("LeftTrenchRush", "LeftTrenchRush");
     autoChooser.addOption("NewLeftBumpRush", "NewLeftBumpRush");
+    autoChooser.addOption("4414DoubleSwipeLeft", "4414DoubleSwipeLeft");
         autoChooser.addOption("NewLeftBumpRush2.0", "NewLeftBumpRush2.0");
     autoChooser.addOption("3539Left", "3539Left");
     autoChooser.addOption("Left+Depot", "Left+Depot");
@@ -247,10 +245,11 @@ public class RobotContainer
       // TODO: Configure this pose to a better position/use apriltags
       //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.690, 7.377, new Rotation2d(0)))));
-      driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
+      /*driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
               shooter.startManualShooting(drivebase);
               turret.startManualShooting(drivebase);
-          }));
+          }));*/
+      driverXbox.leftBumper().whileTrue(new TuneShot(drivebase, shooter, indexer, turret, () -> getTarget()));
 
       driverXbox.pov(90).onTrue(Commands.runOnce(() -> {
               shooter.startManualFeeding(drivebase);
@@ -266,9 +265,6 @@ public class RobotContainer
       // Left Trigger - Intake
       driverXbox.leftTrigger().whileTrue(new Intake(intake, leds));
       driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.toggleStowedUp()));
-
-      driverXbox.pov(0).onTrue(new InstantCommand(() -> climber.climberUp()));
-      driverXbox.pov(180).onTrue(new InstantCommand(() -> climber.climberDown()));
 
       // X - Switch shooter to idle mode
       driverXbox.x().onTrue(Commands.runOnce(() -> {
@@ -326,28 +322,7 @@ public class RobotContainer
       inAllianceZone.onTrue(Commands.runOnce(() -> {
         shooter.startAiming(drivebase, () -> getTarget());
         turret.startAiming(drivebase, () -> getTarget());
-      }));
-
-      // Feeding when crossing into neutral field (past idle), still in a trench Y-band.
-      Trigger inNeutralFeedZone = new Trigger(() -> {
-        double x = drivebase.getPose().getX();
-        double y = drivebase.getPose().getY();
-        boolean inTrench = (y >= Constants.ObstacleAlignmentConstants.TRENCH1_Y_MIN
-                         && y <= Constants.ObstacleAlignmentConstants.TRENCH1_Y_MAX)
-                        || (y >= Constants.ObstacleAlignmentConstants.TRENCH2_Y_MIN
-                         && y <= Constants.ObstacleAlignmentConstants.TRENCH2_Y_MAX);
-        boolean onAllianceSide = x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_BOTTOM
-            || x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP;
-        boolean inIdleCorridor =
-            (x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_BOTTOM
-                && x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_BLUE_TOP)
-            || (x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_BOTTOM
-                && x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP);
-        return inTrench && !onAllianceSide && !inIdleCorridor;
-      });
-      inNeutralFeedZone.onTrue(Commands.runOnce(() -> {
-        shooter.startFeeding(drivebase, () -> getFeedTarget());
-        turret.startFeeding(drivebase, () -> getFeedTarget());
+        new InstantCommand(() -> new FireCommand(shooter, indexer, turret, intake, leds));
       }));
     }
   }

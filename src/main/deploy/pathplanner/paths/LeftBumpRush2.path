@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.1834,
-        "y": 7.392582025677603
+        "x": 3.251611111111111,
+        "y": 7.465044444444444
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.453157489300998,
-        "y": 7.871312410841655
+        "x": 7.521368600412108,
+        "y": 7.943774829608494
       },
       "isLocked": false,
       "linkedName": "LeftBumpRushStopPoint"

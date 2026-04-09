@@ -119,6 +119,7 @@ public final class Constants
       public static final double SHOOTER_IDLE_ZONE_RED_TOP = 12.55;
 
 
+
       /**
        * Minimum field-relative X speed (m/s) required to consider the robot
        * "approaching" a boundary.  Prevents false triggers from slow drift.
@@ -136,10 +137,13 @@ public final class Constants
 
       public static final double MOUNTING_OFFSET = -180;
 
-      public static final double TURRET_LOWER_LIMIT_DEG = -285;
+      public static final double TURRET_LOWER_LIMIT_DEG = -166;
 
 
-      public static final double TURRET_UPPER_LIMIT_DEG = 80;
+      public static final double TURRET_UPPER_LIMIT_DEG = 183;
+
+      // MEASURED IN RPM
+      public static final double TURRET_SPEED_SAFEZONE = 1000;
   }
   
   public static class IntakeConstants {
