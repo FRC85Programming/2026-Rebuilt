@@ -62,8 +62,8 @@ public class TuneShot extends Command{
             return;
         }
 
-        goalRPM = 600; //SmartDashboard.getNumber("TUNE RPM", 1000);
-        goalAngle = 70; //SmartDashboard.getNumber("TUNE ANGLE", 75);
+        goalRPM = SmartDashboard.getNumber("TUNE RPM", 1000);
+        goalAngle = SmartDashboard.getNumber("TUNE ANGLE", 75);
 
         // Find where the turret pivot actually is in field space
         Translation2d turretFieldPos =

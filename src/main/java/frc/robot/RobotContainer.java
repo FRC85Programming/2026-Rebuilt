@@ -146,8 +146,13 @@ public class RobotContainer
     // Change shooter states and start shooting
     Command shootCommand = new SequentialCommandGroup(new InstantCommand(() -> shooter.startAiming(drivebase, () -> getTarget())), 
                                                       new InstantCommand(() -> turret.startAiming(drivebase, () -> getTarget())),
-                                                      new FireCommand(shooter, indexer, turret, intake, leds));
+                                                      new FireCommand(drivebase, shooter, indexer, turret, intake, leds));
     NamedCommands.registerCommand("Start Shooting", shootCommand);
+
+    Command feedCommand = new SequentialCommandGroup(new InstantCommand(() -> shooter.startFeeding(drivebase, () -> getFeedTarget())), 
+                                                      new InstantCommand(() -> turret.startFeeding(drivebase, () -> getFeedTarget())),
+                                                      new FireCommand(drivebase, shooter, indexer, turret, intake, leds));
+    NamedCommands.registerCommand("Start Feeding", feedCommand);
 
 
     // Change shooter states and stop shooting — requiring shooter+turret interrupts the running FireCommand,
@@ -176,6 +181,7 @@ public class RobotContainer
     autoChooser.addOption("LeftTrenchRush", "LeftTrenchRush");
     autoChooser.addOption("NewLeftBumpRush", "NewLeftBumpRush");
     autoChooser.addOption("4414DoubleSwipeLeft", "4414DoubleSwipeLeft");
+    autoChooser.addOption("LeftFeedAuto", "LeftFeedAuto");
         autoChooser.addOption("NewLeftBumpRush2.0", "NewLeftBumpRush2.0");
     autoChooser.addOption("3539Left", "3539Left");
     autoChooser.addOption("Left+Depot", "Left+Depot");
@@ -191,8 +197,9 @@ public class RobotContainer
     SmartDashboard.putBoolean("BLUE LEFT RESET", false);
     SmartDashboard.putBoolean("BLUE RIGHT RESET", false);
     SmartDashboard.putBoolean("RESET QUEST TO VISION", false);
+    SmartDashboard.putNumber("FF", 0.2);
 
-    SmartDashboard.putNumber("SPIN FACTOR", 0.1);
+    SmartDashboard.putNumber("SPIN FACTOR", 0.0);
 
     for (var i = 0; i < getTestBalls().length; i++) {
       //SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(getTestBalls()[i]));
@@ -228,7 +235,7 @@ public class RobotContainer
     if (Robot.isSimulation())
     {
       //driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
-      driverXbox.button(2).onTrue(new FireCommand(shooter, indexer, turret, intake, leds));
+      driverXbox.button(2).onTrue(new FireCommand(drivebase, shooter, indexer, turret, intake, leds));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
     }
@@ -251,7 +258,7 @@ public class RobotContainer
               shooter.startManualShooting(drivebase);
               turret.startManualShooting(drivebase);
           }));*/
-      driverXbox.leftBumper().whileTrue(new TuneShot(drivebase, shooter, indexer, turret, () -> getTarget()));
+      driverXbox.leftBumper().whileTrue(new InstantCommand(() -> shooter.testMotorFeedforward(SmartDashboard.getNumber("FF", 0.2))));
 
       driverXbox.pov(90).onTrue(Commands.runOnce(() -> {
               shooter.startManualFeeding(drivebase);
@@ -259,10 +266,12 @@ public class RobotContainer
           }));
 
       driverXbox.pov(270).onTrue(new InstantCommand(() -> shooter.decreaseFlywheelOffset()));
+      driverXbox.pov(0).onTrue(new InstantCommand(() -> intake.setRollerSpeed(-0.5)));
+      driverXbox.pov(0).onFalse(new InstantCommand(() -> intake.setRollerSpeed(0.0)));
       driverXbox.y().onTrue(new InstantCommand(() -> shooter.increaseFlywheelOffset()));
 
       // Right Trigger - Shoot based on current mode
-      driverXbox.rightTrigger().whileTrue(new FireCommand(shooter, indexer, turret, intake, leds));
+      driverXbox.rightTrigger().whileTrue(new FireCommand(drivebase, shooter, indexer, turret, intake, leds));
 
       // Left Trigger - Intake
       driverXbox.leftTrigger().whileTrue(new Intake(intake, leds));
@@ -324,7 +333,7 @@ public class RobotContainer
       inAllianceZone.onTrue(Commands.runOnce(() -> {
         shooter.startAiming(drivebase, () -> getTarget());
         turret.startAiming(drivebase, () -> getTarget());
-        new InstantCommand(() -> new FireCommand(shooter, indexer, turret, intake, leds));
+        new InstantCommand(() -> new FireCommand(drivebase, shooter, indexer, turret, intake, leds));
       }));
     }
   }

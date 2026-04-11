@@ -9,11 +9,14 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.leds.LEDSubsystem.Animation;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem.TurretState;
+import swervelib.SwerveDrive;
 
 public class FireCommand extends Command {
 
+    private final SwerveSubsystem swerve;
     private final ShooterSubsystem shooter;
     private final TurretSubsystem turret;
     private final IndexerSubsystem indexer;
@@ -23,8 +26,10 @@ public class FireCommand extends Command {
     private final Timer intakeTimer = new Timer();
     private boolean intakeIsDown = false;
     private double turretTolerance = 9;
+    boolean ready = false;
 
-    public FireCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret, IntakeSubsystem intake, LEDSubsystem leds) {
+    public FireCommand(SwerveSubsystem swerve, ShooterSubsystem shooter, IndexerSubsystem indexer, TurretSubsystem turret, IntakeSubsystem intake, LEDSubsystem leds) {
+        this.swerve = swerve;
         this.shooter = shooter;
         this.turret = turret;
         this.indexer = indexer;
@@ -40,6 +45,10 @@ public class FireCommand extends Command {
         if (intake.getCurrentCommand() == null) {
             intake.stowIntake();
         }
+
+        if (turret.getState() == TurretState.AIMING) {
+            swerve.setSpeedMultiplier(0.25);
+        }
     }
 
     @Override
@@ -47,18 +56,23 @@ public class FireCommand extends Command {
         shooter.setFlywheelRPM(shooter.getCalculatedRPM());
 
         if (turret.getState() == TurretState.FEEDING) {
-            turretTolerance = SmartDashboard.getNumber("FEED TOLERANCE", 25);
+            ready = shooter.flywheelAtSpeed(0.60);
         } else {
-            turretTolerance = SmartDashboard.getNumber("TOLERANCE", 9);
+            ready = shooter.flywheelAtSpeed(0.95) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turret.getMaxTurretError());
         }
-        boolean ready = shooter.flywheelAtSpeed(0.95) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turretTolerance);
+
         SmartDashboard.putBoolean("AIMED", ready);
-        SmartDashboard.putBoolean("READY FLYWHEEL", shooter.flywheelAtSpeed(0.80));
+        SmartDashboard.putBoolean("READY FLYWHEEL", shooter.flywheelAtSpeed(0.95));
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
-        SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(turretTolerance));
+        SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(turret.getMaxTurretError()));
 
         if (ready && turret.isSpeedSafeToFire()) {
+
             indexer.startIndexing();
+
+            // TODO: Test to see if this improves fire rate
+            //indexer.indexAtProportionalRate(shooter.getFlywheelErrorPercentage());
+
             if (turret.getState() == TurretState.AIMING) {
                 leds.setAnimation(Animation.BLINK_GREEN);
             } else if (turret.getState() == TurretState.FEEDING) {
@@ -76,8 +90,16 @@ public class FireCommand extends Command {
         if (intake.getCurrentCommand() == null) {
             if (intakeTimer.advanceIfElapsed(0.8)) {
                 intakeIsDown = !intakeIsDown;
-                if (!intakeIsDown) intake.stowIntake();
-                else              intake.deployIntake();
+
+                /** TODO: Try different wheel running configs when agitating
+                 * so that balls dont fly everywhere (wheels off, slow wheels) */
+                if (!intakeIsDown) {
+                    intake.stowIntake();
+                    intake.stopRollers();
+                } else {
+                    intake.deployIntake();
+                    intake.runRollers();
+                }
             }
         } else {
             intakeTimer.restart();
@@ -94,10 +116,11 @@ public class FireCommand extends Command {
         shooter.stopFlywheel();
         indexer.stopIndexing();
         intake.stowIntake();
+        swerve.setSpeedMultiplier(1);
         if (!DriverStation.isAutonomous()) {
             leds.setAnimation(Animation.ALLIANCE_SPECIFIC);
         } else {
             leds.setAnimation(Animation.AUTO);
-        }
+        }  
     }
 }

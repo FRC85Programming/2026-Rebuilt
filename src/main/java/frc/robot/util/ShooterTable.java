@@ -29,14 +29,14 @@ public class ShooterTable {
 
     flywheelSpeedMap.put(1.45, 3300.0);
     flywheelSpeedMap.put(2.41, 3790.0);
-    flywheelSpeedMap.put(2.71, 3900.0);
-    flywheelSpeedMap.put(3.2, 4000.0);   // adjusted
-    flywheelSpeedMap.put(3.6, 4200.0);   // adjusted
-    flywheelSpeedMap.put(3.8, 4300.0);   // adjusted
-    flywheelSpeedMap.put(4.28, 4700.0);  // adjusted
-    flywheelSpeedMap.put(4.53, 4900.0);  // adjusted
-    flywheelSpeedMap.put(4.63, 5100.0);  // adjusted
-    flywheelSpeedMap.put(5.13, 5300.0);  // adjusted
+    flywheelSpeedMap.put(2.71, 3800.0);
+    flywheelSpeedMap.put(3.2, 3900.0);   // adjusted
+    flywheelSpeedMap.put(3.6, 4000.0);   // adjusted
+    flywheelSpeedMap.put(3.8, 4100.0);   // adjusted
+    flywheelSpeedMap.put(4.28, 4200.0);  // adjusted
+    flywheelSpeedMap.put(4.53, 4300.0);  // adjusted
+    flywheelSpeedMap.put(4.63, 4400.0);  // adjusted
+    flywheelSpeedMap.put(5.13, 4500.0);  // adjusted
   }
 
   public static ShooterSetpoint getSetpoint(double distanceMeters) {

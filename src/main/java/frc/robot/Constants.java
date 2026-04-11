@@ -137,10 +137,10 @@ public final class Constants
 
       public static final double MOUNTING_OFFSET = -180;
 
-      public static final double TURRET_LOWER_LIMIT_DEG = -166;
+      public static final double TURRET_LOWER_LIMIT_DEG = -150;
 
 
-      public static final double TURRET_UPPER_LIMIT_DEG = 183;
+      public static final double TURRET_UPPER_LIMIT_DEG = 165;
 
       // MEASURED IN RPM
       public static final double TURRET_SPEED_SAFEZONE = 1000;

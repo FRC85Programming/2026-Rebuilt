@@ -62,12 +62,12 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.18174273858921708,
+      "waypointRelativePos": 0.22388059701492813,
       "rotationDegrees": 0.0
     },
     {
       "waypointRelativePos": 0.580082987551873,
-      "rotationDegrees": -50.57194477983365
+      "rotationDegrees": -51.182715994666744
     },
     {
       "waypointRelativePos": 1.187551867219911,
@@ -97,7 +97,7 @@
   "eventMarkers": [
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.15186104218361507,
+      "waypointRelativePos": 0.3900744416873405,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

@@ -90,12 +90,12 @@ public class ShooterSubsystem extends SubsystemBase {
                 .i(0)
                 .d(0)
                 .outputRange(-1, 0)
-                .p(0.0004, ClosedLoopSlot.kSlot1)
+                .p(0.0005, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
                 .outputRange(-1, 0, ClosedLoopSlot.kSlot1)
                 .feedForward
-                .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
+                .kV(0.0019, ClosedLoopSlot.kSlot1);
 
         flywheelConfigLeft.closedLoop
                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -103,12 +103,12 @@ public class ShooterSubsystem extends SubsystemBase {
                 .i(0)
                 .d(0)
                 .outputRange(0, 1)
-                .p(0.0004, ClosedLoopSlot.kSlot1)
+                .p(0.0005, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
                 .outputRange(0, 1, ClosedLoopSlot.kSlot1)
                 .feedForward
-                .kV(12.0 / 6784, ClosedLoopSlot.kSlot1);
+                .kV(0.0019, ClosedLoopSlot.kSlot1);
 
         hoodConfig.closedLoop
                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -362,25 +362,34 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean flywheelAtSpeed(double tolerance) {
-        return getFlywheelRPM() / goalRpm > tolerance;
+        return getFlywheelErrorPercentage() > tolerance;
     }
 
+    public double getFlywheelErrorPercentage() {
+        return getFlywheelRPM() / goalRpm;
+    }
+
+    // SIM FUNCTION
     public double mpsToRpm(double speed) {
         return speed / 0.0023;
     }
 
+    // SIM FUNCTION
     public double rpmToMps(double rpm) {
         return rpm * 0.0023;
     }
 
+    // SIM FUNCTION
     public void simulatedShot(Pose2d pose, ChassisSpeeds velocity, Rotation2d turretAngle) {
         shooterSim.generateProjectile(pose, velocity, turretAngle);
     }
 
+    // SIM FUNCTION
     public boolean generateProjectileIsReady() {
         return shooterSim.generateProjectileIsReady();
     }
 
+    // SIM FUNCTION
     public void cleanupPieces() {
         shooterSim.cleanupPieces();
     }
@@ -396,5 +405,18 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void decreaseFlywheelOffset() {
         flywheelOffset -= 50;
+    }
+
+    // TODO: Run this with different speeds, use as flywheel feedforward values
+    public void testMotorFeedforward(double dutyCycle) {
+        setFlywheelSpeed(dutyCycle);
+
+        double leftVoltage = flywheelMotorLeft.getAppliedOutput() * flywheelMotorLeft.getBusVoltage();
+        double leftRpm = flywheelMotorLeft.getEncoder().getVelocity();
+        SmartDashboard.putNumber("FLYWHEEL LEFT KV", leftVoltage / leftRpm);
+
+        double rightVoltage = flywheelMotorRight.getAppliedOutput() * flywheelMotorRight.getBusVoltage();
+        double rightRpm = flywheelMotorRight.getEncoder().getVelocity();
+        SmartDashboard.putNumber("FLYWHEEL RIGHT KV", rightVoltage / rightRpm);
     }
 }

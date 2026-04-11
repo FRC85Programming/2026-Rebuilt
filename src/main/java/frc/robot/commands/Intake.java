@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.leds.LEDSubsystem;
@@ -18,12 +19,17 @@ public class Intake extends Command{
     @Override
     public void initialize() {
         intake.deployIntake();
-        intake.runRollers();
+        if (DriverStation.isAutonomous()) {
+            intake.setRollerSpeed(1);
+        } else {
+            intake.runRollers();
+        }
+        
         leds.setAnimation(Animation.ALLIANCE_SPECIFIC);
     }
 
-
     @Override
     public void end(boolean interrupted) {
+        intake.stopRollers();
     }
 }

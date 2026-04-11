@@ -57,6 +57,8 @@ public class TurretSubsystem extends SubsystemBase {
     private SwerveSubsystem swerve = null;
     private Supplier<Translation3d> aimTarget = null;
 
+    double maxErrorDegrees = 0.0;
+
     // TUNE THIS
     final double K_SPIN = 0.1;
 
@@ -92,7 +94,6 @@ public class TurretSubsystem extends SubsystemBase {
         turretMotor.configure(turretConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         turretMotor.getEncoder().setPosition(0);
-        //turretMotor.getEncoder().setPosition((turretMotor.getAbsoluteEncoder().getPosition() - turretHome) * TurretConstants.TURRET_GEAR_RATIO);
         
         SmartDashboard.putNumber("Turret P", 1);
         SmartDashboard.putNumber("Setpoint", 0);
@@ -122,59 +123,6 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
-    // private void updateAiming() {
-    //     Translation3d targetTranslation = aimTarget.get();
-    //     ChassisSpeeds robotVel = swerve.getFieldVelocity();
-    //     Pose2d robotPose = swerve.getPose();
-    //     ChassisSpeeds robotRelVel = swerve.getRobotVelocity();
-
-    //     final double PHASE_DELAY = 0.03;
-    //     robotPose = robotPose.exp(new Twist2d(
-    //         robotRelVel.vxMetersPerSecond * PHASE_DELAY,
-    //         robotRelVel.vyMetersPerSecond * PHASE_DELAY,
-    //         robotRelVel.omegaRadiansPerSecond * PHASE_DELAY
-    //     ));
-
-    //     Translation2d turretFieldPos2d =
-    //         robotPose.getTranslation()
-    //             .plus(TurretConstants.ROBOT_TO_TURRET.getTranslation().toTranslation2d().rotateBy(robotPose.getRotation()));
-
-    //     Translation2d toTarget = targetTranslation.toTranslation2d().minus(turretFieldPos2d);
-    //     double distance = toTarget.getNorm();
-
-    //     if (distance < 1e-6) return;
-
-    //     Translation2d toTargetDir = toTarget.div(distance);
-
-    //     double radialVel  =  robotVel.vxMetersPerSecond * toTargetDir.getX()
-    //                        + robotVel.vyMetersPerSecond * toTargetDir.getY();
-    //     double lateralVel = robotVel.vxMetersPerSecond * toTargetDir.getY()
-    //                        + -robotVel.vyMetersPerSecond * toTargetDir.getX();
-
-    //     // Iterate to find time of flight accounting for radial velocity compensation
-    //     double effectiveDistance = distance;
-    //     double timeOfFlight = 0;
-    //     for (int i = 0; i < 3; i++) {
-    //         timeOfFlight = TimeOfFlightTable.getTimeOfFlight(Math.max(effectiveDistance, 0.1));
-    //         effectiveDistance = distance - (radialVel * timeOfFlight);
-    //     }
-
-    //     // Lead-compensated target position
-    //     Translation2d leadTargetFieldPos = targetTranslation.toTranslation2d()
-    //         .plus(new Translation2d(
-    //             lateralVel * timeOfFlight,
-    //             toTarget.getAngle().plus(Rotation2d.fromDegrees(90))
-    //         ));
-
-    //     Translation2d turretToTarget = leadTargetFieldPos.minus(turretFieldPos2d);
-    //     Rotation2d fieldAngle  = new Rotation2d(turretToTarget.getX(), turretToTarget.getY());
-    //     Rotation2d turretAngle = fieldAngle.minus(robotPose.getRotation());
-
-    //     setTurretAngle(turretAngle.getDegrees() - TurretConstants.MOUNTING_OFFSET);
-
-    //     SmartDashboard.putNumber("Calced Turret Angle", turretAngle.getDegrees());
-    // }
-
     // FIXED FOR  ROTATIONAL VELOCITY
     private void updateAiming() {
         Translation3d targetTranslation = aimTarget.get();
@@ -195,6 +143,12 @@ public class TurretSubsystem extends SubsystemBase {
 
         Translation2d toTarget = targetTranslation.toTranslation2d().minus(turretFieldPos2d);
         double distance = toTarget.getNorm();
+
+        // Compute the maximum allowed angular error for the turret
+        // 47" goal, 4" margin each side
+        maxErrorDegrees = Math.atan(0.4953 / distance) * (180 / Math.PI);
+
+        SmartDashboard.putNumber("MAX TURRET ERROR", maxErrorDegrees);
 
         if (distance < 1e-6) return;
 
@@ -226,7 +180,9 @@ public class TurretSubsystem extends SubsystemBase {
 
         //double spinLateralOffset = K_SPIN * Math.sin(turretAnglePreSpin.getRadians()) * timeOfFlight;
 
-        double spinLateralOffset = SmartDashboard.getNumber("SPIN FACTOR", 0.1) * Math.sin(turretAnglePreSpin.getRadians()) * timeOfFlight;
+        double spinLateralOffset = SmartDashboard.getNumber("SPIN FACTOR", 0.0) * Math.sin(turretAnglePreSpin.getRadians()) * timeOfFlight;
+
+        SmartDashboard.putNumber("SPIN OFFSET", spinLateralOffset);
 
         // Lead-compensated target position, including spin offset
         Translation2d leadTargetFieldPos = targetTranslation.toTranslation2d()
@@ -345,5 +301,9 @@ public class TurretSubsystem extends SubsystemBase {
     
     public boolean isSpeedSafeToFire() {
         return turretMotor.getEncoder().getVelocity() < TurretConstants.TURRET_SPEED_SAFEZONE;
+    }
+
+    public double getMaxTurretError() {
+        return maxErrorDegrees;
     }
 }

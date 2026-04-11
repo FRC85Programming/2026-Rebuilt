@@ -102,6 +102,8 @@ public class SwerveSubsystem extends SubsystemBase
 
   Supplier<ChassisSpeeds> velocitySupplier;
 
+  double velocityMultiplier = 1;
+
   /**
    * Speed multiplier for slowing down drive during certain commands (e.g., shooting).
    * Defaults to 1.0 (full speed).

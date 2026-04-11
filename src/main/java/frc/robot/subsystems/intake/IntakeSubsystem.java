@@ -56,8 +56,6 @@ public class IntakeSubsystem extends SubsystemBase {
                 .positionWrappingEnabled(false)
                 .feedForward.kV(12.0 / 6784);
 
-        pivotConfig.idleMode(IdleMode.kBrake);
-
         pivotConfig.signals
             .primaryEncoderPositionPeriodMs(20)
             .primaryEncoderVelocityPeriodMs(500)
@@ -162,6 +160,11 @@ public class IntakeSubsystem extends SubsystemBase {
     public void reverseRollers() {
         rollerMotorLeft.set(-rollerSpeed);
         rollerMotorRight.set(rollerSpeed);
+    }
+
+    public void setRollerSpeed(double speed) {
+        rollerMotorLeft.set(-speed);
+        rollerMotorRight.set(speed);
     }
 
     /**

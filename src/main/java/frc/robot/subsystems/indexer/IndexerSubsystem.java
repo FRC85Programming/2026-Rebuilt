@@ -174,4 +174,11 @@ public class IndexerSubsystem extends SubsystemBase {
         }
         state = IndexerState.AGITATE;
     }
+
+    // Something to try
+    public void indexAtProportionalRate(double proportion) {
+        // Square function
+        indexerMotor.set(indexSpeed * (proportion * proportion));
+        beltMotor.set(beltSpeed);
+    }
 }
