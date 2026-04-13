@@ -7,6 +7,8 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.util.ShooterTableData.ShooterPoint;
+import frc.robot.util.ShooterTableData.RPMPoint;
+import frc.robot.util.ShooterTableData.AnglePoint;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,15 +53,45 @@ public class ShooterTableManager {
         try {
             if (jsonFile.exists()) {
                 data = ShooterTableData.fromFile(jsonFile);
-                System.out.println("Loaded shooter table from JSON: " + data.getPoints().size() + " points");
+                migrateOldFormat();
+                if (data.getRpmPoints().isEmpty() && data.getAnglePoints().isEmpty()) {
+                    System.out.println("Loaded shooter table from JSON: " + data.getPoints().size() + " points (old format)");
+                } else {
+                    System.out.println("Loaded shooter table from JSON: " + data.getRpmPoints().size() + " RPM points, " + data.getAnglePoints().size() + " angle points");
+                }
             } else {
                 System.out.println("JSON file not found, using hardcoded defaults");
                 data = getDefaultData();
+                migrateOldFormat();
                 saveToJson();
             }
         } catch (IOException e) {
             System.err.println("Error loading shooter table JSON, using defaults: " + e.getMessage());
             data = getDefaultData();
+            migrateOldFormat();
+        }
+    }
+    
+    private void migrateOldFormat() {
+        if (data.getPoints() != null && !data.getPoints().isEmpty() && 
+            (data.getRpmPoints() == null || data.getRpmPoints().isEmpty()) &&
+            (data.getAnglePoints() == null || data.getAnglePoints().isEmpty())) {
+            
+            System.out.println("Migrating old format to new separate tables...");
+            List<RPMPoint> rpmPoints = new ArrayList<>();
+            List<AnglePoint> anglePoints = new ArrayList<>();
+            
+            for (ShooterPoint p : data.getPoints()) {
+                rpmPoints.add(new RPMPoint(p.distance(), p.flywheelRPM()));
+                anglePoints.add(new AnglePoint(p.distance(), p.hoodAngleDegrees()));
+            }
+            
+            data.setRpmPoints(rpmPoints);
+            data.setAnglePoints(anglePoints);
+            data.setPoints(new ArrayList<>());
+            
+            saveToJson();
+            System.out.println("Migration complete: " + rpmPoints.size() + " RPM points, " + anglePoints.size() + " angle points");
         }
     }
     
@@ -87,14 +119,18 @@ public class ShooterTableManager {
             );
             flywheelSpeedMap = new InterpolatingDoubleTreeMap();
             
-            for (ShooterPoint point : data.getPoints()) {
-                hoodAngleMap.put(point.distance(), Rotation2d.fromDegrees(point.hoodAngleDegrees()));
-                flywheelSpeedMap.put(point.distance(), point.flywheelRPM());
+            for (AnglePoint point : data.getAnglePoints()) {
+                hoodAngleMap.put(point.distance(), Rotation2d.fromDegrees(point.angle()));
+            }
+            
+            for (RPMPoint point : data.getRpmPoints()) {
+                flywheelSpeedMap.put(point.distance(), point.rpm());
             }
             
             SmartDashboard.putString("ShooterTable/LastReload", java.time.Instant.now().toString());
-            SmartDashboard.putNumber("ShooterTable/PointCount", data.getPoints().size());
-            System.out.println("Rebuilt shooter table maps with " + data.getPoints().size() + " points");
+            SmartDashboard.putNumber("ShooterTable/RPMPointCount", data.getRpmPoints().size());
+            SmartDashboard.putNumber("ShooterTable/AnglePointCount", data.getAnglePoints().size());
+            System.out.println("Rebuilt shooter table maps with " + data.getRpmPoints().size() + " RPM points and " + data.getAnglePoints().size() + " angle points");
         } finally {
             lock.writeLock().unlock();
         }
@@ -136,23 +172,89 @@ public class ShooterTableManager {
     }
     
     public void updatePoint(double distance, double hoodAngleDegrees, double flywheelRPM) {
+        updateRPMPoint(distance, flywheelRPM);
+        updateAnglePoint(distance, hoodAngleDegrees);
+    }
+    
+    public void updateRPMPoint(double distance, double rpm) {
         lock.writeLock().lock();
         try {
-            List<ShooterPoint> points = data.getPoints();
+            List<RPMPoint> rpmPoints = data.getRpmPoints();
             boolean found = false;
             
-            for (int i = 0; i < points.size(); i++) {
-                if (Math.abs(points.get(i).distance() - distance) < 0.001) {
-                    points.set(i, new ShooterPoint(distance, hoodAngleDegrees, flywheelRPM));
+            for (int i = 0; i < rpmPoints.size(); i++) {
+                if (Math.abs(rpmPoints.get(i).distance() - distance) < 0.001) {
+                    rpmPoints.set(i, new RPMPoint(distance, rpm));
                     found = true;
                     break;
                 }
             }
             
             if (!found) {
-                points.add(new ShooterPoint(distance, hoodAngleDegrees, flywheelRPM));
-                points.sort((a, b) -> Double.compare(a.distance(), b.distance()));
+                rpmPoints.add(new RPMPoint(distance, rpm));
+                rpmPoints.sort((a, b) -> Double.compare(a.distance(), b.distance()));
             }
+            
+            saveToJson();
+            
+            if (liveUpdatesEnabled) {
+                rebuildMaps();
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+    
+    public void updateAnglePoint(double distance, double angle) {
+        lock.writeLock().lock();
+        try {
+            List<AnglePoint> anglePoints = data.getAnglePoints();
+            boolean found = false;
+            
+            for (int i = 0; i < anglePoints.size(); i++) {
+                if (Math.abs(anglePoints.get(i).distance() - distance) < 0.001) {
+                    anglePoints.set(i, new AnglePoint(distance, angle));
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                anglePoints.add(new AnglePoint(distance, angle));
+                anglePoints.sort((a, b) -> Double.compare(a.distance(), b.distance()));
+            }
+            
+            saveToJson();
+            
+            if (liveUpdatesEnabled) {
+                rebuildMaps();
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+    
+    public void deleteRPMPoint(double distance) {
+        lock.writeLock().lock();
+        try {
+            List<RPMPoint> rpmPoints = data.getRpmPoints();
+            rpmPoints.removeIf(p -> Math.abs(p.distance() - distance) < 0.001);
+            
+            saveToJson();
+            
+            if (liveUpdatesEnabled) {
+                rebuildMaps();
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+    
+    public void deleteAnglePoint(double distance) {
+        lock.writeLock().lock();
+        try {
+            List<AnglePoint> anglePoints = data.getAnglePoints();
+            anglePoints.removeIf(p -> Math.abs(p.distance() - distance) < 0.001);
             
             saveToJson();
             

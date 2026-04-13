@@ -11,12 +11,28 @@ public class ShooterTableData {
     @JsonProperty("points")
     private List<ShooterPoint> points;
 
+    @JsonProperty("rpmPoints")
+    private List<RPMPoint> rpmPoints;
+
+    @JsonProperty("anglePoints")
+    private List<AnglePoint> anglePoints;
+
     public ShooterTableData() {
         this.points = new ArrayList<>();
+        this.rpmPoints = new ArrayList<>();
+        this.anglePoints = new ArrayList<>();
     }
 
     public ShooterTableData(List<ShooterPoint> points) {
         this.points = points;
+        this.rpmPoints = new ArrayList<>();
+        this.anglePoints = new ArrayList<>();
+    }
+
+    public ShooterTableData(List<RPMPoint> rpmPoints, List<AnglePoint> anglePoints) {
+        this.points = new ArrayList<>();
+        this.rpmPoints = rpmPoints;
+        this.anglePoints = anglePoints;
     }
 
     public List<ShooterPoint> getPoints() {
@@ -25,6 +41,22 @@ public class ShooterTableData {
 
     public void setPoints(List<ShooterPoint> points) {
         this.points = points;
+    }
+
+    public List<RPMPoint> getRpmPoints() {
+        return rpmPoints;
+    }
+
+    public void setRpmPoints(List<RPMPoint> rpmPoints) {
+        this.rpmPoints = rpmPoints;
+    }
+
+    public List<AnglePoint> getAnglePoints() {
+        return anglePoints;
+    }
+
+    public void setAnglePoints(List<AnglePoint> anglePoints) {
+        this.anglePoints = anglePoints;
     }
 
     public static ShooterTableData fromJson(String json) throws IOException {
@@ -51,5 +83,15 @@ public class ShooterTableData {
         @JsonProperty("distance") double distance,
         @JsonProperty("hoodAngleDegrees") double hoodAngleDegrees,
         @JsonProperty("flywheelRPM") double flywheelRPM
+    ) {}
+
+    public record RPMPoint(
+        @JsonProperty("distance") double distance,
+        @JsonProperty("rpm") double rpm
+    ) {}
+
+    public record AnglePoint(
+        @JsonProperty("distance") double distance,
+        @JsonProperty("angle") double angle
     ) {}
 }

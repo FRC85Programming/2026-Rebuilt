@@ -5,66 +5,97 @@
 }
 
 :root {
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --bg-tertiary: #0f3460;
-    --text-primary: #eaeaea;
-    --text-secondary: #a0a0a0;
-    --accent-blue: #4a9eff;
-    --accent-yellow: #ffd93d;
-    --accent-green: #6bcf7f;
-    --border-color: #2d3748;
-    --success: #48bb78;
-    --error: #f56565;
+    --bg-primary: #0f0f0f;
+    --bg-secondary: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #666666;
+    --accent-blue: #00d4ff;
+    --accent-yellow: #ffff00;
+    --accent-green: #00ff88;
+    --border-color: #2a2a2a;
+    --success: #00ff88;
+    --error: #ff0055;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background: var(--bg-primary);
     color: var(--text-primary);
-    min-height: 100vh;
-    padding: 20px;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
-    max-width: 1400px;
-    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-yellow) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.undo-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.undo-btn:hover:not(:disabled) {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.undo-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 
 .connection-status {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    background: var(--bg-tertiary);
-    border-radius: 20px;
-    border: 1px solid var(--border-color);
+    justify-content: center;
+    width: 36px;
+    height: 36px;
 }
 
 .status-dot {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: var(--error);
     animation: pulse 2s infinite;
+    box-shadow: 0 0 10px currentColor;
 }
 
 .status-dot.connected {
@@ -74,42 +105,22 @@ h1 {
 
 @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-.status-text {
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding: 20px;
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-}
-
-.control-group {
-    display: flex;
-    gap: 20px;
-    align-items: center;
+    50% { opacity: 0.3; }
 }
 
 .toggle-container {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     cursor: pointer;
     user-select: none;
 }
 
 .toggle-label {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
 }
 
 .toggle-container input[type="checkbox"] {
@@ -118,19 +129,19 @@ h1 {
 
 .toggle-slider {
     position: relative;
-    width: 50px;
-    height: 26px;
-    background: var(--bg-tertiary);
-    border-radius: 13px;
-    transition: background 0.3s;
-    border: 2px solid var(--border-color);
+    width: 40px;
+    height: 22px;
+    background: var(--bg-secondary);
+    border-radius: 11px;
+    transition: all 0.3s;
+    border: 1px solid var(--border-color);
 }
 
 .toggle-slider::before {
     content: '';
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: var(--text-secondary);
     top: 2px;
@@ -141,132 +152,78 @@ h1 {
 .toggle-container input[type="checkbox"]:checked + .toggle-slider {
     background: var(--accent-blue);
     border-color: var(--accent-blue);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
 }
 
 .toggle-container input[type="checkbox"]:checked + .toggle-slider::before {
-    transform: translateX(24px);
+    transform: translateX(18px);
     background: white;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
 }
 
-.info-panel {
-    display: flex;
-    gap: 30px;
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.info-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.info-value {
-    font-size: 1.1rem;
-    font-weight: 600;
+.toggle-container input[type="checkbox"]:checked ~ .toggle-label {
     color: var(--accent-blue);
 }
 
 .chart-container {
+    flex: 1;
     background: var(--bg-secondary);
-    padding: 30px;
-    border-radius: 12px;
+    border-radius: 8px;
     border: 1px solid var(--border-color);
-    margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 canvas {
-    max-height: 600px;
+    flex: 1;
+    min-height: 0;
+    cursor: default;
 }
 
-.instructions {
-    background: var(--bg-secondary);
-    padding: 25px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    margin-bottom: 20px;
+.info-bar {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 15px;
+    flex-shrink: 0;
 }
 
-.instructions h3 {
-    margin-bottom: 15px;
-    color: var(--accent-blue);
-    font-size: 1.3rem;
+.info-item {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
 }
 
-.instructions ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.instructions li {
-    padding: 8px 0;
-    padding-left: 25px;
-    position: relative;
-    line-height: 1.6;
-}
-
-.instructions li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent-blue);
-    font-weight: bold;
-}
-
-.instructions strong {
-    color: var(--text-primary);
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
+.info-label {
+    font-size: 0.7rem;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
-@media (max-width: 768px) {
-    h1 {
-        font-size: 1.8rem;
-    }
-    
-    header {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .controls {
-        flex-direction: column;
-        gap: 20px;
-    }
-    
-    .info-panel {
-        flex-direction: column;
-        gap: 15px;
-        width: 100%;
-    }
-    
-    .chart-container {
-        padding: 15px;
-    }
+.info-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--accent-blue);
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
 }
 
 .notification {
     position: fixed;
     top: 20px;
     right: 20px;
-    padding: 15px 25px;
-    border-radius: 8px;
+    padding: 12px 20px;
+    border-radius: 6px;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
     z-index: 1000;
     animation: slideIn 0.3s ease-out;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
 }
 
 @keyframes slideIn {
@@ -281,9 +238,11 @@ footer {
 }
 
 .notification.success {
-    border-left: 4px solid var(--success);
+    border-left: 3px solid var(--success);
+    color: var(--success);
 }
 
 .notification.error {
-    border-left: 4px solid var(--error);
+    border-left: 3px solid var(--error);
+    color: var(--error);
 }

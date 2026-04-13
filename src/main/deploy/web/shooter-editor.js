@@ -6,12 +6,81 @@ let distanceUpdateInterval = null;
 
 const RPM_SNAP = 25;
 const ANGLE_SNAP = 1;
+const DISTANCE_SNAP = 0.01;
+
+let undoStack = [];
+const MAX_UNDO_STACK = 50;
+
+let dragState = {
+    isDragging: false,
+    datasetIndex: null,
+    pointIndex: null,
+    startX: null,
+    startY: null
+};
+
+function saveState() {
+    const state = JSON.parse(JSON.stringify(shooterData));
+    undoStack.push(state);
+    if (undoStack.length > MAX_UNDO_STACK) {
+        undoStack.shift();
+    }
+    updateUndoButton();
+}
+
+function undo() {
+    if (undoStack.length === 0) return;
+    
+    const previousState = undoStack.pop();
+    shooterData = previousState;
+    
+    updateChart();
+    updatePointCount();
+    updateUndoButton();
+    
+    saveAllPointsToServer();
+}
+
+function updateUndoButton() {
+    const undoBtn = document.getElementById('undoBtn');
+    undoBtn.disabled = undoStack.length === 0;
+}
+
+async function saveAllPointsToServer() {
+    try {
+        for (const point of shooterData.rpmPoints) {
+            await fetch('/api/update-rpm-point', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    distance: point.distance,
+                    rpm: point.rpm
+                })
+            });
+        }
+        for (const point of shooterData.anglePoints) {
+            await fetch('/api/update-angle-point', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    distance: point.distance,
+                    angle: point.angle
+                })
+            });
+        }
+        showNotification('Changes restored', 'success');
+    } catch (error) {
+        console.error('Error saving state:', error);
+        showNotification('Failed to restore changes', 'error');
+    }
+}
 
 async function init() {
     try {
         await loadShooterData();
         createChart();
         setupEventListeners();
+        setupCanvasListeners();
         startDistancePolling();
         updateConnectionStatus(true);
     } catch (error) {
@@ -25,53 +94,67 @@ async function init() {
 async function loadShooterData() {
     const response = await fetch('/api/shooter-data');
     if (!response.ok) throw new Error('Failed to load shooter data');
-    shooterData = await response.json();
+    const data = await response.json();
+    
+    shooterData = {
+        rpmPoints: data.rpmPoints || [],
+        anglePoints: data.anglePoints || []
+    };
+    
+    shooterData.rpmPoints.sort((a, b) => a.distance - b.distance);
+    shooterData.anglePoints.sort((a, b) => a.distance - b.distance);
+    
     updatePointCount();
+}
+
+function updateChart() {
+    if (!chart) return;
+    
+    chart.data.datasets[0].data = shooterData.rpmPoints.map(p => ({ x: p.distance, y: p.rpm }));
+    chart.data.datasets[1].data = shooterData.anglePoints.map(p => ({ x: p.distance, y: p.angle }));
+    chart.update('none');
 }
 
 function createChart() {
     const ctx = document.getElementById('shooterChart').getContext('2d');
-    
-    const distances = shooterData.points.map(p => p.distance);
-    const rpms = shooterData.points.map(p => p.flywheelRPM);
-    const angles = shooterData.points.map(p => p.hoodAngleDegrees);
     
     chart = new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [
                 {
-                    label: 'Flywheel RPM',
-                    data: distances.map((d, i) => ({ x: d, y: rpms[i] })),
-                    borderColor: '#4a9eff',
-                    backgroundColor: 'rgba(74, 158, 255, 0.2)',
-                    pointBackgroundColor: '#4a9eff',
-                    pointBorderColor: '#fff',
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
+                    label: 'RPM',
+                    data: shooterData.rpmPoints.map(p => ({ x: p.distance, y: p.rpm })),
+                    borderColor: '#00d4ff',
+                    backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                    pointBackgroundColor: '#00d4ff',
+                    pointBorderColor: '#00d4ff',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBorderWidth: 2,
                     yAxisID: 'y',
                     tension: 0.4,
-                    borderWidth: 3
+                    borderWidth: 2
                 },
                 {
-                    label: 'Hood Angle (°)',
-                    data: distances.map((d, i) => ({ x: d, y: angles[i] })),
-                    borderColor: '#ffd93d',
-                    backgroundColor: 'rgba(255, 217, 61, 0.2)',
-                    pointBackgroundColor: '#ffd93d',
-                    pointBorderColor: '#fff',
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
+                    label: 'ANGLE',
+                    data: shooterData.anglePoints.map(p => ({ x: p.distance, y: p.angle })),
+                    borderColor: '#ffff00',
+                    backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                    pointBackgroundColor: '#ffff00',
+                    pointBorderColor: '#ffff00',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBorderWidth: 2,
                     yAxisID: 'y1',
                     tension: 0.4,
-                    borderWidth: 3
+                    borderWidth: 2
                 }
             ]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 2,
+            maintainAspectRatio: false,
             interaction: {
                 mode: 'nearest',
                 axis: 'xy',
@@ -82,69 +165,45 @@ function createChart() {
                     display: true,
                     position: 'top',
                     labels: {
-                        color: '#eaeaea',
+                        color: '#ffffff',
                         font: {
-                            size: 14,
-                            weight: 'bold'
+                            size: 11,
+                            weight: '600',
+                            family: 'monospace'
                         },
-                        padding: 20,
-                        usePointStyle: true
+                        padding: 15,
+                        usePointStyle: false,
+                        boxWidth: 30,
+                        boxHeight: 2
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(22, 33, 62, 0.95)',
-                    titleColor: '#eaeaea',
-                    bodyColor: '#eaeaea',
-                    borderColor: '#2d3748',
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#00d4ff',
+                    borderColor: '#00d4ff',
                     borderWidth: 1,
-                    padding: 12,
-                    displayColors: true,
+                    padding: 10,
+                    displayColors: false,
+                    titleFont: {
+                        size: 11,
+                        family: 'monospace'
+                    },
+                    bodyFont: {
+                        size: 12,
+                        family: 'monospace',
+                        weight: 'bold'
+                    },
                     callbacks: {
-                        title: (items) => `Distance: ${items[0].parsed.x.toFixed(2)}m`,
+                        title: (items) => `${items[0].parsed.x.toFixed(2)}m`,
                         label: (item) => {
                             if (item.datasetIndex === 0) {
-                                return `RPM: ${item.parsed.y.toFixed(0)}`;
+                                return `${item.parsed.y.toFixed(0)} RPM`;
                             } else {
-                                return `Hood: ${item.parsed.y.toFixed(1)}°`;
+                                return `${item.parsed.y.toFixed(1)}°`;
                             }
                         }
-                    }
-                },
-                dragData: {
-                    round: 0,
-                    showTooltip: true,
-                    onDragStart: function(e, datasetIndex, index, value) {
-                        return true;
-                    },
-                    onDrag: function(e, datasetIndex, index, value) {
-                        if (datasetIndex === 0) {
-                            value.y = Math.round(value.y / RPM_SNAP) * RPM_SNAP;
-                        } else if (datasetIndex === 1) {
-                            value.y = Math.round(value.y / ANGLE_SNAP) * ANGLE_SNAP;
-                        }
-                        value.x = shooterData.points[index].distance;
-                        return value;
-                    },
-                    onDragEnd: async function(e, datasetIndex, index, value) {
-                        const distance = shooterData.points[index].distance;
-                        let hoodAngle, rpm;
-                        
-                        if (datasetIndex === 0) {
-                            rpm = Math.round(value.y / RPM_SNAP) * RPM_SNAP;
-                            hoodAngle = shooterData.points[index].hoodAngleDegrees;
-                        } else {
-                            hoodAngle = Math.round(value.y / ANGLE_SNAP) * ANGLE_SNAP;
-                            rpm = shooterData.points[index].flywheelRPM;
-                        }
-                        
-                        shooterData.points[index].flywheelRPM = rpm;
-                        shooterData.points[index].hoodAngleDegrees = hoodAngle;
-                        
-                        chart.data.datasets[0].data[index].y = rpm;
-                        chart.data.datasets[1].data[index].y = hoodAngle;
-                        chart.update('none');
-                        
-                        await updatePoint(distance, hoodAngle, rpm);
                     }
                 }
             },
@@ -154,18 +213,24 @@ function createChart() {
                     position: 'bottom',
                     title: {
                         display: true,
-                        text: 'Distance (meters)',
-                        color: '#eaeaea',
+                        text: 'DISTANCE (m)',
+                        color: '#666666',
                         font: {
-                            size: 14,
-                            weight: 'bold'
+                            size: 11,
+                            weight: '600',
+                            family: 'monospace'
                         }
                     },
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        lineWidth: 1
                     },
                     ticks: {
-                        color: '#eaeaea'
+                        color: '#666666',
+                        font: {
+                            size: 10,
+                            family: 'monospace'
+                        }
                     }
                 },
                 y: {
@@ -173,18 +238,24 @@ function createChart() {
                     position: 'left',
                     title: {
                         display: true,
-                        text: 'Flywheel RPM',
-                        color: '#4a9eff',
+                        text: 'RPM',
+                        color: '#00d4ff',
                         font: {
-                            size: 14,
-                            weight: 'bold'
+                            size: 11,
+                            weight: '600',
+                            family: 'monospace'
                         }
                     },
                     grid: {
-                        color: 'rgba(74, 158, 255, 0.1)'
+                        color: 'rgba(0, 212, 255, 0.1)',
+                        lineWidth: 1
                     },
                     ticks: {
-                        color: '#4a9eff'
+                        color: '#00d4ff',
+                        font: {
+                            size: 10,
+                            family: 'monospace'
+                        }
                     }
                 },
                 y1: {
@@ -192,18 +263,23 @@ function createChart() {
                     position: 'right',
                     title: {
                         display: true,
-                        text: 'Hood Angle (degrees)',
-                        color: '#ffd93d',
+                        text: 'ANGLE (°)',
+                        color: '#ffff00',
                         font: {
-                            size: 14,
-                            weight: 'bold'
+                            size: 11,
+                            weight: '600',
+                            family: 'monospace'
                         }
                     },
                     grid: {
                         drawOnChartArea: false
                     },
                     ticks: {
-                        color: '#ffd93d'
+                        color: '#ffff00',
+                        font: {
+                            size: 10,
+                            family: 'monospace'
+                        }
                     }
                 }
             }
@@ -221,40 +297,273 @@ function createChart() {
                     const bottomY = yScale.bottom;
                     
                     ctx.save();
-                    ctx.strokeStyle = '#6bcf7f';
-                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = '#00ff88';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#00ff88';
                     ctx.setLineDash([5, 5]);
                     ctx.beginPath();
                     ctx.moveTo(x, topY);
                     ctx.lineTo(x, bottomY);
                     ctx.stroke();
                     
-                    ctx.fillStyle = '#6bcf7f';
-                    ctx.font = 'bold 12px sans-serif';
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#00ff88';
+                    ctx.font = 'bold 11px monospace';
                     ctx.textAlign = 'center';
-                    ctx.fillText(`${currentDistance.toFixed(2)}m`, x, topY - 5);
+                    ctx.fillText(`${currentDistance.toFixed(2)}m`, x, topY - 8);
                     ctx.restore();
                 }
             }
         }]
     });
+    
+    chart.canvas.addEventListener('mousemove', (event) => {
+        if (dragState.isDragging) return;
+        
+        const rect = chart.canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        const xScale = chart.scales.x;
+        const dataX = xScale.getValueForPixel(x);
+        
+        const clickedDataset = detectLineClick(x, y, dataX);
+        
+        if (clickedDataset !== null) {
+            chart.canvas.style.cursor = 'copy';
+        } else {
+            const elements = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+            chart.canvas.style.cursor = elements.length > 0 ? 'grab' : 'default';
+        }
+    });
 }
 
-async function updatePoint(distance, hoodAngleDegrees, flywheelRPM) {
+function setupCanvasListeners() {
+    const canvas = document.getElementById('shooterChart');
+    
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mouseleave', handleMouseUp);
+    canvas.addEventListener('click', handleCanvasClick);
+}
+
+function handleMouseDown(event) {
+    const rect = chart.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    const elements = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+    
+    if (elements.length > 0) {
+        const element = elements[0];
+        dragState.isDragging = true;
+        dragState.datasetIndex = element.datasetIndex;
+        dragState.pointIndex = element.index;
+        dragState.startX = x;
+        dragState.startY = y;
+        
+        saveState();
+        
+        chart.canvas.style.cursor = 'grabbing';
+        event.preventDefault();
+    }
+}
+
+function handleMouseMove(event) {
+    if (!dragState.isDragging) {
+        return;
+    }
+    
+    const rect = chart.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    const xScale = chart.scales.x;
+    const yScale = dragState.datasetIndex === 0 ? chart.scales.y : chart.scales.y1;
+    
+    const dataX = xScale.getValueForPixel(x);
+    const dataY = yScale.getValueForPixel(y);
+    
+    const snappedX = Math.max(0.1, Math.round(dataX / DISTANCE_SNAP) * DISTANCE_SNAP);
+    const snappedY = dragState.datasetIndex === 0 
+        ? Math.round(dataY / RPM_SNAP) * RPM_SNAP
+        : Math.round(dataY / ANGLE_SNAP) * ANGLE_SNAP;
+    
+    if (dragState.datasetIndex === 0) {
+        shooterData.rpmPoints[dragState.pointIndex] = {
+            distance: snappedX,
+            rpm: snappedY
+        };
+    } else {
+        shooterData.anglePoints[dragState.pointIndex] = {
+            distance: snappedX,
+            angle: snappedY
+        };
+    }
+    
+    updateChart();
+    event.preventDefault();
+}
+
+async function handleMouseUp(event) {
+    if (!dragState.isDragging) return;
+    
+    if (dragState.datasetIndex === 0) {
+        shooterData.rpmPoints.sort((a, b) => a.distance - b.distance);
+    } else {
+        shooterData.anglePoints.sort((a, b) => a.distance - b.distance);
+    }
+    
+    updateChart();
+    updatePointCount();
+    
+    const point = dragState.datasetIndex === 0 
+        ? shooterData.rpmPoints[dragState.pointIndex]
+        : shooterData.anglePoints[dragState.pointIndex];
+    
+    if (point) {
+        if (dragState.datasetIndex === 0) {
+            await updateRPMPoint(point.distance, point.rpm);
+        } else {
+            await updateAnglePoint(point.distance, point.angle);
+        }
+    }
+    
+    dragState.isDragging = false;
+    dragState.datasetIndex = null;
+    dragState.pointIndex = null;
+    chart.canvas.style.cursor = 'default';
+    
+    event.preventDefault();
+}
+
+function handleCanvasClick(event) {
+    if (dragState.isDragging) return;
+    
+    const elements = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+    
+    if (elements.length > 0) {
+        return;
+    }
+    
+    const rect = chart.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+    const yScale1 = chart.scales.y1;
+    
+    const dataX = xScale.getValueForPixel(x);
+    const dataY = yScale.getValueForPixel(y);
+    const dataY1 = yScale1.getValueForPixel(y);
+    
+    if (dataX < 0.1 || dataX > 10) return;
+    
+    const clickedDataset = detectLineClick(x, y, dataX);
+    
+    if (clickedDataset === null) {
+        return;
+    }
+    
+    saveState();
+    
+    const newDistance = Math.round(dataX / DISTANCE_SNAP) * DISTANCE_SNAP;
+    
+    if (clickedDataset === 0) {
+        const newRPM = Math.round(dataY / RPM_SNAP) * RPM_SNAP;
+        shooterData.rpmPoints.push({ distance: newDistance, rpm: newRPM });
+        shooterData.rpmPoints.sort((a, b) => a.distance - b.distance);
+        updateRPMPoint(newDistance, newRPM);
+    } else {
+        const newAngle = Math.round(dataY1 / ANGLE_SNAP) * ANGLE_SNAP;
+        shooterData.anglePoints.push({ distance: newDistance, angle: newAngle });
+        shooterData.anglePoints.sort((a, b) => a.distance - b.distance);
+        updateAnglePoint(newDistance, newAngle);
+    }
+    
+    updateChart();
+    updatePointCount();
+    showNotification('Point added', 'success');
+}
+
+function detectLineClick(pixelX, pixelY, dataX) {
+    const threshold = 15;
+    
+    const interpolatedRPM = interpolateValue(dataX, shooterData.rpmPoints, 'rpm');
+    const interpolatedAngle = interpolateValue(dataX, shooterData.anglePoints, 'angle');
+    
+    const rpmPixelY = chart.scales.y.getPixelForValue(interpolatedRPM);
+    const anglePixelY = chart.scales.y1.getPixelForValue(interpolatedAngle);
+    
+    const distToRPM = Math.abs(pixelY - rpmPixelY);
+    const distToAngle = Math.abs(pixelY - anglePixelY);
+    
+    if (distToRPM < threshold && distToRPM < distToAngle) {
+        return 0;
+    } else if (distToAngle < threshold) {
+        return 1;
+    }
+    
+    return null;
+}
+
+function interpolateValue(distance, points, property) {
+    if (points.length === 0) return 0;
+    if (points.length === 1) return points[0][property];
+    
+    const sortedPoints = [...points].sort((a, b) => a.distance - b.distance);
+    
+    if (distance <= sortedPoints[0].distance) {
+        return sortedPoints[0][property];
+    }
+    
+    if (distance >= sortedPoints[sortedPoints.length - 1].distance) {
+        return sortedPoints[sortedPoints.length - 1][property];
+    }
+    
+    for (let i = 0; i < sortedPoints.length - 1; i++) {
+        const p1 = sortedPoints[i];
+        const p2 = sortedPoints[i + 1];
+        
+        if (distance >= p1.distance && distance <= p2.distance) {
+            const t = (distance - p1.distance) / (p2.distance - p1.distance);
+            return p1[property] + t * (p2[property] - p1[property]);
+        }
+    }
+    
+    return sortedPoints[sortedPoints.length - 1][property];
+}
+
+async function updateRPMPoint(distance, rpm) {
     try {
-        const response = await fetch('/api/update-point', {
+        const response = await fetch('/api/update-rpm-point', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ distance, hoodAngleDegrees, flywheelRPM })
+            body: JSON.stringify({ distance, rpm })
         });
         
-        if (!response.ok) throw new Error('Failed to update point');
-        
-        updateLastUpdate();
-        showNotification('Point updated successfully', 'success');
+        if (!response.ok) throw new Error('Failed to update RPM point');
     } catch (error) {
-        console.error('Error updating point:', error);
-        showNotification('Failed to update point', 'error');
+        console.error('Error updating RPM point:', error);
+        showNotification('Update failed', 'error');
+    }
+}
+
+async function updateAnglePoint(distance, angle) {
+    try {
+        const response = await fetch('/api/update-angle-point', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ distance, angle })
+        });
+        
+        if (!response.ok) throw new Error('Failed to update angle point');
+    } catch (error) {
+        console.error('Error updating angle point:', error);
+        showNotification('Update failed', 'error');
     }
 }
 
@@ -271,13 +580,23 @@ function setupEventListeners() {
             if (!response.ok) throw new Error('Failed to toggle live updates');
             
             showNotification(
-                e.target.checked ? 'Live updates enabled' : 'Live updates disabled',
+                e.target.checked ? 'Live mode ON' : 'Live mode OFF',
                 'success'
             );
         } catch (error) {
             console.error('Error toggling live updates:', error);
-            showNotification('Failed to toggle live updates', 'error');
+            showNotification('Toggle failed', 'error');
             e.target.checked = !e.target.checked;
+        }
+    });
+    
+    const undoBtn = document.getElementById('undoBtn');
+    undoBtn.addEventListener('click', undo);
+    
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+            e.preventDefault();
+            undo();
         }
     });
 }
@@ -304,7 +623,6 @@ function startDistancePolling() {
                 updateConnectionStatus(true);
             }
         } catch (error) {
-            console.error('Error fetching distance:', error);
             if (isConnected) {
                 updateConnectionStatus(false);
             }
@@ -315,29 +633,21 @@ function startDistancePolling() {
 function updateConnectionStatus(connected) {
     isConnected = connected;
     const statusDot = document.querySelector('.status-dot');
-    const statusText = document.querySelector('.status-text');
     
     if (connected) {
         statusDot.classList.add('connected');
-        statusText.textContent = 'Connected';
     } else {
         statusDot.classList.remove('connected');
-        statusText.textContent = 'Disconnected';
     }
 }
 
 function updatePointCount() {
-    document.getElementById('pointCount').textContent = shooterData.points.length;
+    const total = shooterData.rpmPoints.length + shooterData.anglePoints.length;
+    document.getElementById('pointCount').textContent = total;
 }
 
 function updateCurrentDistanceDisplay(distance) {
-    document.getElementById('currentDistance').textContent = `${distance.toFixed(2)}m`;
-}
-
-function updateLastUpdate() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString();
-    document.getElementById('lastUpdate').textContent = timeString;
+    document.getElementById('currentDistance').textContent = distance.toFixed(2);
 }
 
 function showNotification(message, type = 'success') {
@@ -349,7 +659,7 @@ function showNotification(message, type = 'success') {
     setTimeout(() => {
         notification.style.animation = 'slideIn 0.3s ease-out reverse';
         setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    }, 2000);
 }
 
 document.addEventListener('DOMContentLoaded', init);

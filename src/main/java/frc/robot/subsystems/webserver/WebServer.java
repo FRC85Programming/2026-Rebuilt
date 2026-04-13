@@ -88,6 +88,80 @@ public class WebServer extends SubsystemBase {
             }
         });
         
+        app.post("/api/update-rpm-point", ctx -> {
+            try {
+                Map<String, Object> body = mapper.readValue(ctx.body(), Map.class);
+                
+                double distance = ((Number) body.get("distance")).doubleValue();
+                double rpm = ((Number) body.get("rpm")).doubleValue();
+                
+                tableManager.updateRPMPoint(distance, rpm);
+                
+                SmartDashboard.putString("WebServer/LastUpdate", java.time.Instant.now().toString());
+                System.out.println(String.format("Updated RPM point: distance=%.2f, rpm=%.0f", 
+                    distance, rpm));
+                
+                ctx.status(200).json(Map.of("success", true));
+                incrementRequestCount();
+            } catch (Exception e) {
+                ctx.status(400).result("Error updating RPM point: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        
+        app.post("/api/update-angle-point", ctx -> {
+            try {
+                Map<String, Object> body = mapper.readValue(ctx.body(), Map.class);
+                
+                double distance = ((Number) body.get("distance")).doubleValue();
+                double angle = ((Number) body.get("angle")).doubleValue();
+                
+                tableManager.updateAnglePoint(distance, angle);
+                
+                SmartDashboard.putString("WebServer/LastUpdate", java.time.Instant.now().toString());
+                System.out.println(String.format("Updated angle point: distance=%.2f, angle=%.1f", 
+                    distance, angle));
+                
+                ctx.status(200).json(Map.of("success", true));
+                incrementRequestCount();
+            } catch (Exception e) {
+                ctx.status(400).result("Error updating angle point: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        
+        app.delete("/api/delete-rpm-point", ctx -> {
+            try {
+                Map<String, Object> body = mapper.readValue(ctx.body(), Map.class);
+                double distance = ((Number) body.get("distance")).doubleValue();
+                
+                tableManager.deleteRPMPoint(distance);
+                
+                System.out.println(String.format("Deleted RPM point at distance=%.2f", distance));
+                ctx.status(200).json(Map.of("success", true));
+                incrementRequestCount();
+            } catch (Exception e) {
+                ctx.status(400).result("Error deleting RPM point: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        
+        app.delete("/api/delete-angle-point", ctx -> {
+            try {
+                Map<String, Object> body = mapper.readValue(ctx.body(), Map.class);
+                double distance = ((Number) body.get("distance")).doubleValue();
+                
+                tableManager.deleteAnglePoint(distance);
+                
+                System.out.println(String.format("Deleted angle point at distance=%.2f", distance));
+                ctx.status(200).json(Map.of("success", true));
+                incrementRequestCount();
+            } catch (Exception e) {
+                ctx.status(400).result("Error deleting angle point: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        
         app.post("/api/toggle-live", ctx -> {
             try {
                 Map<String, Object> body = mapper.readValue(ctx.body(), Map.class);
