@@ -33,6 +33,7 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem.TurretState;
 import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.ShooterTable;
+import frc.robot.util.ShooterTableManager;
 import frc.robot.util.TimeOfFlightTable;
 import frc.robot.util.TrajectoryTransform3d;
 
@@ -234,8 +235,8 @@ public class ShooterSubsystem extends SubsystemBase {
         double clampedEffectiveDistance = Math.max(effectiveDistance, 0.1);
         var setpoint = (state == ShooterState.FEEDING)
             // CHANGE THIS TO FEEDING TABLE ONCE IT IS CREATED
-            ? ShooterTable.getSetpoint(clampedEffectiveDistance)
-            : ShooterTable.getSetpoint(clampedEffectiveDistance);
+            ? ShooterTableManager.getInstance().getSetpoint(clampedEffectiveDistance)
+            : ShooterTableManager.getInstance().getSetpoint(clampedEffectiveDistance);
 
         calculatedRPM = Math.abs(setpoint.flywheelRPM());
         calculatedRPM = calculatedRPM + flywheelOffset;

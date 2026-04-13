@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shooter Table Editor</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.5/dist/chartjs-plugin-dragdata.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Shooter Table Editor</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label class="toggle-container">
+                    <span class="toggle-label">Live Updates</span>
+                    <input type="checkbox" id="liveToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="info-panel">
+                <div class="info-item">
+                    <span class="info-label">Points:</span>
+                    <span class="info-value" id="pointCount">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Current Distance:</span>
+                    <span class="info-value" id="currentDistance">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Last Update:</span>
+                    <span class="info-value" id="lastUpdate">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="shooterChart"></canvas>
+        </div>
+
+        <div class="instructions">
+            <h3>Instructions</h3>
+            <ul>
+                <li><strong>Blue curve:</strong> Flywheel RPM (drag to adjust in 25 RPM increments)</li>
+                <li><strong>Yellow curve:</strong> Hood Angle (drag to adjust in 1° increments)</li>
+                <li><strong>Green line:</strong> Current robot distance from target</li>
+                <li><strong>Live Updates:</strong> When enabled, changes apply immediately to the robot</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>FRC Team 85 - Shooter Table Configuration Tool</p>
+        </footer>
+    </div>
+
+    <script src="shooter-editor.js"></script>
+</body>
+</html>

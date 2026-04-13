@@ -32,7 +32,9 @@ import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.leds.LEDSubsystem.Animation;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.subsystems.webserver.WebServer;
 import frc.robot.util.BallFieldGenerator;
+import frc.robot.util.ShooterTableManager;
 
 import java.io.File;
 import java.sql.Driver;
@@ -64,6 +66,8 @@ public class RobotContainer
   //private final VisionSubsystem vision = new VisionSubsystem();
 
   private final LEDSubsystem leds = new LEDSubsystem();
+
+  private final WebServer webServer = new WebServer();
 
   boolean isRedAlliance = false;
 
@@ -131,6 +135,8 @@ public class RobotContainer
    */
   public RobotContainer()
   {
+    ShooterTableManager.getInstance();
+    
     balls = gen.getBalls();
 
     //vision.setPoseSupplier(drivebase::getPose);
@@ -235,7 +241,10 @@ public class RobotContainer
     if (Robot.isSimulation())
     {
       //driverXbox.button(1).whileTrue(new PathPlanToBalls(drivebase, vision, getTestBalls(), 5.2, 8.43, 3.9, 7.5));
-      driverXbox.button(2).onTrue(new FireCommand(drivebase, shooter, indexer, turret, intake, leds));
+      driverXbox.button(2).onTrue(Commands.runOnce(() -> {
+              shooter.startAiming(drivebase, () -> getTarget());
+              turret.startAiming(drivebase, () -> getTarget());
+          }));
       driverXbox.button(3).whileTrue(drivebase.driveToPose(new Pose2d(14, 4, new Rotation2d())));
       driverXbox.button(4).onTrue(new InstantCommand(() -> shooter.setHoodAngle(45)));
     }

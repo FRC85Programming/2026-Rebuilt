@@ -1,0 +1,43 @@
+{
+  "points" : [ {
+    "distance" : 1.45,
+    "hoodAngleDegrees" : 71.0,
+    "flywheelRPM" : 3300.0
+  }, {
+    "distance" : 2.41,
+    "hoodAngleDegrees" : 69.0,
+    "flywheelRPM" : 3790.0
+  }, {
+    "distance" : 2.71,
+    "hoodAngleDegrees" : 64.0,
+    "flywheelRPM" : 3800.0
+  }, {
+    "distance" : 3.2,
+    "hoodAngleDegrees" : 63.0,
+    "flywheelRPM" : 3900.0
+  }, {
+    "distance" : 3.6,
+    "hoodAngleDegrees" : 60.0,
+    "flywheelRPM" : 4000.0
+  }, {
+    "distance" : 3.8,
+    "hoodAngleDegrees" : 58.0,
+    "flywheelRPM" : 4100.0
+  }, {
+    "distance" : 4.28,
+    "hoodAngleDegrees" : 56.0,
+    "flywheelRPM" : 4200.0
+  }, {
+    "distance" : 4.53,
+    "hoodAngleDegrees" : 55.0,
+    "flywheelRPM" : 4300.0
+  }, {
+    "distance" : 4.63,
+    "hoodAngleDegrees" : 54.0,
+    "flywheelRPM" : 4400.0
+  }, {
+    "distance" : 5.13,
+    "hoodAngleDegrees" : 53.0,
+    "flywheelRPM" : 4500.0
+  } ]
+}
