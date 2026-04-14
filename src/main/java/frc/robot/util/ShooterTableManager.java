@@ -22,17 +22,19 @@ public class ShooterTableManager {
     private static ShooterTableManager instance;
     
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final File jsonFile;
+    private final File persistentJsonFile;
+    private final File deployJsonFile;
     private final File tempFile;
     
     private ShooterTableData data;
     private InterpolatingTreeMap<Double, Rotation2d> hoodAngleMap;
     private InterpolatingDoubleTreeMap flywheelSpeedMap;
-    private boolean liveUpdatesEnabled = true;
+    private boolean liveUpdatesEnabled = false;
     
     private ShooterTableManager() {
-        jsonFile = new File("/home/lvuser/deploy/shooter-table.json");
-        tempFile = new File("/home/lvuser/deploy/shooter-table.json.tmp");
+        persistentJsonFile = new File("/home/lvuser/shooter-table.json");
+        deployJsonFile = new File("/home/lvuser/deploy/shooter-table.json");
+        tempFile = new File("/home/lvuser/shooter-table.json.tmp");
         
         loadFromJson();
         rebuildMaps();
@@ -51,16 +53,27 @@ public class ShooterTableManager {
     
     private void loadFromJson() {
         try {
-            if (jsonFile.exists()) {
-                data = ShooterTableData.fromFile(jsonFile);
+            if (persistentJsonFile.exists()) {
+                System.out.println("Loading shooter table from persistent file: " + persistentJsonFile.getAbsolutePath());
+                data = ShooterTableData.fromFile(persistentJsonFile);
                 migrateOldFormat();
                 if (data.getRpmPoints().isEmpty() && data.getAnglePoints().isEmpty()) {
-                    System.out.println("Loaded shooter table from JSON: " + data.getPoints().size() + " points (old format)");
+                    System.out.println("Loaded shooter table from persistent file: " + data.getPoints().size() + " points (old format)");
                 } else {
-                    System.out.println("Loaded shooter table from JSON: " + data.getRpmPoints().size() + " RPM points, " + data.getAnglePoints().size() + " angle points");
+                    System.out.println("Loaded shooter table from persistent file: " + data.getRpmPoints().size() + " RPM points, " + data.getAnglePoints().size() + " angle points");
+                }
+            } else if (deployJsonFile.exists()) {
+                System.out.println("No persistent file found, loading from deploy: " + deployJsonFile.getAbsolutePath());
+                data = ShooterTableData.fromFile(deployJsonFile);
+                migrateOldFormat();
+                saveToJson();
+                if (data.getRpmPoints().isEmpty() && data.getAnglePoints().isEmpty()) {
+                    System.out.println("Loaded shooter table from deploy: " + data.getPoints().size() + " points (old format)");
+                } else {
+                    System.out.println("Loaded shooter table from deploy: " + data.getRpmPoints().size() + " RPM points, " + data.getAnglePoints().size() + " angle points");
                 }
             } else {
-                System.out.println("JSON file not found, using hardcoded defaults");
+                System.out.println("No JSON file found, using hardcoded defaults");
                 data = getDefaultData();
                 migrateOldFormat();
                 saveToJson();
@@ -97,16 +110,8 @@ public class ShooterTableManager {
     
     private ShooterTableData getDefaultData() {
         List<ShooterPoint> points = new ArrayList<>();
-        points.add(new ShooterPoint(1.45, 71, 3300.0));
-        points.add(new ShooterPoint(2.41, 69, 3790.0));
-        points.add(new ShooterPoint(2.71, 64, 3800.0));
-        points.add(new ShooterPoint(3.2, 63, 3900.0));
-        points.add(new ShooterPoint(3.6, 60, 4000.0));
-        points.add(new ShooterPoint(3.8, 58, 4100.0));
-        points.add(new ShooterPoint(4.28, 56, 4200.0));
-        points.add(new ShooterPoint(4.53, 55, 4300.0));
-        points.add(new ShooterPoint(4.63, 54, 4400.0));
-        points.add(new ShooterPoint(5.13, 53, 4500.0));
+        points.add(new ShooterPoint(1.19, 71, 3300.0));
+        points.add(new ShooterPoint(5.74, 53, 4500.0));
         return new ShooterTableData(points);
     }
     
@@ -140,8 +145,8 @@ public class ShooterTableManager {
         lock.readLock().lock();
         try {
             data.toFile(tempFile);
-            Files.move(tempFile.toPath(), jsonFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            System.out.println("Saved shooter table to JSON");
+            Files.move(tempFile.toPath(), persistentJsonFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            System.out.println("Saved shooter table to persistent file: " + persistentJsonFile.getAbsolutePath());
         } catch (IOException e) {
             System.err.println("Error saving shooter table JSON: " + e.getMessage());
             e.printStackTrace();

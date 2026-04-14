@@ -59,6 +59,8 @@ public class TurretSubsystem extends SubsystemBase {
 
     double maxErrorDegrees = 0.0;
 
+    double turretGoal = 0;
+
     // TUNE THIS
     final double K_SPIN = 0.1;
 
@@ -247,12 +249,16 @@ public class TurretSubsystem extends SubsystemBase {
             angleDeg += 360.0;
         }
 
-        angleDeg = MathUtil.clamp(angleDeg, TurretConstants.TURRET_LOWER_LIMIT_DEG, TurretConstants.TURRET_UPPER_LIMIT_DEG);
+        turretGoal = angleDeg = MathUtil.clamp(angleDeg, TurretConstants.TURRET_LOWER_LIMIT_DEG, TurretConstants.TURRET_UPPER_LIMIT_DEG);
 
-        goalAngle = (angleDeg / 360.0) * TurretConstants.TURRET_GEAR_RATIO;
-        closedLoopController.setSetpoint(goalAngle, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        turretGoal = (turretGoal / 360.0) * TurretConstants.TURRET_GEAR_RATIO;
+        closedLoopController.setSetpoint(turretGoal, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
-        SmartDashboard.putNumber("Turret Goal Angle", angleDeg);
+        SmartDashboard.putNumber("Turret Goal Angle", turretGoal);
+    }
+
+    public boolean isTurretDrivingToDeadzone() {
+        return TurretConstants.TURRET_LOWER_LIMIT_DEG > turretGoal || TurretConstants.TURRET_UPPER_LIMIT_DEG < turretGoal;
     }
 
     public double getTurretAngleRads() {

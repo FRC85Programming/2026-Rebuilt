@@ -7,19 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftDoubleSwipe1"
+            "pathName": "4414DoubleSwipeRight1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeftDoubleSwipe2"
+            "pathName": "4414DoubleSwipeRight2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Shooting"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
-  "folder": "Left",
+  "resetOdom": false,
+  "folder": "Right",
   "choreoAuto": false
 }

@@ -32,15 +32,15 @@
     },
     {
       "anchor": {
-        "x": 3.5049666666666663,
+        "x": 3.555375854214123,
         "y": 5.574622222222222
       },
       "prevControl": {
-        "x": 6.098286191706359,
+        "x": 6.148695379253816,
         "y": 5.7915618026030335
       },
       "nextControl": {
-        "x": 2.809885877318117,
+        "x": 2.8602950648655736,
         "y": 5.516476462196862
       },
       "isLocked": false,
@@ -151,7 +151,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Left Double Swipe",
+  "folder": "4414 Double Swipe Left",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -90.9240453527727

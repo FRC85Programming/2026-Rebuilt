@@ -9,6 +9,12 @@
           "data": {
             "pathName": "LeftFeedAuto1"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Shooting"
+          }
         }
       ]
     }

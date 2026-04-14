@@ -176,6 +176,10 @@ public class RobotContainer
 
     NamedCommands.registerCommand("Intake Depot", new SequentialCommandGroup(new InstantCommand(() -> intake.deployIntakeDepot()), new InstantCommand(() -> intake.runRollers())));
 
+    NamedCommands.registerCommand("Stow Intake", new InstantCommand(() -> intake.stowIntake()));
+
+    NamedCommands.registerCommand("Intake Down", new InstantCommand(() -> intake.deployIntake()));
+
     //NamedCommands.registerCommand("Climb", new Climb(ClimberSubsystem));
 
     // Movement commands
@@ -183,18 +187,10 @@ public class RobotContainer
     NamedCommands.registerCommand("DriveToBlueLeftShoot", drivebase.driveToPose(new Pose2d(3.625, 7.406, new Rotation2d(Math.toRadians(180)))));
 
 
-    autoChooser.addOption("LeftDoubleRush", "LeftDoubleRush");
-    autoChooser.addOption("LeftTrenchRush", "LeftTrenchRush");
-    autoChooser.addOption("NewLeftBumpRush", "NewLeftBumpRush");
-    autoChooser.addOption("4414DoubleSwipeLeft", "4414DoubleSwipeLeft");
-    autoChooser.addOption("LeftFeedAuto", "LeftFeedAuto");
-        autoChooser.addOption("NewLeftBumpRush2.0", "NewLeftBumpRush2.0");
-    autoChooser.addOption("3539Left", "3539Left");
-    autoChooser.addOption("Left+Depot", "Left+Depot");
-    autoChooser.addOption("RightDoubleRush", "RightDoubleRush");
-    autoChooser.addOption("RightTrenchRush", "RightTrenchRush");
-    autoChooser.addOption("NewRightBumpRush", "NewRightBumpRush");
-    autoChooser.addOption("Center", "Center");
+    autoChooser.addOption("LEFT 4414 Double Swipe", "4414DoubleSwipeLeft");
+    autoChooser.addOption("LEFT Feed Auto", "LeftFeedAuto");
+    autoChooser.addOption("RIGHT 4414 Double Swipe", "4414DoubleSwipeRight");
+    autoChooser.addOption("CENTER Depot", "Center");
 
     SmartDashboard.putData("Auto Selector", autoChooser);
 
