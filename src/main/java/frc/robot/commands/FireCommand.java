@@ -61,10 +61,12 @@ public class FireCommand extends Command {
             ready = shooter.flywheelAtSpeed(0.95) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turret.getMaxTurretError());
         }
 
+
         SmartDashboard.putBoolean("AIMED", ready);
         SmartDashboard.putBoolean("READY FLYWHEEL", shooter.flywheelAtSpeed(0.95));
         SmartDashboard.putBoolean("READY HOOD", shooter.hoodAtAngle(1));
         SmartDashboard.putBoolean("READY TURRET", turret.turretAtAngle(turret.getMaxTurretError()));
+        SmartDashboard.putNumber("MAX ERROR 2", turret.getMaxTurretError());
 
         if (ready && turret.isSpeedSafeToFire()) {
 

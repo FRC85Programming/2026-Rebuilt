@@ -51,8 +51,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     SparkMaxConfig turretConfig = new SparkMaxConfig();
 
-    private double goalAngle = 0;
-
     private TurretState state = TurretState.IDLE;
     private SwerveSubsystem swerve = null;
     private Supplier<Translation3d> aimTarget = null;
@@ -249,7 +247,7 @@ public class TurretSubsystem extends SubsystemBase {
             angleDeg += 360.0;
         }
 
-        turretGoal = angleDeg = MathUtil.clamp(angleDeg, TurretConstants.TURRET_LOWER_LIMIT_DEG, TurretConstants.TURRET_UPPER_LIMIT_DEG);
+        turretGoal = MathUtil.clamp(angleDeg, TurretConstants.TURRET_LOWER_LIMIT_DEG, TurretConstants.TURRET_UPPER_LIMIT_DEG);
 
         turretGoal = (turretGoal / 360.0) * TurretConstants.TURRET_GEAR_RATIO;
         closedLoopController.setSetpoint(turretGoal, ControlType.kPosition, ClosedLoopSlot.kSlot0);
@@ -289,7 +287,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     public boolean turretAtAngle(double tolerance) {
         double currentDeg = Math.toDegrees(getTurretAngleRads());
-        double goalDeg = (goalAngle / TurretConstants.TURRET_GEAR_RATIO) * 360.0;
+        double goalDeg = (turretGoal / TurretConstants.TURRET_GEAR_RATIO) * 360.0;
+        SmartDashboard.putNumber("current degree 1", currentDeg);
+        SmartDashboard.putNumber("goal degree 1", goalDeg);
         return Math.abs(currentDeg - goalDeg) < tolerance;
     }
 

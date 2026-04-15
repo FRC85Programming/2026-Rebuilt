@@ -110,8 +110,16 @@ public class ShooterTableManager {
     
     private ShooterTableData getDefaultData() {
         List<ShooterPoint> points = new ArrayList<>();
-        points.add(new ShooterPoint(1.19, 71, 3300.0));
-        points.add(new ShooterPoint(5.74, 53, 4500.0));
+        points.add(new ShooterPoint(1.45, 71, 3300.0));
+        points.add(new ShooterPoint(2.41, 69, 3790.0));
+        points.add(new ShooterPoint(2.71, 64, 3800.0));
+        points.add(new ShooterPoint(3.2, 63, 3900.0));
+        points.add(new ShooterPoint(3.6, 60, 4000.0));
+        points.add(new ShooterPoint(3.8, 58, 4100.0));
+        points.add(new ShooterPoint(4.28, 56, 4200.0));
+        points.add(new ShooterPoint(4.53, 55, 4300.0));
+        points.add(new ShooterPoint(4.63, 54, 4400.0));
+        points.add(new ShooterPoint(5.13, 53, 4500.0));
         return new ShooterTableData(points);
     }
     
