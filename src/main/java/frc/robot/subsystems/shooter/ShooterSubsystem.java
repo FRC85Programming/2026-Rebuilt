@@ -30,10 +30,8 @@ import frc.robot.Robot;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import frc.robot.subsystems.turret.TurretSubsystem.TurretState;
 import frc.robot.util.BallisticTrajectory3d;
 import frc.robot.util.ShooterTable;
-import frc.robot.util.ShooterTableManager;
 import frc.robot.util.TimeOfFlightTable;
 import frc.robot.util.TrajectoryTransform3d;
 
@@ -62,6 +60,7 @@ public class ShooterSubsystem extends SubsystemBase {
     double goalAngle = 69;
 
     double flywheelOffset = 0;
+    double hoodOffset = 0;
 
     boolean readyToFire = false;
 
@@ -91,9 +90,9 @@ public class ShooterSubsystem extends SubsystemBase {
                 .i(0)
                 .d(0)
                 .outputRange(-1, 0)
-                .p(0.0005, ClosedLoopSlot.kSlot1)
+                .p(0.00045, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
-                .d(0, ClosedLoopSlot.kSlot1)
+                .d(0.015, ClosedLoopSlot.kSlot1)
                 .outputRange(-1, 0, ClosedLoopSlot.kSlot1)
                 .feedForward
                 .kV(0.0019, ClosedLoopSlot.kSlot1);
@@ -104,9 +103,9 @@ public class ShooterSubsystem extends SubsystemBase {
                 .i(0)
                 .d(0)
                 .outputRange(0, 1)
-                .p(0.0005, ClosedLoopSlot.kSlot1)
+                .p(0.00045, ClosedLoopSlot.kSlot1)
                 .i(0.0, ClosedLoopSlot.kSlot1)
-                .d(0, ClosedLoopSlot.kSlot1)
+                .d(0.015, ClosedLoopSlot.kSlot1)
                 .outputRange(0, 1, ClosedLoopSlot.kSlot1)
                 .feedForward
                 .kV(0.0019, ClosedLoopSlot.kSlot1);
@@ -185,7 +184,8 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Hood Angle", getHoodAngle());
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
         SmartDashboard.putString("Shooter State", state.toString());
-        SmartDashboard.putNumber("Flywheel RPM Offset", flywheelOffset);
+        flywheelOffset = SmartDashboard.getNumber("Flywheel RPM Offset", flywheelOffset);
+        hoodOffset = SmartDashboard.getNumber("Hood Offset ", hoodOffset);
 
         if (SmartDashboard.getBoolean("RESET HOOD", false) == true) {
             hoodMotor.getEncoder().setPosition(0);
@@ -233,14 +233,18 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("CALCULATED TIME OF FLIGHT", timeOfFlight);
 
         double clampedEffectiveDistance = Math.max(effectiveDistance, 0.1);
-        var setpoint = (state == ShooterState.FEEDING)
-            // CHANGE THIS TO FEEDING TABLE ONCE IT IS CREATED
-            ? ShooterTableManager.getInstance().getSetpoint(clampedEffectiveDistance)
-            : ShooterTableManager.getInstance().getSetpoint(clampedEffectiveDistance);
+
+        var setpoint = ShooterTable.getSetpoint(clampedEffectiveDistance);
+        
 
         calculatedRPM = Math.abs(setpoint.flywheelRPM());
         calculatedRPM = calculatedRPM + flywheelOffset;
-        double hoodAngleRad = setpoint.hoodAngle().getRadians();
+        double hoodAngleRad = setpoint.hoodAngle().getRadians() + Math.toRadians(hoodOffset);
+
+        if (state == ShooterState.FEEDING && distance >= 5.5) {
+            calculatedRPM = 6000;
+            hoodAngleRad = Math.toRadians(50);
+        }
 
         setHoodAngle(Math.toDegrees(hoodAngleRad));
 

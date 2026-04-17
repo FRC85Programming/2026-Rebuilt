@@ -158,7 +158,7 @@ public class PoseEstimationSubsystem
           var pose = poseEst.get();
           var bestTarget = pose.targetsUsed.get(0);
           boolean ambiguityOk = bestTarget.getPoseAmbiguity() < 0.1;
-          boolean distanceOk  = bestTarget.getBestCameraToTarget().getTranslation().getNorm() < 3;
+          boolean distanceOk  = bestTarget.getBestCameraToTarget().getTranslation().getNorm() < 4;
           if (ambiguityOk && distanceOk) {
             swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                               pose.timestampSeconds,

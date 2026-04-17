@@ -32,9 +32,9 @@ import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.leds.LEDSubsystem.Animation;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
-import frc.robot.subsystems.webserver.WebServer;
+//import frc.robot.subsystems.webserver.WebServer;
 import frc.robot.util.BallFieldGenerator;
-import frc.robot.util.ShooterTableManager;
+//import frc.robot.util.ShooterTableManager;
 
 import java.io.File;
 import java.sql.Driver;
@@ -67,7 +67,7 @@ public class RobotContainer
 
   private final LEDSubsystem leds = new LEDSubsystem();
 
-  private final WebServer webServer = new WebServer();
+  //private final WebServer webServer = new WebServer();
 
   boolean isRedAlliance = false;
 
@@ -135,7 +135,7 @@ public class RobotContainer
    */
   public RobotContainer()
   {
-    ShooterTableManager.getInstance();
+    //ShooterTableManager.getInstance();
     
     balls = gen.getBalls();
 
@@ -191,6 +191,7 @@ public class RobotContainer
     autoChooser.addOption("LEFT Feed Auto", "LeftFeedAuto");
     autoChooser.addOption("RIGHT 4414 Double Swipe", "4414DoubleSwipeRight");
     autoChooser.addOption("CENTER Depot", "Center");
+    autoChooser.addOption("CENTER Preload Center", "PreloadCenter");
 
     SmartDashboard.putData("Auto Selector", autoChooser);
 
@@ -198,9 +199,14 @@ public class RobotContainer
     SmartDashboard.putBoolean("RED LEFT RESET", false);
     SmartDashboard.putBoolean("BLUE LEFT RESET", false);
     SmartDashboard.putBoolean("BLUE RIGHT RESET", false);
+    SmartDashboard.putBoolean("BLUE CENTER RESET", false);
+    SmartDashboard.putBoolean("RED CENTER RESET", false);
+    SmartDashboard.putBoolean("RED HUB RESET", false);
+    SmartDashboard.putBoolean("BLUE HUB RESET", false);
     SmartDashboard.putBoolean("RESET QUEST TO VISION", false);
     SmartDashboard.putNumber("FF", 0.2);
-
+    SmartDashboard.putNumber("Flywheel RPM Offset", 0);
+    SmartDashboard.putNumber("Hood Offset ", 0);
     SmartDashboard.putNumber("SPIN FACTOR", 0.0);
 
     for (var i = 0; i < getTestBalls().length; i++) {
@@ -258,12 +264,15 @@ public class RobotContainer
     {
       // TODO: Configure this pose to a better position/use apriltags
       //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.690, 7.377, new Rotation2d(0)))));
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(11.905, 5.039, new Rotation2d(0)))));
       /*driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
               shooter.startManualShooting(drivebase);
               turret.startManualShooting(drivebase);
           }));*/
-      driverXbox.leftBumper().whileTrue(new InstantCommand(() -> shooter.testMotorFeedforward(SmartDashboard.getNumber("FF", 0.2))));
+      driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
+              shooter.startManualShooting(drivebase);
+              turret.startManualShooting(drivebase);
+          }));
 
       driverXbox.pov(90).onTrue(Commands.runOnce(() -> {
               shooter.startManualFeeding(drivebase);

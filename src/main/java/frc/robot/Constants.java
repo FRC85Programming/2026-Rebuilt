@@ -95,10 +95,14 @@ public final class Constants
       public static final Translation2d blueLeftEnterAllianceZonePose = new Translation2d(5.825, 7.500);
       public static final Translation2d blueRightEnterAllianceZonePose = new Translation2d(5.825, 0.600);
 
-      public static final Pose2d BLUE_LEFT_START_POSE = new Pose2d(3.690, 7.377, new Rotation2d(0));
-      public static final Pose2d BLUE_RIGHT_START_POSE = new Pose2d(3.703, 0.587, new Rotation2d(0));
-      public static final Pose2d RED_RIGHT_START_POSE = new Pose2d(12.821, 7.407, new Rotation2d(Math.PI));
-      public static final Pose2d RED_LEFT_START_POSE = new Pose2d(12.821, 0.644, new Rotation2d(Math.PI));
+      public static final Pose2d BLUE_LEFT_START_POSE = new Pose2d(4.324, 7.465, new Rotation2d(Math.toRadians(-90)));
+      public static final Pose2d BLUE_RIGHT_START_POSE = new Pose2d(4.324, 0.654, new Rotation2d(Math.toRadians(90)));
+      public static final Pose2d RED_RIGHT_START_POSE = new Pose2d(12.217, 7.465, new Rotation2d(Math.toRadians(-90)));
+      public static final Pose2d RED_LEFT_START_POSE = new Pose2d(12.217, 0.624, new Rotation2d(Math.toRadians(90)));
+      public static final Pose2d BLUE_CENTER_STARTING_POSE = new Pose2d(3.622, 4.970, new Rotation2d(Math.toRadians(180)));
+      public static final Pose2d RED_CENTER_STARTING_POSE = new Pose2d(12.889, 3.080, new Rotation2d(Math.toRadians(0)));
+      public static final Pose2d BLUE_HUB_STARTING_POSE = new Pose2d(3.583, 3.996, new Rotation2d(Math.toRadians(180)));
+      public static final Pose2d RED_HUB_STARTING_POSE = new Pose2d(12.967, 4.016, new Rotation2d(Math.toRadians(0)));
 
       /**
        * X boundary near the blue alliance structure. When the robot is below this

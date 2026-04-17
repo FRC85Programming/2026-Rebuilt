@@ -58,7 +58,7 @@ public class FireCommand extends Command {
         if (turret.getState() == TurretState.FEEDING) {
             ready = shooter.flywheelAtSpeed(0.60);
         } else {
-            ready = shooter.flywheelAtSpeed(0.95) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turret.getMaxTurretError());
+            ready = shooter.flywheelAtSpeed(0.98) && shooter.hoodAtAngle(1) && turret.turretAtAngle(turret.getMaxTurretError());
         }
 
 
@@ -69,7 +69,6 @@ public class FireCommand extends Command {
         SmartDashboard.putNumber("MAX ERROR 2", turret.getMaxTurretError());
 
         if (ready && turret.isSpeedSafeToFire()) {
-
             indexer.startIndexing();
 
             // TODO: Test to see if this improves fire rate
