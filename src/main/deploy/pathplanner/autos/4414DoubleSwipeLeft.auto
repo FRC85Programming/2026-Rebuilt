@@ -15,18 +15,24 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.7
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Start Shooting"
                 }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 4.0
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Shooting"
           }
         },
         {

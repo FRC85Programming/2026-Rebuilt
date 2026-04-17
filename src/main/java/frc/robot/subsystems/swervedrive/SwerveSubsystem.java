@@ -243,14 +243,6 @@ public class SwerveSubsystem extends SubsystemBase
 
       resetOdometry(FieldConstants.RED_RIGHT_START_POSE);
       SmartDashboard.putBoolean("RED RIGHT RESET", false);
-    } else if (SmartDashboard.getBoolean("BLUE CENTER RESET", false)) {
-
-      resetOdometry(FieldConstants.BLUE_CENTER_STARTING_POSE);
-      SmartDashboard.putBoolean("BLUE CENTER RESET", false);
-    } else if (SmartDashboard.getBoolean("RED CENTER RESET", false)) {
-
-      resetOdometry(FieldConstants.RED_CENTER_STARTING_POSE);
-      SmartDashboard.putBoolean("RED CENTER RESET", false);
     } else if (SmartDashboard.getBoolean("RED HUB RESET", false)) {
 
       resetOdometry(FieldConstants.RED_HUB_STARTING_POSE);

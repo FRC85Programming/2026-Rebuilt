@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "Center2"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Start Shooting"
@@ -19,7 +25,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "Center",
   "choreoAuto": false
 }
