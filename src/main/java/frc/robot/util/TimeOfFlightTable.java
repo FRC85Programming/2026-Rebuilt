@@ -8,11 +8,11 @@ public class TimeOfFlightTable {
 
   static {
     // Low variance - Good results :)
-    tofMap.put(1.75, 2.0); 
-    tofMap.put(2.78, 2.37); 
-    tofMap.put(3.76, 2.12); 
-    tofMap.put(4.73, 2.2); 
-    tofMap.put(5.6, 2.29); 
+    tofMap.put(1.75, 1.6); 
+    tofMap.put(2.78, 1.7); 
+    tofMap.put(3.76, 1.8); 
+    tofMap.put(4.73, 1.7); 
+    tofMap.put(5.6, 1.6); 
   }
 
   public static Double getTimeOfFlight(double distanceMeters) {

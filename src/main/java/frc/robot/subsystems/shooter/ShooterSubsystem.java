@@ -184,6 +184,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Hood Angle", getHoodAngle());
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
         SmartDashboard.putString("Shooter State", state.toString());
+        SmartDashboard.putNumber("Flywheel RPM Offset", flywheelOffset);
         flywheelOffset = SmartDashboard.getNumber("Flywheel RPM Offset", flywheelOffset);
         hoodOffset = SmartDashboard.getNumber("Hood Offset ", hoodOffset);
 
@@ -238,7 +239,7 @@ public class ShooterSubsystem extends SubsystemBase {
         
 
         calculatedRPM = Math.abs(setpoint.flywheelRPM());
-        calculatedRPM = calculatedRPM + flywheelOffset;
+        calculatedRPM = calculatedRPM * (1+(flywheelOffset*.01));
         double hoodAngleRad = setpoint.hoodAngle().getRadians() + Math.toRadians(hoodOffset);
 
         if (state == ShooterState.FEEDING && distance >= 5.5) {
@@ -405,11 +406,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void increaseFlywheelOffset() {
-        flywheelOffset += 50;
+        flywheelOffset += 1;
     }
 
     public void decreaseFlywheelOffset() {
-        flywheelOffset -= 50;
+        flywheelOffset -= 1;
     }
 
     // TODO: Run this with different speeds, use as flywheel feedforward values
