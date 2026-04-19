@@ -279,10 +279,10 @@ public class RobotContainer
               turret.startManualFeeding(drivebase);
           }));
 
-      driverXbox.pov(270).onTrue(new InstantCommand(() -> shooter.decreaseFlywheelOffset()));
+      driverXbox.pov(270).onTrue(new InstantCommand(() -> shooter.decreaseDistanceOffset()));
       driverXbox.pov(0).onTrue(new InstantCommand(() -> intake.setRollerSpeed(-0.5)));
       driverXbox.pov(0).onFalse(new InstantCommand(() -> intake.setRollerSpeed(0.0)));
-      driverXbox.y().onTrue(new InstantCommand(() -> shooter.increaseFlywheelOffset()));
+      driverXbox.y().onTrue(new InstantCommand(() -> shooter.increaseDistanceOffset()));
 
       // Right Trigger - Shoot based on current mode
       driverXbox.rightTrigger().whileTrue(new FireCommand(drivebase, shooter, indexer, turret, intake, leds));

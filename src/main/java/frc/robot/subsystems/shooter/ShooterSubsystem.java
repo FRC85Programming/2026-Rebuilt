@@ -59,7 +59,7 @@ public class ShooterSubsystem extends SubsystemBase {
     double goalRpm = 0.0;
     double goalAngle = 69;
 
-    double flywheelOffset = 0;
+    double distanceOffset = 0;
     double hoodOffset = 0;
 
     boolean readyToFire = false;
@@ -184,8 +184,8 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Hood Angle", getHoodAngle());
         SmartDashboard.putNumber("Hood Goal Angle", goalAngle);
         SmartDashboard.putString("Shooter State", state.toString());
-        SmartDashboard.putNumber("Flywheel RPM Offset", flywheelOffset);
-        flywheelOffset = SmartDashboard.getNumber("Flywheel RPM Offset", flywheelOffset);
+        SmartDashboard.putNumber("Flywheel RPM Offset", distanceOffset);
+        distanceOffset = SmartDashboard.getNumber("DISTANCE Offset", distanceOffset);
         hoodOffset = SmartDashboard.getNumber("Hood Offset ", hoodOffset);
 
         if (SmartDashboard.getBoolean("RESET HOOD", false) == true) {
@@ -230,16 +230,16 @@ public class ShooterSubsystem extends SubsystemBase {
             timeOfFlight = TimeOfFlightTable.getTimeOfFlight(Math.max(effectiveDistance, 0.1));
             effectiveDistance = distance - (radialVel * timeOfFlight);
         }
+        effectiveDistance = effectiveDistance * (1+(distanceOffset*.01));
 
         SmartDashboard.putNumber("CALCULATED TIME OF FLIGHT", timeOfFlight);
+        SmartDashboard.putNumber("E DISTANCE", effectiveDistance);
 
         double clampedEffectiveDistance = Math.max(effectiveDistance, 0.1);
 
         var setpoint = ShooterTable.getSetpoint(clampedEffectiveDistance);
-        
 
         calculatedRPM = Math.abs(setpoint.flywheelRPM());
-        calculatedRPM = calculatedRPM * (1+(flywheelOffset*.01));
         double hoodAngleRad = setpoint.hoodAngle().getRadians() + Math.toRadians(hoodOffset);
 
         if (state == ShooterState.FEEDING && distance >= 5.5) {
@@ -405,12 +405,12 @@ public class ShooterSubsystem extends SubsystemBase {
         flywheelMotorRight.set(-speed);
     }
 
-    public void increaseFlywheelOffset() {
-        flywheelOffset += 1;
+    public void increaseDistanceOffset() {
+        distanceOffset += 10;
     }
 
-    public void decreaseFlywheelOffset() {
-        flywheelOffset -= 1;
+    public void decreaseDistanceOffset() {
+        distanceOffset -= 10;
     }
 
     // TODO: Run this with different speeds, use as flywheel feedforward values
