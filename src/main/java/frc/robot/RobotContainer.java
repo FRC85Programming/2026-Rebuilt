@@ -136,6 +136,8 @@ public class RobotContainer
     //vision.setPoseSupplier(drivebase::getPose);
 
     configureBindings();
+    shooter.startManualShooting(drivebase);
+    turret.startManualShooting(drivebase);
     DriverStation.silenceJoystickConnectionWarning(true);
 
     // Basic intaking command (same as the one bound to a button)
@@ -254,16 +256,16 @@ public class RobotContainer
       // TODO: Configure this pose to a better position/use apriltags
       //driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(0.368, 6.000, new Rotation2d(0)))));
       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3.690, 7.377, new Rotation2d(0)))));
-      /*driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
+      driverXbox.leftBumper().onTrue(Commands.runOnce(() -> {
               shooter.startManualShooting(drivebase);
               turret.startManualShooting(drivebase);
-          }));*/
-      driverXbox.leftBumper().whileTrue(new InstantCommand(() -> shooter.testMotorFeedforward(SmartDashboard.getNumber("FF", 0.2))));
-
-      driverXbox.pov(90).onTrue(Commands.runOnce(() -> {
-              shooter.startManualFeeding(drivebase);
-              turret.startManualFeeding(drivebase);
           }));
+      //driverXbox.leftBumper().whileTrue(new InstantCommand(() -> shooter.testMotorFeedforward(SmartDashboard.getNumber("FF", 0.2))));
+
+      // driverXbox.pov(90).onTrue(Commands.runOnce(() -> {
+      //         shooter.startManualFeeding(drivebase);
+      //         turret.startManualFeeding(drivebase);
+      //     }));
 
       driverXbox.pov(270).onTrue(new InstantCommand(() -> shooter.decreaseFlywheelOffset()));
       driverXbox.pov(0).onTrue(new InstantCommand(() -> intake.setRollerSpeed(-0.5)));
@@ -275,7 +277,7 @@ public class RobotContainer
 
       // Left Trigger - Intake
       driverXbox.leftTrigger().whileTrue(new Intake(intake, leds));
-      driverXbox.rightBumper().onTrue(new InstantCommand(() -> intake.toggleStowedUp()));
+      driverXbox.rightBumper().onTrue(new InstantCommand(() -> {intake.toggleStowedUp(); shooter.stopAiming();}));
 
       // X - Switch shooter to idle mode
       driverXbox.x().onTrue(Commands.runOnce(() -> {
@@ -284,10 +286,10 @@ public class RobotContainer
           }));
 
       // B - Start aiming in case of failure to auto init
-      driverXbox.b().onTrue(Commands.runOnce(() -> {
-              shooter.startAiming(drivebase, () -> getTarget());
-              turret.startAiming(drivebase, () -> getTarget());
-          }));
+      // driverXbox.b().onTrue(Commands.runOnce(() -> {
+      //         shooter.startAiming(drivebase, () -> getTarget());
+      //         turret.startAiming(drivebase, () -> getTarget());
+      //     }));
 
       // A - Start feeding mode
       driverXbox.a().onTrue(Commands.runOnce(() -> {
@@ -313,10 +315,10 @@ public class RobotContainer
                          && x < Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP;
         return inTrench && (inBlueBox || inRedBox);
       });
-      inIdleZone.onTrue(Commands.runOnce(() -> {
-        shooter.stopAiming();
-        turret.stopAiming();
-      }));
+      // inIdleZone.onTrue(Commands.runOnce(() -> {
+      //   shooter.stopAiming();
+      //   turret.stopAiming();
+      // }));
 
       // Re-activate aiming when the robot crosses into the alliance from the idle box.
       Trigger inAllianceZone = new Trigger(() -> {
@@ -330,11 +332,11 @@ public class RobotContainer
         boolean inRedAlliance  = x > Constants.FieldConstants.SHOOTER_IDLE_ZONE_RED_TOP;
         return inTrench && (inBlueAlliance || inRedAlliance);
       });
-      inAllianceZone.onTrue(Commands.runOnce(() -> {
-        shooter.startAiming(drivebase, () -> getTarget());
-        turret.startAiming(drivebase, () -> getTarget());
-        new InstantCommand(() -> new FireCommand(drivebase, shooter, indexer, turret, intake, leds));
-      }));
+      // inAllianceZone.onTrue(Commands.runOnce(() -> {
+      //   shooter.startAiming(drivebase, () -> getTarget());
+      //   turret.startAiming(drivebase, () -> getTarget());
+      //   new InstantCommand(() -> new FireCommand(drivebase, shooter, indexer, turret, intake, leds));
+      // }));
     }
   }
 
