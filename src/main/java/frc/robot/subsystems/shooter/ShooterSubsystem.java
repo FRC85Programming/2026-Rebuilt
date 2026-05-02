@@ -290,8 +290,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void startManualShooting(SwerveSubsystem swerve) {
         this.swerve = swerve;
-        setHoodAngle(67);
-        calculatedRPM = 4015;
+        setHoodAngle(75);
+        calculatedRPM = 3996;
         this.state = ShooterState.MANUALSHOOT;
     }
 

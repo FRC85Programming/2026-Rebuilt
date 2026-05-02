@@ -222,7 +222,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void startManualShooting(SwerveSubsystem swerve) {
         this.swerve = swerve;
-        setTurretAngle(0);
+        setTurretAngle(200);
         this.state = TurretState.MANUALSHOOT;
     }
 
