@@ -273,7 +273,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
     /** Return to IDLE state and stop auto-tracking. Clears trajectory visualization. */
     public void stopAiming() {
-        this.state = ShooterState.IDLE;
+        if (this.state != ShooterState.MANUALSHOOT)
+        {
+            this.state = ShooterState.IDLE;
+        }
+        
         this.aimTarget = null;
         this.swerve = null;
         this.calculatedRPM = 0.0;

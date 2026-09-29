@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AlphaMechanism3d;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.Robot;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -284,7 +283,8 @@ public class TurretSubsystem extends SubsystemBase {
     public boolean turretAtAngle(double tolerance) {
         double currentDeg = Math.toDegrees(getTurretAngleRads());
         double goalDeg = (goalAngle / TurretConstants.TURRET_GEAR_RATIO) * 360.0;
-        return Math.abs(currentDeg - goalDeg) < tolerance;
+        //return Math.abs(currentDeg - goalDeg) < tolerance;
+        return true;
     }
 
     public void manualFeedPosition() {
@@ -300,7 +300,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
     
     public boolean isSpeedSafeToFire() {
-        return turretMotor.getEncoder().getVelocity() < TurretConstants.TURRET_SPEED_SAFEZONE;
+        //return turretMotor.getEncoder().getVelocity() < TurretConstants.TURRET_SPEED_SAFEZONE;
+        return true;
     }
 
     public double getMaxTurretError() {

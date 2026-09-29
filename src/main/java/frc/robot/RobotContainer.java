@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.FireCommand;
 import frc.robot.commands.Intake;
-import frc.robot.commands.TuneShot;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -35,7 +34,6 @@ import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.util.BallFieldGenerator;
 
 import java.io.File;
-import java.sql.Driver;
 import java.util.Optional;
 
 import swervelib.SwerveInputStream;
@@ -136,8 +134,7 @@ public class RobotContainer
     //vision.setPoseSupplier(drivebase::getPose);
 
     configureBindings();
-    shooter.startManualShooting(drivebase);
-    turret.startManualShooting(drivebase);
+    setManualStuff();
     DriverStation.silenceJoystickConnectionWarning(true);
 
     // Basic intaking command (same as the one bound to a button)
@@ -206,6 +203,12 @@ public class RobotContainer
     for (var i = 0; i < getTestBalls().length; i++) {
       //SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(getTestBalls()[i]));
     }
+  }
+
+  public void setManualStuff()
+  {
+    shooter.startManualShooting(drivebase);
+    turret.startManualShooting(drivebase);
   }
 
   /**
