@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.util.FieldObstacleAligner;
-import frc.robot.subsystems.odometry.PoseEstimationSubsystem;
 import frc.robot.subsystems.odometry.QuestNavSubsystem;
 import frc.robot.subsystems.odometry.QuestResult;
 import gg.questnav.questnav.PoseFrame;
@@ -86,7 +85,6 @@ public class SwerveSubsystem extends SubsystemBase
 
   private QuestNavSubsystem questNav = new QuestNavSubsystem();
 
-  private PoseEstimationSubsystem visionPoseEstimator;
 
   PoseFrame[] questFrames;
 
@@ -146,14 +144,8 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
-    visionPoseEstimator = new PoseEstimationSubsystem(swerveDrive::getPose, swerveDrive.field);
-
-    if (visionDriveTest)
-    {
-      setupPhotonVision();
-      // Stop the odometry thread if we are using vision that way we can synchronize updates better.
-      swerveDrive.stopOdometryThread();
-    }
+    
+      // Stop 
     setupPathPlanner();
     //RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
 
@@ -212,15 +204,10 @@ public class SwerveSubsystem extends SubsystemBase
             fieldQuest.setRobotPose(result.getPose().toPose2d());
             SmartDashboard.putData("QuestField", fieldQuest);
         }
-      } else {
-        visionPoseEstimator.updatePoseEstimation(swerveDrive);
       }
     }
 
-    if (SmartDashboard.getBoolean("RESET QUEST TO VISION", false)) {
-      questNav.setPose(visionPoseEstimator.getLastEstimatedVisionPose());
-      SmartDashboard.putBoolean("RESET QUEST TO VISION", false);
-    }
+    
 
     Logger.recordOutput("Odometry/Robot", new Pose3d(getPose()));
 
