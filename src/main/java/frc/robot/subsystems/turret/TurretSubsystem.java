@@ -61,6 +61,8 @@ public class TurretSubsystem extends SubsystemBase {
     // TUNE THIS
     final double K_SPIN = 0.1;
 
+    private boolean _enableTurret;
+
     public TurretSubsystem() {
         isSim = Robot.isSimulation();
 
@@ -100,6 +102,7 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("TOLERANCE", 9);
         SmartDashboard.getNumber("FEED TOLERANCE", 25);
         SmartDashboard.putBoolean("RESET TURRET", false);
+        SmartDashboard.putBoolean("Enable Turret", _enableTurret);
     }
 
     @Override
@@ -120,6 +123,8 @@ public class TurretSubsystem extends SubsystemBase {
             turretMotor.getEncoder().setPosition(0);
             SmartDashboard.putBoolean("RESET TURRET", false);
         }
+
+        _enableTurret = SmartDashboard.getBoolean("Enable Turret", _enableTurret);
     }
 
     // FIXED FOR  ROTATIONAL VELOCITY
@@ -249,7 +254,10 @@ public class TurretSubsystem extends SubsystemBase {
         turretGoal = MathUtil.clamp(angleDeg, TurretConstants.TURRET_LOWER_LIMIT_DEG, TurretConstants.TURRET_UPPER_LIMIT_DEG);
 
         turretGoal = (turretGoal / 360.0) * TurretConstants.TURRET_GEAR_RATIO;
-        closedLoopController.setSetpoint(turretGoal, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        
+        if (_enableTurret) {
+            closedLoopController.setSetpoint(turretGoal, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        }
 
         SmartDashboard.putNumber("Turret Goal Angle", turretGoal);
     }
@@ -263,10 +271,6 @@ public class TurretSubsystem extends SubsystemBase {
             return turretSim.getTurretAngleRads();
         }
         return (turretMotor.getEncoder().getPosition() / TurretConstants.TURRET_GEAR_RATIO) * (Math.PI * 2);
-    }
-
-    public void setTurretSpeed(double speed) {
-        turretMotor.set(speed);
     }
 
     public void updateLogging() {
@@ -301,7 +305,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public double getTurretSetpointRadians() {
-        return (closedLoopController.getSetpoint() / TurretConstants.TURRET_GEAR_RATIO) * (Math.PI * 2);
+        return (turretGoal / TurretConstants.TURRET_GEAR_RATIO) * (Math.PI * 2);
     }
     
     public boolean isSpeedSafeToFire() {
