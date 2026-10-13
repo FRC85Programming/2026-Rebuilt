@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.FireCommand;
 import frc.robot.commands.Intake;
-import frc.robot.commands.TuneShot;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -37,7 +36,6 @@ import frc.robot.util.BallFieldGenerator;
 //import frc.robot.util.ShooterTableManager;
 
 import java.io.File;
-import java.sql.Driver;
 import java.util.Optional;
 
 import swervelib.SwerveInputStream;
