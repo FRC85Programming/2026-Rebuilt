@@ -143,7 +143,7 @@ public class IndexerSubsystem extends SubsystemBase {
      */
     public void stopIndexing() {
         enterAgitateState();
-        beltMotor.set(0);
+        beltMotor.set(0.2);
     }
 
     /**
